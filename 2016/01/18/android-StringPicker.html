@@ -5,8 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
 <!--[if lte IE 9]><meta http-equiv="refresh" content="0;url=/ie.html"><![endif]-->
 
-<title>博客首页 | 落风的博客</title>
+<title>NumberPicker与StringPicker | 落风的博客</title>
 <meta name="author" content="落风">
+
+  <meta name="keywords" content="StringPicker与NumberPicker">
 
 
 
@@ -62,23 +64,51 @@
     <div id="post">
       <div id="pjax">
         <article id="post__content">
-  <h1 id="post__title" data-identifier="">博客首页</h1>
-  <h2 id="section">前言</h2>
-
-<blockquote>
-  <p>很多时候,自己会有一些有趣的想法但是却得不到很好的表达。更有些时候，自己产生了一些星星片片的灵感,没有很好的释放,最终却流于记忆。知道自己不擅长表达和写作,却常常有这方面的冲动，最终留下遗憾。</p>
+  <h1 id="post__title" data-identifier="20160118">NumberPicker与StringPicker</h1>
+  <blockquote>
+  <p>NumberPicker是一款开源的控件，被收入goole的android包里面，原本我以为它不支持不连续的数字组合，后来找到了StringPicker看了它的源码才知道里面用的也是NumberPicker。</p>
 </blockquote>
 
-<p>我是一个随性的人，喜欢也就是喜欢瞎折腾，但是却嫌麻烦，所以至今以来很少写过博客，之前偶然看到别人在github上的博客，觉得风格简约，正是我喜欢的类型。所以便想自己也做一个，现在fork了别人的模板，正在做最后的改动，却突然发现自己做着做着便完全把它当成一个技术的工作来做了，网页前端懂得少，改着吃力，便想一步一步的往里面走，只想了解的更多而忘了自己的初衷-写作。所以，今天我决定提前开始我的写作之路。我想这对于一个程序员也是至关重要的一步。</p>
+<p>StringPicker里面用反射获取了并调用了setDisplayedValues的方法：</p>
 
-<p><strong>我要学会记录,亦要学会表达</strong></p>
+<pre><code>	try {
+            mClazz.getMethod("setMaxValue", int.class).invoke(mInstance, values.length - 1);
+            mClazz.getMethod("setMinValue", int.class).invoke(mInstance, 0);
+            mClazz.getMethod("setDisplayedValues", String[].class).invoke(mInstance, new Object[]{values});
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
+</code></pre>
+
+<p>用来设置进去一个字符串数组。<br />
+因为setDisplayedValues这个方法并不是私有的所以可以直接调用修改，但是经过初步尝试，嵌入在dialog中的NumberPicker在构造方法中实例化后不能直接调用setDisplayedValues传入数组对其进行赋值操作。在这一步只能通过设置大小极值来获得一个连续区间，同时调用的setDisplayedValues不会起作用。必须将这一步作为一个方法分离，分开调用才能得到StringPicker的效果。</p>
+
+<p>这时，setValue和getValue的值需要在dialog中进行转换，因为NumberPicker可以直接传入和获取数字，但此时setValue传入的值需要转换成values数组对应元素的序号，同理getValue也是从NumberPicker中获取的序号，需要转化成values中对应的元素。</p>
+
+<p>单独分离的setValues方法:mElseNum是一个不连续的String数组，作为一个连续数字区间的额外补充。</p>
+
+<pre><code>public void setValues(){
+    values = new String[mMax-mMin+mElseNum.length+1];
+    for (int i=0;i&lt;mMax-mMin+mElseNum.length+1;i++){
+        if(mMin+i&lt;=mMax){
+            values[i] = String.valueOf(mMin+i);
+        }else{
+            values[i] = String.valueOf(mElseNum[i-(mMax-mMin)-1]);
+        }
+    }
+    numberPickerView.setMaxValue(mMax + mElseNum.length - mMin);
+    numberPickerView.setMinValue(0);
+    numberPickerView.setDisplayedValues(values);
+    numberPickerView.setValue(currentValue);
+}
+</code></pre>
 
 </article> <!-- end #post__content -->
 
 <div id="post__share">
-  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/&text=博客首页" target="_blank"></a>
+  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/01/18/android-StringPicker.html&text=NumberPicker与StringPicker" target="_blank"></a>
   <a id="icon-cc" class="fontello" href="http://creativecommons.org/licenses/by-nc-sa/3.0" target="_blank"></a>
-  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/&title=博客首页" target="_blank"></a>
+  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/01/18/android-StringPicker.html&title=NumberPicker与StringPicker" target="_blank"></a>
 </div> <!-- end #post__share -->
 <div id="disqus_thread" name="luofeng">
   <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>

@@ -1,0 +1,418 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0">
+  <channel>
+    <title>落风的博客</title>
+    <link>http://www.liuschen.com</link>
+    <description>落风的博客</description>
+    
+      <item>
+        <title>listview焦点冲突</title>
+        <link>http://www.liuschen.com/2016/01/18/listview-focus.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2016/01/18/listview-focus.html</guid>
+        <pubDate>Mon, 18 Jan 2016 00:00:00 +0800</pubDate>
+        <description>&lt;p&gt;listView中经常出现焦点冲突问题，导致Item不可点击，解决方法是在条目Item的跟布局添加如下属性:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;android:descendantFocusability=&quot;blocksDescendants&quot; 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;该属性有3个值:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;	beforeDescendants：viewgroup会优先其子类控件而获取到焦点
+
+    afterDescendants：viewgroup只有当其子类控件不需要获取焦点时才获取焦点
+
+    blocksDescendants：viewgroup会覆盖子类控件而直接获得焦点
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;而在StringPicker中除了对NumberPicker中&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;mClazz.getMethod(&quot;setMaxValue&quot;, int.class).invoke(mInstance, values.length - 1);
+mClazz.getMethod(&quot;setMinValue&quot;, int.class).invoke(mInstance, 0);
+mClazz.getMethod(&quot;setDisplayedValues&quot;, String[].class).invoke(mInstance, new Object[]{values});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;还有setValue和getValue进行反射调用外，就是对这个属性的设置&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;setDescendantFocusability
+值为:
+NumberPicker.FOCUS_BLOCK_DESCENDANTS
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+      </item>
+    
+      <item>
+        <title>NumberPicker与StringPicker</title>
+        <link>http://www.liuschen.com/2016/01/18/android-StringPicker.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2016/01/18/android-StringPicker.html</guid>
+        <pubDate>Mon, 18 Jan 2016 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;NumberPicker是一款开源的控件，被收入goole的android包里面，原本我以为它不支持不连续的数字组合，后来找到了StringPicker看了它的源码才知道里面用的也是NumberPicker。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;StringPicker里面用反射获取了并调用了setDisplayedValues的方法：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;	try {
+            mClazz.getMethod(&quot;setMaxValue&quot;, int.class).invoke(mInstance, values.length - 1);
+            mClazz.getMethod(&quot;setMinValue&quot;, int.class).invoke(mInstance, 0);
+            mClazz.getMethod(&quot;setDisplayedValues&quot;, String[].class).invoke(mInstance, new Object[]{values});
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;用来设置进去一个字符串数组。&lt;br /&gt;
+因为setDisplayedValues这个方法并不是私有的所以可以直接调用修改，但是经过初步尝试，嵌入在dialog中的NumberPicker在构造方法中实例化后不能直接调用setDisplayedValues传入数组对其进行赋值操作。在这一步只能通过设置大小极值来获得一个连续区间，同时调用的setDisplayedValues不会起作用。必须将这一步作为一个方法分离，分开调用才能得到StringPicker的效果。&lt;/p&gt;
+
+&lt;p&gt;这时，setValue和getValue的值需要在dialog中进行转换，因为NumberPicker可以直接传入和获取数字，但此时setValue传入的值需要转换成values数组对应元素的序号，同理getValue也是从NumberPicker中获取的序号，需要转化成values中对应的元素。&lt;/p&gt;
+
+&lt;p&gt;单独分离的setValues方法:mElseNum是一个不连续的String数组，作为一个连续数字区间的额外补充。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;public void setValues(){
+    values = new String[mMax-mMin+mElseNum.length+1];
+    for (int i=0;i&amp;lt;mMax-mMin+mElseNum.length+1;i++){
+        if(mMin+i&amp;lt;=mMax){
+            values[i] = String.valueOf(mMin+i);
+        }else{
+            values[i] = String.valueOf(mElseNum[i-(mMax-mMin)-1]);
+        }
+    }
+    numberPickerView.setMaxValue(mMax + mElseNum.length - mMin);
+    numberPickerView.setMinValue(0);
+    numberPickerView.setDisplayedValues(values);
+    numberPickerView.setValue(currentValue);
+}
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+      </item>
+    
+      <item>
+        <title>Androidstudio下jni的一些问题</title>
+        <link>http://www.liuschen.com/2016/01/15/NDK.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2016/01/15/NDK.html</guid>
+        <pubDate>Fri, 15 Jan 2016 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;android NDK 支持纯jni的方式构建app&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;此处是AndroidStudio下构建jni程序方法，通用&lt;/p&gt;
+
+&lt;p&gt;成功运行程序后，可以逐渐接触jni代码了。和熟悉AndroidStudio的过程一样，对工具的使用都是一个慢慢累积的过程。&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;试着将NDK android-ndk-r10e\samples下的代码在androidstudio下跑，果然没那么顺利。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;运行的是native-activity这个项目，遇到了如下错误:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;F:\androidstudio\JNIActivity\app\src\main\jni\main.c
+Error:(27, 37) android_native_app_glue.h: No such file or directory
+compilation terminated.
+make.exe: *** [F:\androidstudio\JNIActivity\app\build\intermediates\ndk\debug\obj/local/arm64-v8a/objs/jniLibs/F_\androidstudio\JNIActivity\app\src\main\jni\main.o] Error 1
+Error:Execution failed for task &#39;:app:compileDebugNdk&#39;.
+&amp;gt; com.android.ide.common.process.ProcessException: org.gradle.process.internal.ExecException: Process &#39;command &#39;F:\BaiduYunDownload\android-ndk-r10e\ndk-build.cmd&#39;&#39; finished with non-zero exit value 2
+Information:BUILD FAILED
+Information:Total time: 0.89 secs
+Information:2 errors
+Information:0 warnings
+Information:See complete output in console
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;网上大部分都是说在Android.mk文件里少了&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;include $(BUILD_SHARED_LIBRARY)
+$(call import-module,android/native_app_glue)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;但我是拷贝的文件里面是有的，并且在已经通过编译的项目中加上上述依赖并引用该库依然没有通过编译。&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;所以要找突破口&lt;br /&gt;
+1.Android.mk是Android提供的一种makefile文件，多个模块的项目每个目录中定义对应的Android.mk文件（类似于上面的写法）， &lt;br /&gt;
+最后，在根目录放置一个Android.mk文件,需要先明白里面变量的意义:&lt;a href=&quot;http://blog.csdn.net/ly131420/article/details/9619269&quot;&gt;Android.mk释义&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;后来绕过来了Android.mk是eclipse下组织编译JNI的文件，而studio使用gradle来组织编译的&lt;br /&gt;
+在项目下的build.gradle文件中&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;android {
+	defaultConfig {
+        ndk {
+            moduleName &quot;jniLibs&quot;   // 生成so文件的名字
+            ldLibs &quot;EGL&quot;, &quot;GLESv3&quot;, &quot;dl&quot;, &quot;log&quot;	   // Link with these libraries!
+            stl &quot;stlport_shared&quot;					  // Use shared stlport library
+    }
+	}
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;即是用来编译的设置，之前在android.mk下的设置并没有起到相应的作用，现在要做的就是如何将引用的外部库添加到这个位置。&lt;br /&gt;
+暂时没有想到对应方法。&lt;/p&gt;
+
+&lt;p&gt;最后可以手动编译出.so文件供程序调用。&lt;br /&gt;
+然后运行成功了。&lt;/p&gt;
+
+&lt;p&gt;总结:&lt;br /&gt;
+当前我运行jni没有通过gradle中的设置实现全自动的编译打包&lt;br /&gt;
+还是要切换到jni的目录下先运行ndk-build命令生成so动态库，当然前提是先把ndk-build命令添加到path路径中去会方便些。&lt;/p&gt;
+
+&lt;p&gt;在androidstudio的配置文件中需要加3个地方&lt;/p&gt;
+
+&lt;p&gt;1.gradle.properties中添加&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;android.useDeprecatedNdk=true
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;2.module下的build.gradle下添加两处代码&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;android {
+    defaultConfig {
+        ndk {
+            moduleName &quot;jniLibs&quot;  // 1.生成so文件的名字，和system.loadlibrary引入的名字相同
+        }
+    }
+
+	//2.定义jni的so文件的存放目录，缺的话生成so文件程序也找不到
+    sourceSets.main {
+        jni.srcDirs = [] // This prevents the auto generation of Android.mk
+	//        sourceSets.main.jni.srcDirs = []
+        jniLibs.srcDir &#39;src/main/libs&#39; // This is not necessary unless you have precompiled libraries in your project.
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+</description>
+      </item>
+    
+      <item>
+        <title>Android绘图-LOGO-实现2</title>
+        <link>http://www.liuschen.com/2016/01/14/draw-a-logo.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2016/01/14/draw-a-logo.html</guid>
+        <pubDate>Thu, 14 Jan 2016 00:00:00 +0800</pubDate>
+        <description>&lt;p&gt;首先对半圆的绘制考虑到之前版本并不能精确的满足绘制的要求（内圆和外圆并不一定是同心圆，用Path.FillType.EVEN_ODD来实现的话可能会产生多余的部分），要是能够像ps中单纯对路径进行相加相减就好了。所幸在Path中找到了一个Op的枚举类型（和FillType距离不远），最终就是用Path的这个属性完美的解决了这个问题&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+private void drawRing(Canvas canvas, Paint paint,float interX, float innerY,float outerX, float outerY,float startAngle,float sweepAngle,float inner_circle,float outter_circle) {
+
+    Path outterpath = new Path();
+
+    outterpath.moveTo(outerX, outerY);
+    outterpath.lineTo(outerX, outerY - outter_circle);
+    outterpath.arcTo(outerX - outter_circle, outerY - outter_circle, outerX + outter_circle, outerY + outter_circle, startAngle, sweepAngle, true);
+    outterpath.lineTo(outerX, outerY);
+    outterpath.close();
+
+    Path innerpath = new Path();
+
+    innerpath.moveTo(interX, innerY);
+    innerpath.lineTo(interX, innerY - inner_circle);
+    innerpath.arcTo(interX - inner_circle, innerY - inner_circle, interX + inner_circle, innerY + inner_circle, startAngle, -360, true);
+    innerpath.lineTo(interX, innerY);
+    innerpath.close();
+
+    outterpath.op(innerpath,Path.Op.DIFFERENCE);
+    canvas.drawPath(outterpath,paint);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;最终整个动画由一个定时器控制速率，通过定时重绘View实现了整个动画，最后的退出动画是通过对画布操作完成的（对画布的操作必须在绘制之前）。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;@Override
+protected void onDraw(Canvas canvas) {
+    super.onDraw(canvas);
+
+    canvas.translate(TRACK1_OUTTER_CIRCLE * 1.5f, TRACK1_OUTTER_CIRCLE * 1.5f);
+    scaleAnim(canvas);
+
+    Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    paint.setStyle(Paint.Style.FILL);
+    track1(canvas, paint);
+    track2(canvas, paint);
+    track3(canvas, paint);
+
+    if(!isTimerRunning){
+        mHandler.post(mRunnable);
+        isTimerRunning = true;
+    }else{
+        mHandler.postDelayed(mRunnable, mFrameTime);
+    }
+    if(mFrameNumber&amp;gt;60){
+        resetAnim();
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+      </item>
+    
+      <item>
+        <title>Android绘图-LOGO-实现1</title>
+        <link>http://www.liuschen.com/2016/01/12/draw-a-logo.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2016/01/12/draw-a-logo.html</guid>
+        <pubDate>Tue, 12 Jan 2016 00:00:00 +0800</pubDate>
+        <description>&lt;p&gt;整体通过继承View来绘制自定义的logo；&lt;br /&gt;
+logo动画分为3个部分，所以通过3个track来实现对3部分动画的分别控制，3个track函数分别在ondraw里面绘制&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;@Override
+protected void onDraw(Canvas canvas) {
+    super.onDraw(canvas);
+    track1(canvas);
+    track2(canvas);
+    track3(canvas);
+    invalidate();
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;2.绘制圆环&lt;/p&gt;
+
+&lt;p&gt;圆环的绘制是基于android Java层的API来实现的&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;public void drawArc(float left, float top, float right, float bottom, float startAngle,
+            float sweepAngle, boolean useCenter, @NonNull Paint paint) {
+        native_drawArc(mNativeCanvasWrapper, left, top, right, bottom, startAngle, sweepAngle,
+                useCenter, paint.getNativeInstance());
+    }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;其中前四个参数：&lt;br /&gt;
+左上右下是绘制图形的左边上边右边下边分别与右上角为原点的笛卡尔坐标系两坐标轴的距离&lt;br /&gt;
+startAngle:是扇形开始的角度；&lt;br /&gt;
+sweepAngle:扇形扫过的角度；&lt;strong&gt;正数为顺时针，负数为逆时针(之所以这样,是因为AndroidView中的坐标是y轴正向向下)&lt;/strong&gt;&lt;br /&gt;
+useCenter:是否包以圆心为中心点&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;paint.setColor(Color.RED);
+canvas.drawArc(-OUTTER_CIRCLE, -OUTTER_CIRCLE, OUTTER_CIRCLE, OUTTER_CIRCLE, 270, endAngle, true, paint);
+paint.setColor(Color.BLACK);
+canvas.drawArc(-INNER_CIRCLE, -INNER_CIRCLE, INNER_CIRCLE, INNER_CIRCLE, 270,endAngle, true, paint);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这种方法，会将圆环中心的颜色填充，不再支持透明，对于画圆环除了以上一种方法外，还可以用path来画&lt;br /&gt;
+但是path添加圆弧存在一个问题&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Path outterpath = new Path();
+outterpath.addArc(-OUTTER_CIRCLE, -OUTTER_CIRCLE, OUTTER_CIRCLE, OUTTER_CIRCLE, 270, endAngle);
+outterpath.addArc(-INNER_CIRCLE, -INNER_CIRCLE, INNER_CIRCLE, INNER_CIRCLE, 270, endAngle);
+outterpath.setFillType(Path.FillType.EVEN_ODD);
+canvas.drawPath(outterpath,paint);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;就是addARC里面没有useCenter参数，默认是不以圆心为中心画的，达不到效果要求。所以要画圆弧需要自己画，比较麻烦。&lt;br /&gt;
+贝塞尔曲线可以考虑，但太麻烦，需要计算。&lt;br /&gt;
+QuadTo一阶贝塞尔曲线&lt;br /&gt;
+CubicTo二阶贝塞尔曲线&lt;br /&gt;
+带r的跟去掉字母r的相对应的函数一样，但是都会考虑提供的点跟轮廓的相对位置。&lt;/p&gt;
+
+&lt;p&gt;可以依然用path但换一种方式来实现&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;	Path outterpath = new Path();
+
+    outterpath.moveTo(0, 0);
+    outterpath.lineTo(0, -OUTTER_CIRCLE);
+    outterpath.arcTo(-OUTTER_CIRCLE, -OUTTER_CIRCLE, OUTTER_CIRCLE, OUTTER_CIRCLE, 270, endAngle, true);
+    outterpath.lineTo(0, 0);
+    outterpath.close();
+
+    Path innerpath = new Path();
+
+    innerpath.moveTo(0, 0);
+    innerpath.lineTo(0, -INNER_CIRCLE);
+    innerpath.arcTo(-INNER_CIRCLE, -INNER_CIRCLE, INNER_CIRCLE, INNER_CIRCLE, 270, endAngle, true);
+    innerpath.lineTo(0, 0);
+    innerpath.close();
+
+    outterpath.setFillType(Path.FillType.EVEN_ODD);
+    outterpath.addPath(innerpath);
+    canvas.drawPath(outterpath,paint);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;3.最后的动画效果同过定时重绘来实现&lt;/p&gt;
+
+&lt;p&gt;总的来说，在Java层通过API来调用已有的绘图函数画自己想要的图形不难，里面既有现成的绘制图形的函数比如圆，矩形等等，也有Path工具可以定制自己想要的图形，和Photoshop的绘图原理基本相同。还有贝塞尔曲线，只要数学可以，任何图形都可以画。&lt;/p&gt;
+
+&lt;p&gt;项目地址:&lt;a href=&quot;https://github.com/luofengliuchen/QJLogo&quot;&gt;github&lt;/a&gt;&lt;/p&gt;
+</description>
+      </item>
+    
+      <item>
+        <title>android图像处理:像素过滤</title>
+        <link>http://www.liuschen.com/2016/01/11/deal-with-pix.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2016/01/11/deal-with-pix.html</guid>
+        <pubDate>Mon, 11 Jan 2016 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;第一次用photoshop时给我印象最深的是里面的&lt;strong&gt;色相/饱和度&lt;/strong&gt;功能&lt;/p&gt;
+
+  &lt;p&gt;用它来替换图片中的颜色特别方便。要知道我最早用来处理图片用的是微软的画图工具，在高放大率下对每一个像素点进行处理，现在想想也是醉。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;现在做程序，更多的方法也变的可行，毕竟在计算机上做的一切事情都是各种程序在下面默默付出辛劳的结果。虽然语言不同，但转换成二进制都是执行的同一件事。不同的只是有些语言，为了追求个别功能，扩展性等等再转换成底层语言时绕了远路，所以才有了效率上的差异。&lt;/p&gt;
+
+&lt;p&gt;我现在要写的是在Android上对图像像素的过滤。&lt;/p&gt;
+
+&lt;p&gt;首先如果要对bitmap里面的像素点进行操作需要将里面的一个参数&lt;/p&gt;
+
+&lt;p&gt;mIsMutable设置为true&lt;br /&gt;
+可以在copy Bitmap时设置&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;bitmap.copy(bitmap.getConfig(), true);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;而我最开始是在写的工具方法里面通过反射设置的&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;	try {
+        Field mIsMutable = Bitmap.class.getDeclaredField(&quot;mIsMutable&quot;);
+        mIsMutable.setAccessible(true);
+        mIsMutable.setBoolean(bitmap,true);
+    } catch (NoSuchFieldException e) {
+        e.printStackTrace();
+    } catch (IllegalAccessException e) {
+        e.printStackTrace();
+    }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;然后就对bitmap图像进行点的操作&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;int bitmapWidth = bitmap.getWidth();
+int bitmapHeight = bitmap.getHeight();
+for (int i = 0; i &amp;lt; bitmapHeight; i++) {
+    for (int j = 0; j &amp;lt; bitmapWidth; j++) {
+        int singleColor = bitmap.getPixel(j,i);
+        if(addFilter(singleColor,filter)){
+            continue;
+        }else{
+            bitmap.setPixel(j, i, color);
+        }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;其中添加了一个过滤函数&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;private static boolean addFilter(int singleColor,ColorFilter filter) {
+
+    int a = Color.alpha(singleColor);
+    switch(filter){
+        case TRANSLATE:
+            if(a==0){
+                return true;
+            }else{
+                break;
+            }
+        case WHITE:
+            if(singleColor == 0xffffffff){
+                return true;
+            }else{
+                break;
+            }
+    }
+    return false;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这个过滤函数可以自由定制，我这里添加了一个透明像素点和白色像素的的忽略。可以自由选择并且修改。因为要对每一个像素点进行操作，肯定需要耗费CPU资源，至于到什么程度，我也没测就是了。这个在可以在需要严控应用资源大小时用到。内部对颜色不多的图片进行色相操作，满足对资源的需求。&lt;/p&gt;
+
+&lt;p&gt;现在已知操作后图片以原分辨率显示会有明显锯齿，还没想到合适的解决办法。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/luofengliuchen/AndroidColorMaster&quot;&gt;本篇DEMO地址&lt;/a&gt;&lt;/p&gt;
+</description>
+      </item>
+    
+  </channel>
+</rss>

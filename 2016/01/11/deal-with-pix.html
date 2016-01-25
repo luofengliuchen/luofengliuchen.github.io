@@ -5,8 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
 <!--[if lte IE 9]><meta http-equiv="refresh" content="0;url=/ie.html"><![endif]-->
 
-<title>博客首页 | 落风的博客</title>
+<title>android图像处理:像素过滤 | 落风的博客</title>
 <meta name="author" content="落风">
+
+  <meta name="keywords" content="android,pix">
 
 
 
@@ -62,23 +64,89 @@
     <div id="post">
       <div id="pjax">
         <article id="post__content">
-  <h1 id="post__title" data-identifier="">博客首页</h1>
-  <h2 id="section">前言</h2>
+  <h1 id="post__title" data-identifier="20160111">android图像处理:像素过滤</h1>
+  <blockquote>
+  <p>第一次用photoshop时给我印象最深的是里面的<strong>色相/饱和度</strong>功能</p>
 
-<blockquote>
-  <p>很多时候,自己会有一些有趣的想法但是却得不到很好的表达。更有些时候，自己产生了一些星星片片的灵感,没有很好的释放,最终却流于记忆。知道自己不擅长表达和写作,却常常有这方面的冲动，最终留下遗憾。</p>
+  <p>用它来替换图片中的颜色特别方便。要知道我最早用来处理图片用的是微软的画图工具，在高放大率下对每一个像素点进行处理，现在想想也是醉。</p>
 </blockquote>
 
-<p>我是一个随性的人，喜欢也就是喜欢瞎折腾，但是却嫌麻烦，所以至今以来很少写过博客，之前偶然看到别人在github上的博客，觉得风格简约，正是我喜欢的类型。所以便想自己也做一个，现在fork了别人的模板，正在做最后的改动，却突然发现自己做着做着便完全把它当成一个技术的工作来做了，网页前端懂得少，改着吃力，便想一步一步的往里面走，只想了解的更多而忘了自己的初衷-写作。所以，今天我决定提前开始我的写作之路。我想这对于一个程序员也是至关重要的一步。</p>
+<p>现在做程序，更多的方法也变的可行，毕竟在计算机上做的一切事情都是各种程序在下面默默付出辛劳的结果。虽然语言不同，但转换成二进制都是执行的同一件事。不同的只是有些语言，为了追求个别功能，扩展性等等再转换成底层语言时绕了远路，所以才有了效率上的差异。</p>
 
-<p><strong>我要学会记录,亦要学会表达</strong></p>
+<p>我现在要写的是在Android上对图像像素的过滤。</p>
+
+<p>首先如果要对bitmap里面的像素点进行操作需要将里面的一个参数</p>
+
+<p>mIsMutable设置为true<br />
+可以在copy Bitmap时设置</p>
+
+<pre><code>bitmap.copy(bitmap.getConfig(), true);
+</code></pre>
+
+<p>而我最开始是在写的工具方法里面通过反射设置的</p>
+
+<pre><code>	try {
+        Field mIsMutable = Bitmap.class.getDeclaredField("mIsMutable");
+        mIsMutable.setAccessible(true);
+        mIsMutable.setBoolean(bitmap,true);
+    } catch (NoSuchFieldException e) {
+        e.printStackTrace();
+    } catch (IllegalAccessException e) {
+        e.printStackTrace();
+    }
+</code></pre>
+
+<p>然后就对bitmap图像进行点的操作</p>
+
+<pre><code>int bitmapWidth = bitmap.getWidth();
+int bitmapHeight = bitmap.getHeight();
+for (int i = 0; i &lt; bitmapHeight; i++) {
+    for (int j = 0; j &lt; bitmapWidth; j++) {
+        int singleColor = bitmap.getPixel(j,i);
+        if(addFilter(singleColor,filter)){
+            continue;
+        }else{
+            bitmap.setPixel(j, i, color);
+        }
+    }
+}
+</code></pre>
+
+<p>其中添加了一个过滤函数</p>
+
+<pre><code>private static boolean addFilter(int singleColor,ColorFilter filter) {
+
+    int a = Color.alpha(singleColor);
+    switch(filter){
+        case TRANSLATE:
+            if(a==0){
+                return true;
+            }else{
+                break;
+            }
+        case WHITE:
+            if(singleColor == 0xffffffff){
+                return true;
+            }else{
+                break;
+            }
+    }
+    return false;
+}
+</code></pre>
+
+<p>这个过滤函数可以自由定制，我这里添加了一个透明像素点和白色像素的的忽略。可以自由选择并且修改。因为要对每一个像素点进行操作，肯定需要耗费CPU资源，至于到什么程度，我也没测就是了。这个在可以在需要严控应用资源大小时用到。内部对颜色不多的图片进行色相操作，满足对资源的需求。</p>
+
+<p>现在已知操作后图片以原分辨率显示会有明显锯齿，还没想到合适的解决办法。</p>
+
+<p><a href="https://github.com/luofengliuchen/AndroidColorMaster">本篇DEMO地址</a></p>
 
 </article> <!-- end #post__content -->
 
 <div id="post__share">
-  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/&text=博客首页" target="_blank"></a>
+  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/01/11/deal-with-pix.html&text=android图像处理:像素过滤" target="_blank"></a>
   <a id="icon-cc" class="fontello" href="http://creativecommons.org/licenses/by-nc-sa/3.0" target="_blank"></a>
-  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/&title=博客首页" target="_blank"></a>
+  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/01/11/deal-with-pix.html&title=android图像处理:像素过滤" target="_blank"></a>
 </div> <!-- end #post__share -->
 <div id="disqus_thread" name="luofeng">
   <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>

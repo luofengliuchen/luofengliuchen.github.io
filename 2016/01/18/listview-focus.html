@@ -5,8 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
 <!--[if lte IE 9]><meta http-equiv="refresh" content="0;url=/ie.html"><![endif]-->
 
-<title>博客首页 | 落风的博客</title>
+<title>listview焦点冲突 | 落风的博客</title>
 <meta name="author" content="落风">
+
+  <meta name="keywords" content="焦点">
 
 
 
@@ -62,23 +64,41 @@
     <div id="post">
       <div id="pjax">
         <article id="post__content">
-  <h1 id="post__title" data-identifier="">博客首页</h1>
-  <h2 id="section">前言</h2>
+  <h1 id="post__title" data-identifier="20160118">listview焦点冲突</h1>
+  <p>listView中经常出现焦点冲突问题，导致Item不可点击，解决方法是在条目Item的跟布局添加如下属性:</p>
 
-<blockquote>
-  <p>很多时候,自己会有一些有趣的想法但是却得不到很好的表达。更有些时候，自己产生了一些星星片片的灵感,没有很好的释放,最终却流于记忆。知道自己不擅长表达和写作,却常常有这方面的冲动，最终留下遗憾。</p>
-</blockquote>
+<pre><code>android:descendantFocusability="blocksDescendants" 
+</code></pre>
 
-<p>我是一个随性的人，喜欢也就是喜欢瞎折腾，但是却嫌麻烦，所以至今以来很少写过博客，之前偶然看到别人在github上的博客，觉得风格简约，正是我喜欢的类型。所以便想自己也做一个，现在fork了别人的模板，正在做最后的改动，却突然发现自己做着做着便完全把它当成一个技术的工作来做了，网页前端懂得少，改着吃力，便想一步一步的往里面走，只想了解的更多而忘了自己的初衷-写作。所以，今天我决定提前开始我的写作之路。我想这对于一个程序员也是至关重要的一步。</p>
+<p>该属性有3个值:</p>
 
-<p><strong>我要学会记录,亦要学会表达</strong></p>
+<pre><code>	beforeDescendants：viewgroup会优先其子类控件而获取到焦点
+
+    afterDescendants：viewgroup只有当其子类控件不需要获取焦点时才获取焦点
+
+    blocksDescendants：viewgroup会覆盖子类控件而直接获得焦点
+</code></pre>
+
+<p>而在StringPicker中除了对NumberPicker中</p>
+
+<pre><code>mClazz.getMethod("setMaxValue", int.class).invoke(mInstance, values.length - 1);
+mClazz.getMethod("setMinValue", int.class).invoke(mInstance, 0);
+mClazz.getMethod("setDisplayedValues", String[].class).invoke(mInstance, new Object[]{values});
+</code></pre>
+
+<p>还有setValue和getValue进行反射调用外，就是对这个属性的设置</p>
+
+<pre><code>setDescendantFocusability
+值为:
+NumberPicker.FOCUS_BLOCK_DESCENDANTS
+</code></pre>
 
 </article> <!-- end #post__content -->
 
 <div id="post__share">
-  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/&text=博客首页" target="_blank"></a>
+  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/01/18/listview-focus.html&text=listview焦点冲突" target="_blank"></a>
   <a id="icon-cc" class="fontello" href="http://creativecommons.org/licenses/by-nc-sa/3.0" target="_blank"></a>
-  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/&title=博客首页" target="_blank"></a>
+  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/01/18/listview-focus.html&title=listview焦点冲突" target="_blank"></a>
 </div> <!-- end #post__share -->
 <div id="disqus_thread" name="luofeng">
   <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
