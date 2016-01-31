@@ -9,6 +9,16 @@
 
 
 
+  /2016/01/31/fox.html
+
+  /2016/01/27/dream-flower.html
+
+  /2016/01/27/project-mode.html
+
+  /2016/01/25/stackblur.html
+
+  /2016/01/22/android-logo.html
+
   /2016/01/18/listview-focus.html
 
   /2016/01/18/android-StringPicker.html

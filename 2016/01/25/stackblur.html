@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
 <!--[if lte IE 9]><meta http-equiv="refresh" content="0;url=/ie.html"><![endif]-->
 
-<title>android图像处理:像素过滤 | 落风的博客</title>
+<title>Android滤镜-快速模糊 | 落风的博客</title>
 <meta name="author" content="落风">
 
-  <meta name="keywords" content="android,pix">
+  <meta name="keywords" content="模糊,磨砂效果">
 
 
 
@@ -80,89 +80,134 @@
     <div id="post">
       <div id="pjax">
         <article id="post__content">
-  <h1 id="post__title" data-identifier="20160111">android图像处理:像素过滤</h1>
+  <h1 id="post__title" data-identifier="20160125">Android滤镜-快速模糊</h1>
   <blockquote>
-  <p>第一次用photoshop时给我印象最深的是里面的<strong>色相/饱和度</strong>功能</p>
-
-  <p>用它来替换图片中的颜色特别方便。要知道我最早用来处理图片用的是微软的画图工具，在高放大率下对每一个像素点进行处理，现在想想也是醉。</p>
+  <p>github上有一个stackblur的开源项目，可以对图片进行快速模糊处理</p>
 </blockquote>
 
-<p>现在做程序，更多的方法也变的可行，毕竟在计算机上做的一切事情都是各种程序在下面默默付出辛劳的结果。虽然语言不同，但转换成二进制都是执行的同一件事。不同的只是有些语言，为了追求个别功能，扩展性等等再转换成底层语言时绕了远路，所以才有了效率上的差异。</p>
+<p>有通过Java写的，而我主要看的是通过jni调用的c代码，其实算法都是一样的</p>
 
-<p>我现在要写的是在Android上对图像像素的过滤。</p>
+<pre><code>//bitmapOut ：bitmap图片
+//radius模糊半径
+//threadCount 线程总数
+//threadIndex 第几个处理线程
+//round 第几步
 
-<p>首先如果要对bitmap里面的像素点进行操作需要将里面的一个参数</p>
 
-<p>mIsMutable设置为true<br />
-可以在copy Bitmap时设置</p>
+JNIEXPORT void JNICALL Java_luofeng_myjnitest_jni_JniHelper_toBlur(JNIEnv* env, jclass clzz, jobject bitmapOut, jint radius, jint threadCount, jint threadIndex, jint round) {
+// Properties
+AndroidBitmapInfo   infoOut;
+void*               pixelsOut;
 
-<pre><code>bitmap.copy(bitmap.getConfig(), true);
+int ret;
+
+// Get image info
+if ((ret = AndroidBitmap_getInfo(env, bitmapOut, &amp;infoOut)) != 0) {
+    LOGE("AndroidBitmap_getInfo() failed ! error=%d", ret);
+    return;
+}
+
+// Check image
+if (infoOut.format != ANDROID_BITMAP_FORMAT_RGBA_8888) {
+    LOGE("Bitmap format is not RGBA_8888!");
+    LOGE("==&gt; %d", infoOut.format);
+    return;
+}
+
+// Lock all images
+if ((ret = AndroidBitmap_lockPixels(env, bitmapOut, &amp;pixelsOut)) != 0) {
+    LOGE("AndroidBitmap_lockPixels() failed ! error=%d", ret);
+    return;
+}
+
+int h = infoOut.height;
+int w = infoOut.width;
+stackblurJob((unsigned char*)pixelsOut, w, h, radius, threadCount, threadIndex, round);
+// Unlocks everything
+AndroidBitmap_unlockPixels(env, bitmapOut);
+}
 </code></pre>
 
-<p>而我最开始是在写的工具方法里面通过反射设置的</p>
+<p>其中，模糊半径是用来确定模糊的程度的，高斯模糊是通过每个像素点和周围像素点运算求平均值来实现的，这个模糊半径就是确定一个点的运算范围的。</p>
 
-<pre><code>	try {
-        Field mIsMutable = Bitmap.class.getDeclaredField("mIsMutable");
-        mIsMutable.setAccessible(true);
-        mIsMutable.setBoolean(bitmap,true);
-    } catch (NoSuchFieldException e) {
-        e.printStackTrace();
-    } catch (IllegalAccessException e) {
-        e.printStackTrace();
+<p>threadCount，threadIndex：外部通过n个线程来同时处理提速的。而内部传入这几个值是为了计算每个线程分别处理的区域的，和多线程下载类似。</p>
+
+<p>round：为1时是水平模糊，为2时是竖直模糊。</p>
+
+<p>Java层通过同时启动n个线程来处理</p>
+
+<pre><code>static final int EXECUTOR_THREADS = Runtime.getRuntime().availableProcessors();
+static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(EXECUTOR_THREADS);
+
+public Bitmap blur(Bitmap original, float radius) {
+    Bitmap bitmapOut = original.copy(Bitmap.Config.ARGB_8888, true);
+
+    int cores = EXECUTOR_THREADS;
+
+    ArrayList&lt;NativeTask&gt; horizontal = new ArrayList&lt;NativeTask&gt;(cores);
+    ArrayList&lt;NativeTask&gt; vertical = new ArrayList&lt;NativeTask&gt;(cores);
+    for (int i = 0; i &lt; cores; i++) {
+        horizontal.add(new NativeTask(bitmapOut, (int) radius, cores, i, 1));
+        vertical.add(new NativeTask(bitmapOut, (int) radius, cores, i, 2));
     }
-</code></pre>
 
-<p>然后就对bitmap图像进行点的操作</p>
+    try {
+        EXECUTOR.invokeAll(horizontal);
+    } catch (InterruptedException e) {
+        return bitmapOut;
+    }
 
-<pre><code>int bitmapWidth = bitmap.getWidth();
-int bitmapHeight = bitmap.getHeight();
-for (int i = 0; i &lt; bitmapHeight; i++) {
-    for (int j = 0; j &lt; bitmapWidth; j++) {
-        int singleColor = bitmap.getPixel(j,i);
-        if(addFilter(singleColor,filter)){
-            continue;
-        }else{
-            bitmap.setPixel(j, i, color);
-        }
+    try {
+        EXECUTOR.invokeAll(vertical);
+    } catch (InterruptedException e) {
+        return bitmapOut;
+    }
+    return bitmapOut;
+}
+
+private static class NativeTask implements Callable&lt;Void&gt; {
+    private final Bitmap _bitmapOut;
+    private final int _radius;
+    private final int _totalCores;
+    private final int _coreIndex;
+    private final int _round;
+
+    public NativeTask(Bitmap bitmapOut, int radius, int totalCores, int coreIndex, int round) {
+        _bitmapOut = bitmapOut;
+        _radius = radius;
+        _totalCores = totalCores;
+        _coreIndex = coreIndex;
+        _round = round;
+    }
+
+    @Override
+    public Void call() throws Exception {
+        JniHelper.toBlur(_bitmapOut, _radius, _totalCores, _coreIndex, _round);
+        return null;
     }
 }
 </code></pre>
 
-<p>其中添加了一个过滤函数</p>
+<p>但是图片有时可能会很大，由于模糊就是丢失精度的操作，为了提高效率，可以先对图片进行缩放从而丢失部分像素精度。</p>
 
-<pre><code>private static boolean addFilter(int singleColor,ColorFilter filter) {
-
-    int a = Color.alpha(singleColor);
-    switch(filter){
-        case TRANSLATE:
-            if(a==0){
-                return true;
-            }else{
-                break;
-            }
-        case WHITE:
-            if(singleColor == 0xffffffff){
-                return true;
-            }else{
-                break;
-            }
-    }
-    return false;
+<pre><code>private static Bitmap scaleBitmap(Bitmap bitmap,float scale) {
+    Matrix matrix = new Matrix();
+    matrix.postScale(scale,scale); //长和宽放大缩小的比例
+    Bitmap resizeBmp = Bitmap.createBitmap(bitmap,0,0,bitmap.getWidth(),bitmap.getHeight(),matrix,true);
+    return resizeBmp;
 }
 </code></pre>
 
-<p>这个过滤函数可以自由定制，我这里添加了一个透明像素点和白色像素的的忽略。可以自由选择并且修改。因为要对每一个像素点进行操作，肯定需要耗费CPU资源，至于到什么程度，我也没测就是了。这个在可以在需要严控应用资源大小时用到。内部对颜色不多的图片进行色相操作，满足对资源的需求。</p>
+<p>提高了处理速度，而最终效果区别却不会太大。</p>
 
-<p>现在已知操作后图片以原分辨率显示会有明显锯齿，还没想到合适的解决办法。</p>
-
-<p><a href="https://github.com/luofengliuchen/AndroidColorMaster">本篇DEMO地址</a></p>
+<p><a href="https://github.com/luofengliuchen/MyJniTest/tree/bulr">Demo地址</a></p>
 
 </article> <!-- end #post__content -->
 
 <div id="post__share">
-  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/01/11/deal-with-pix.html&text=android图像处理:像素过滤" target="_blank"></a>
+  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/01/25/stackblur.html&text=Android滤镜-快速模糊" target="_blank"></a>
   <a id="icon-cc" class="fontello" href="http://creativecommons.org/licenses/by-nc-sa/3.0" target="_blank"></a>
-  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/01/11/deal-with-pix.html&title=android图像处理:像素过滤" target="_blank"></a>
+  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/01/25/stackblur.html&title=Android滤镜-快速模糊" target="_blank"></a>
 </div> <!-- end #post__share -->
 <div id="disqus_thread" name="luofeng">
   <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>

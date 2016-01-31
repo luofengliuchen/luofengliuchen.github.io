@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
 <!--[if lte IE 9]><meta http-equiv="refresh" content="0;url=/ie.html"><![endif]-->
 
-<title>android图像处理:像素过滤 | 落风的博客</title>
+<title>狐 | 落风的博客</title>
 <meta name="author" content="落风">
 
-  <meta name="keywords" content="android,pix">
+  <meta name="keywords" content="狐狸">
 
 
 
@@ -80,89 +80,96 @@
     <div id="post">
       <div id="pjax">
         <article id="post__content">
-  <h1 id="post__title" data-identifier="20160111">android图像处理:像素过滤</h1>
-  <blockquote>
-  <p>第一次用photoshop时给我印象最深的是里面的<strong>色相/饱和度</strong>功能</p>
+  <h1 id="post__title" data-identifier="20160131">狐</h1>
+  <p><img src="http://7xpui7.com1.z0.glb.clouddn.com/photo-fox_grey1.jpg" alt="" /></p>
 
-  <p>用它来替换图片中的颜色特别方便。要知道我最早用来处理图片用的是微软的画图工具，在高放大率下对每一个像素点进行处理，现在想想也是醉。</p>
-</blockquote>
+<p><img src="http://7xpui7.com1.z0.glb.clouddn.com/photo-fox_grey2.jpg" alt="" /></p>
 
-<p>现在做程序，更多的方法也变的可行，毕竟在计算机上做的一切事情都是各种程序在下面默默付出辛劳的结果。虽然语言不同，但转换成二进制都是执行的同一件事。不同的只是有些语言，为了追求个别功能，扩展性等等再转换成底层语言时绕了远路，所以才有了效率上的差异。</p>
+<p><img src="http://7xpui7.com1.z0.glb.clouddn.com/photo-fox_grey3.jpg" alt="" /></p>
 
-<p>我现在要写的是在Android上对图像像素的过滤。</p>
+<p><img src="http://7xpui7.com1.z0.glb.clouddn.com/photo-fox_grey4.jpg" alt="" /></p>
 
-<p>首先如果要对bitmap里面的像素点进行操作需要将里面的一个参数</p>
+<p><img src="http://7xpui7.com1.z0.glb.clouddn.com/photo-fox_grey5.jpg" alt="" /></p>
 
-<p>mIsMutable设置为true<br />
-可以在copy Bitmap时设置</p>
+<p><img src="http://7xpui7.com1.z0.glb.clouddn.com/photo-fox_grey6.jpg" alt="" /></p>
 
-<pre><code>bitmap.copy(bitmap.getConfig(), true);
-</code></pre>
+<p><img src="http://7xpui7.com1.z0.glb.clouddn.com/photo-fox_grey7.jpg" alt="" /></p>
 
-<p>而我最开始是在写的工具方法里面通过反射设置的</p>
+<p><img src="http://7xpui7.com1.z0.glb.clouddn.com/photo-fox_grey8.jpg" alt="" /></p>
 
-<pre><code>	try {
-        Field mIsMutable = Bitmap.class.getDeclaredField("mIsMutable");
-        mIsMutable.setAccessible(true);
-        mIsMutable.setBoolean(bitmap,true);
-    } catch (NoSuchFieldException e) {
-        e.printStackTrace();
-    } catch (IllegalAccessException e) {
-        e.printStackTrace();
-    }
-</code></pre>
+<p><img src="http://7xpui7.com1.z0.glb.clouddn.com/photo-fox_grey9.jpg" alt="" /></p>
 
-<p>然后就对bitmap图像进行点的操作</p>
+<p><img src="http://7xpui7.com1.z0.glb.clouddn.com/photo-fox_greya.jpg" alt="" /></p>
 
-<pre><code>int bitmapWidth = bitmap.getWidth();
-int bitmapHeight = bitmap.getHeight();
-for (int i = 0; i &lt; bitmapHeight; i++) {
-    for (int j = 0; j &lt; bitmapWidth; j++) {
-        int singleColor = bitmap.getPixel(j,i);
-        if(addFilter(singleColor,filter)){
-            continue;
-        }else{
-            bitmap.setPixel(j, i, color);
-        }
-    }
-}
-</code></pre>
+<p><img src="http://7xpui7.com1.z0.glb.clouddn.com/photo-fox_greyb.jpg" alt="" /></p>
 
-<p>其中添加了一个过滤函数</p>
+<p><img src="http://7xpui7.com1.z0.glb.clouddn.com/photo-fox_greyc.jpg" alt="" /></p>
 
-<pre><code>private static boolean addFilter(int singleColor,ColorFilter filter) {
+<p><img src="http://7xpui7.com1.z0.glb.clouddn.com/photo-fox_greyd.jpg" alt="" /></p>
 
-    int a = Color.alpha(singleColor);
-    switch(filter){
-        case TRANSLATE:
-            if(a==0){
-                return true;
-            }else{
-                break;
-            }
-        case WHITE:
-            if(singleColor == 0xffffffff){
-                return true;
-            }else{
-                break;
-            }
-    }
-    return false;
-}
-</code></pre>
+<p><img src="http://7xpui7.com1.z0.glb.clouddn.com/photo-fox_greye.jpg" alt="" /></p>
 
-<p>这个过滤函数可以自由定制，我这里添加了一个透明像素点和白色像素的的忽略。可以自由选择并且修改。因为要对每一个像素点进行操作，肯定需要耗费CPU资源，至于到什么程度，我也没测就是了。这个在可以在需要严控应用资源大小时用到。内部对颜色不多的图片进行色相操作，满足对资源的需求。</p>
+<p><img src="http://7xpui7.com1.z0.glb.clouddn.com/photo-fox_greyf.jpg" alt="" /></p>
 
-<p>现在已知操作后图片以原分辨率显示会有明显锯齿，还没想到合适的解决办法。</p>
+<p><img src="http://7xpui7.com1.z0.glb.clouddn.com/photo-fox_greyg.jpg" alt="" /></p>
 
-<p><a href="https://github.com/luofengliuchen/AndroidColorMaster">本篇DEMO地址</a></p>
+<p><img src="http://7xpui7.com1.z0.glb.clouddn.com/photo-fox_greyh.jpg" alt="" /></p>
+
+<p><img src="http://7xpui7.com1.z0.glb.clouddn.com/photo-fox_greyi.jpg" alt="" /></p>
+
+<p><img src="http://7xpui7.com1.z0.glb.clouddn.com/photo-fox_greyj.jpg" alt="" /></p>
+
+<p><img src="http://7xpui7.com1.z0.glb.clouddn.com/photo-fox_greyk.jpg" alt="" /></p>
+
+<p><img src="http://7xpui7.com1.z0.glb.clouddn.com/photo-fox_greyl.jpg" alt="" /></p>
+
+<p><img src="http://7xpui7.com1.z0.glb.clouddn.com/photo-fox_greym.jpg" alt="" /></p>
+
+<p><img src="http://7xpui7.com1.z0.glb.clouddn.com/photo-fox_greyn.jpg" alt="" /></p>
+
+<p><img src="http://7xpui7.com1.z0.glb.clouddn.com/photo-fox_greyo.jpg" alt="" /></p>
+
+<p><img src="http://7xpui7.com1.z0.glb.clouddn.com/photo-fox_greyp.jpg" alt="" /></p>
+
+<p><img src="http://7xpui7.com1.z0.glb.clouddn.com/photo-fox_greyq.jpg" alt="" /></p>
+
+<p><img src="http://7xpui7.com1.z0.glb.clouddn.com/photo-fox_greyr.jpg" alt="" /></p>
+
+<p><img src="http://7xpui7.com1.z0.glb.clouddn.com/photo-fox_greys.jpg" alt="" /></p>
+
+<p><img src="http://7xpui7.com1.z0.glb.clouddn.com/photo-fox_greyt.jpg" alt="" /></p>
+
+<p><img src="http://7xpui7.com1.z0.glb.clouddn.com/photo-fox_greyu.jpg" alt="" /></p>
+
+<p><img src="http://7xpui7.com1.z0.glb.clouddn.com/photo-fox_greyv.jpg" alt="" /></p>
+
+<p><img src="http://7xpui7.com1.z0.glb.clouddn.com/photo-fox_greyw.jpg" alt="" /></p>
+
+<p><img src="http://7xpui7.com1.z0.glb.clouddn.com/photo-fox_greyx.jpg" alt="" /></p>
+
+<p><img src="http://7xpui7.com1.z0.glb.clouddn.com/photo-fox_greyy.jpg" alt="" /></p>
+
+<p><img src="http://7xpui7.com1.z0.glb.clouddn.com/photo-fox_greyz.jpg" alt="" /></p>
+
+<p><img src="http://7xpui7.com1.z0.glb.clouddn.com/photo-fox_greyz1.jpg" alt="" /></p>
+
+<p><img src="http://7xpui7.com1.z0.glb.clouddn.com/photo-fox_greyz2.jpg" alt="" /></p>
+
+<p><img src="http://7xpui7.com1.z0.glb.clouddn.com/photo-fox_greyz3.jpg" alt="" /></p>
+
+<p><img src="http://7xpui7.com1.z0.glb.clouddn.com/photo-fox_greyz4.jpg" alt="" /></p>
+
+<p><img src="http://7xpui7.com1.z0.glb.clouddn.com/photo-fox_greyz5.jpg" alt="" /></p>
+
+<p><img src="http://7xpui7.com1.z0.glb.clouddn.com/photo-fox_greyz7.jpg" alt="" /></p>
+
 
 </article> <!-- end #post__content -->
 
 <div id="post__share">
-  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/01/11/deal-with-pix.html&text=android图像处理:像素过滤" target="_blank"></a>
+  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/01/31/fox.html&text=狐" target="_blank"></a>
   <a id="icon-cc" class="fontello" href="http://creativecommons.org/licenses/by-nc-sa/3.0" target="_blank"></a>
-  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/01/11/deal-with-pix.html&title=android图像处理:像素过滤" target="_blank"></a>
+  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/01/31/fox.html&title=狐" target="_blank"></a>
 </div> <!-- end #post__share -->
 <div id="disqus_thread" name="luofeng">
   <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>

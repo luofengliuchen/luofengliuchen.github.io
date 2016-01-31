@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
 <!--[if lte IE 9]><meta http-equiv="refresh" content="0;url=/ie.html"><![endif]-->
 
-<title>android图像处理:像素过滤 | 落风的博客</title>
+<title>梦花 | 落风的博客</title>
 <meta name="author" content="落风">
 
-  <meta name="keywords" content="android,pix">
+  <meta name="keywords" content="梦">
 
 
 
@@ -80,89 +80,31 @@
     <div id="post">
       <div id="pjax">
         <article id="post__content">
-  <h1 id="post__title" data-identifier="20160111">android图像处理:像素过滤</h1>
+  <h1 id="post__title" data-identifier="20160127">梦花</h1>
   <blockquote>
-  <p>第一次用photoshop时给我印象最深的是里面的<strong>色相/饱和度</strong>功能</p>
-
-  <p>用它来替换图片中的颜色特别方便。要知道我最早用来处理图片用的是微软的画图工具，在高放大率下对每一个像素点进行处理，现在想想也是醉。</p>
+  <p>想写些小说,但是老实说,写出来老是缺少画面感,并且多半时候今天写了，明天就会看得不顺，所以作罢了好多次，但是如果一直不写，也就谈不上进步。所有权当练习表达了。</p>
 </blockquote>
 
-<p>现在做程序，更多的方法也变的可行，毕竟在计算机上做的一切事情都是各种程序在下面默默付出辛劳的结果。虽然语言不同，但转换成二进制都是执行的同一件事。不同的只是有些语言，为了追求个别功能，扩展性等等再转换成底层语言时绕了远路，所以才有了效率上的差异。</p>
+<p>初生一觉醒来，发现自己正坐在大巴里，大巴没动，看着正在陆续上来找座位的同学，初生明白了自己还没走，是要去哪里，一时之间却始终想不起来。</p>
 
-<p>我现在要写的是在Android上对图像像素的过滤。</p>
+<p>现在好像正值仲夏，烈日当空，蝉声的嘶鸣催动的空气中的燥热，在四处恣意的流动，弯曲了光线，仿佛用肉眼就能看到空气中那细小的流苏，灼人肌肤，燥人心房。</p>
 
-<p>首先如果要对bitmap里面的像素点进行操作需要将里面的一个参数</p>
+<p>初生想不起来自己是要去哪里，回家？亦或是离去，游玩？也可能是逃离。</p>
 
-<p>mIsMutable设置为true<br />
-可以在copy Bitmap时设置</p>
+<p>初生又打了个盹儿，梦里他看到一片圆形的雨云突然遮蔽了天空，四周顿时变得阴暗。初生来不及思考，只是见那雨云越来越厚，四周的空气也变的厚重起来，令他喘不过气。如果说此时的他的痛苦能够让他忘记思考，那么接下来他看到的也足以令他忘记这种苦痛的了，周遭的空气变得越发的重，突然，不可思议的事情发生了，初生隔着窗子外的建筑开始发生变化，掉落的砖瓦开始，重新砌好，因为年久剥落的涂料开始一点点的重新回到墙上，渐渐的，整个建筑焕然一新，只是这个过程却丝毫没有半分减缓的迹象，却仿佛更快了，建筑逐渐低矮，最后全部变成了堆积在一旁的砖瓦。又是一栋建筑在飞散的灰尘中瞬间立起，由旧变新，最后变化的速度太快，以至于仿佛本来是电影被点了快进一般却突然被人索性拖着进度条直溜的就朝尾声奔去了。</p>
 
-<pre><code>bitmap.copy(bitmap.getConfig(), true);
-</code></pre>
+<p>初生隐隐约约明白了发生了什么。他睁开眼，大脑柔乎了一阵儿，仔细的观察了一下四周，一个激灵上来，瞬间清醒了好多，才明白眼前发生的不是梦。</p>
 
-<p>而我最开始是在写的工具方法里面通过反射设置的</p>
-
-<pre><code>	try {
-        Field mIsMutable = Bitmap.class.getDeclaredField("mIsMutable");
-        mIsMutable.setAccessible(true);
-        mIsMutable.setBoolean(bitmap,true);
-    } catch (NoSuchFieldException e) {
-        e.printStackTrace();
-    } catch (IllegalAccessException e) {
-        e.printStackTrace();
-    }
-</code></pre>
-
-<p>然后就对bitmap图像进行点的操作</p>
-
-<pre><code>int bitmapWidth = bitmap.getWidth();
-int bitmapHeight = bitmap.getHeight();
-for (int i = 0; i &lt; bitmapHeight; i++) {
-    for (int j = 0; j &lt; bitmapWidth; j++) {
-        int singleColor = bitmap.getPixel(j,i);
-        if(addFilter(singleColor,filter)){
-            continue;
-        }else{
-            bitmap.setPixel(j, i, color);
-        }
-    }
-}
-</code></pre>
-
-<p>其中添加了一个过滤函数</p>
-
-<pre><code>private static boolean addFilter(int singleColor,ColorFilter filter) {
-
-    int a = Color.alpha(singleColor);
-    switch(filter){
-        case TRANSLATE:
-            if(a==0){
-                return true;
-            }else{
-                break;
-            }
-        case WHITE:
-            if(singleColor == 0xffffffff){
-                return true;
-            }else{
-                break;
-            }
-    }
-    return false;
-}
-</code></pre>
-
-<p>这个过滤函数可以自由定制，我这里添加了一个透明像素点和白色像素的的忽略。可以自由选择并且修改。因为要对每一个像素点进行操作，肯定需要耗费CPU资源，至于到什么程度，我也没测就是了。这个在可以在需要严控应用资源大小时用到。内部对颜色不多的图片进行色相操作，满足对资源的需求。</p>
-
-<p>现在已知操作后图片以原分辨率显示会有明显锯齿，还没想到合适的解决办法。</p>
-
-<p><a href="https://github.com/luofengliuchen/AndroidColorMaster">本篇DEMO地址</a></p>
+<blockquote>
+  <p>其实就是我昨天做的梦，因为梦里很玄妙的样子，印象很深，不是有妙笔生花一说吗？这可以叫妙梦生花，故曰:梦花。</p>
+</blockquote>
 
 </article> <!-- end #post__content -->
 
 <div id="post__share">
-  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/01/11/deal-with-pix.html&text=android图像处理:像素过滤" target="_blank"></a>
+  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/01/27/dream-flower.html&text=梦花" target="_blank"></a>
   <a id="icon-cc" class="fontello" href="http://creativecommons.org/licenses/by-nc-sa/3.0" target="_blank"></a>
-  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/01/11/deal-with-pix.html&title=android图像处理:像素过滤" target="_blank"></a>
+  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/01/27/dream-flower.html&title=梦花" target="_blank"></a>
 </div> <!-- end #post__share -->
 <div id="disqus_thread" name="luofeng">
   <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>

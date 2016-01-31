@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
 <!--[if lte IE 9]><meta http-equiv="refresh" content="0;url=/ie.html"><![endif]-->
 
-<title>android图像处理:像素过滤 | 落风的博客</title>
+<title>我对瀑布开发模式和敏捷开发模式的理解 | 落风的博客</title>
 <meta name="author" content="落风">
 
-  <meta name="keywords" content="android,pix">
+  <meta name="keywords" content="瀑布开发模式,敏捷开发模式">
 
 
 
@@ -80,89 +80,28 @@
     <div id="post">
       <div id="pjax">
         <article id="post__content">
-  <h1 id="post__title" data-identifier="20160111">android图像处理:像素过滤</h1>
+  <h1 id="post__title" data-identifier="20160127">我对瀑布开发模式和敏捷开发模式的理解</h1>
   <blockquote>
-  <p>第一次用photoshop时给我印象最深的是里面的<strong>色相/饱和度</strong>功能</p>
-
-  <p>用它来替换图片中的颜色特别方便。要知道我最早用来处理图片用的是微软的画图工具，在高放大率下对每一个像素点进行处理，现在想想也是醉。</p>
+  <p>瀑布开发模式就是一种最常用的开发模型，因为这种开发方式不但简单直观而且大大便利了项目管理的运作。 瀑布开发模式可以令项目管理人员非常方便地把整个项目置于自己的掌握之下。瀑布开发模式限制了开发期间团队间的交互，评估起来相当方便，由于开发计划稳定而且几乎不会发生经常性的变化从而有效地简化了项目开发的管理工作。</p>
 </blockquote>
 
-<p>现在做程序，更多的方法也变的可行，毕竟在计算机上做的一切事情都是各种程序在下面默默付出辛劳的结果。虽然语言不同，但转换成二进制都是执行的同一件事。不同的只是有些语言，为了追求个别功能，扩展性等等再转换成底层语言时绕了远路，所以才有了效率上的差异。</p>
+<blockquote>
+  <p>敏捷开发则是多种软件开发项目管理方法的集合，其中包括了XP、Scrum等十几种开发模式，这些开发方法有些共同点，比如重视响应变更，重视实现客户的价值，重视开发人员的自身发展等等，核心原则是主张简单，拥抱变化，快速反馈并注重开发的目的性，轻装前行，高质量的工作，使投资最大化。</p>
+</blockquote>
 
-<p>我现在要写的是在Android上对图像像素的过滤。</p>
+<p>严格瀑布开发模式，各个环节会依次有条不紊的进行，开发的生命周期时间上往往很好把控，所以它的优点是易于管理和掌控进度。但是因为开发的效果只有在项目完成后才能看到，对用户的反馈往往会滞后，并且如果项目前面环节没有做的很好，到了项目后期这种问题就会被指数性的放大，甚至到达bug的层面。各个开发团队之前缺乏交流也会是整个项目效率低下的一个原因。</p>
 
-<p>首先如果要对bitmap里面的像素点进行操作需要将里面的一个参数</p>
+<p>这种开发模式很受传统行业公司的青睐，原因大概就是这种管理模式符合传统项目的美学，严谨，规范，对时间的绝对把握，但是我个人却认为这种美学却不大符合互联网的思维。</p>
 
-<p>mIsMutable设置为true<br />
-可以在copy Bitmap时设置</p>
+<p>敏捷开发则是瀑布开发模式在互联网思维的进化，说是进化也许有些不妥，因为瀑布开发模式重在管理，易于驾驭，而敏捷开发，则是剥离了管理的外壳，把精力完全放在了个人，产品，和客户需求这个最重要的3个要素之上，并不好驾驭，如果你要管理整个项目，就必须要参与其中，并且具有指导其他成员的能力。</p>
 
-<pre><code>bitmap.copy(bitmap.getConfig(), true);
-</code></pre>
-
-<p>而我最开始是在写的工具方法里面通过反射设置的</p>
-
-<pre><code>	try {
-        Field mIsMutable = Bitmap.class.getDeclaredField("mIsMutable");
-        mIsMutable.setAccessible(true);
-        mIsMutable.setBoolean(bitmap,true);
-    } catch (NoSuchFieldException e) {
-        e.printStackTrace();
-    } catch (IllegalAccessException e) {
-        e.printStackTrace();
-    }
-</code></pre>
-
-<p>然后就对bitmap图像进行点的操作</p>
-
-<pre><code>int bitmapWidth = bitmap.getWidth();
-int bitmapHeight = bitmap.getHeight();
-for (int i = 0; i &lt; bitmapHeight; i++) {
-    for (int j = 0; j &lt; bitmapWidth; j++) {
-        int singleColor = bitmap.getPixel(j,i);
-        if(addFilter(singleColor,filter)){
-            continue;
-        }else{
-            bitmap.setPixel(j, i, color);
-        }
-    }
-}
-</code></pre>
-
-<p>其中添加了一个过滤函数</p>
-
-<pre><code>private static boolean addFilter(int singleColor,ColorFilter filter) {
-
-    int a = Color.alpha(singleColor);
-    switch(filter){
-        case TRANSLATE:
-            if(a==0){
-                return true;
-            }else{
-                break;
-            }
-        case WHITE:
-            if(singleColor == 0xffffffff){
-                return true;
-            }else{
-                break;
-            }
-    }
-    return false;
-}
-</code></pre>
-
-<p>这个过滤函数可以自由定制，我这里添加了一个透明像素点和白色像素的的忽略。可以自由选择并且修改。因为要对每一个像素点进行操作，肯定需要耗费CPU资源，至于到什么程度，我也没测就是了。这个在可以在需要严控应用资源大小时用到。内部对颜色不多的图片进行色相操作，满足对资源的需求。</p>
-
-<p>现在已知操作后图片以原分辨率显示会有明显锯齿，还没想到合适的解决办法。</p>
-
-<p><a href="https://github.com/luofengliuchen/AndroidColorMaster">本篇DEMO地址</a></p>
 
 </article> <!-- end #post__content -->
 
 <div id="post__share">
-  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/01/11/deal-with-pix.html&text=android图像处理:像素过滤" target="_blank"></a>
+  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/01/27/project-mode.html&text=我对瀑布开发模式和敏捷开发模式的理解" target="_blank"></a>
   <a id="icon-cc" class="fontello" href="http://creativecommons.org/licenses/by-nc-sa/3.0" target="_blank"></a>
-  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/01/11/deal-with-pix.html&title=android图像处理:像素过滤" target="_blank"></a>
+  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/01/27/project-mode.html&title=我对瀑布开发模式和敏捷开发模式的理解" target="_blank"></a>
 </div> <!-- end #post__share -->
 <div id="disqus_thread" name="luofeng">
   <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
