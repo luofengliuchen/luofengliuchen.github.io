@@ -9,7 +9,11 @@
 
 
 
-  /2016/01/31/fox.html
+  /2016/01/31/fox3.html
+
+  /2016/01/31/fox2.html
+
+  /2016/01/31/fox1.html
 
   /2016/01/27/dream-flower.html
 
