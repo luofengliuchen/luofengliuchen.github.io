@@ -6,6 +6,200 @@
     <description>落风的博客</description>
     
       <item>
+        <title>html5内嵌入android</title>
+        <link>http://www.liuschen.com/2016/02/05/html5-2.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2016/02/05/html5-2.html</guid>
+        <pubDate>Fri, 05 Feb 2016 00:00:00 +0800</pubDate>
+        <description>&lt;p&gt;首先Android的目录中建立一个assets文件夹，将canvas.html文件放入其中，然后添加如下代码：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;	WebView webview = (WebView) findViewById(R.id.wv);
+    webview.getSettings().setJavaScriptEnabled(true);
+    webview.setBackgroundColor(Color.TRANSPARENT);
+    webview.loadUrl(&quot;file:///android_asset/canvas2.html&quot;);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;本地也需要加入权限&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;uses-permission android:name=&quot;android.permission.INTERNET&quot; /&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+      </item>
+    
+      <item>
+        <title>HTML5绘图学习记录</title>
+        <link>http://www.liuschen.com/2016/02/04/html5-1.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2016/02/04/html5-1.html</guid>
+        <pubDate>Thu, 04 Feb 2016 00:00:00 +0800</pubDate>
+        <description>&lt;p&gt;首先先要导入jquery.min.js&lt;/p&gt;
+
+&lt;h2 id=&quot;section&quot;&gt;1.绘制矩形，线条，圆形&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;//获取canvas对象
+var canvas  = $(&quot;#mycanvas&quot;);
+//的到2D context
+var context = canvas.get(0).getContext(&quot;2d&quot;);
+
+//矩形
+context.fillStyle = &quot;rgb(255,0,0)&quot;;
+context.strokeStyle = &quot;rgb(0,255,0)&quot;;
+context.fillRect(40,40,100,100);
+context.strokeRect(140,140,100,100);
+
+//直线
+context.beginPath();
+context.moveTo(240,240);
+context.lineTo(600,500);
+context.closePath();
+context.stroke();
+
+//绘制圆形
+context.beginPath();
+context.arc(500,500,50,0,Math.PI/2,false);
+context.lineTo(500,500);
+context.closePath();
+context.stroke();
+
+//绘制字体
+var text  = &quot;this is html5&quot;;
+context.font = &quot;italic 30px serif&quot;;
+context.fillText(text,40,300);	
+context.lineWidth = 1;
+context.strokeText(text,40,400);
+
+//擦除操作
+context.clearRect(200,200,100,100);
+
+//擦除操作
+context.clearRect(200,200,100,100);
+//context.clearRect(0,0,canvas.width(),canvas.height());
+
+//重置所有canvas上的元素
+canvas.attr(&quot;width&quot;,canvas.width());
+canvas.attr(&quot;height&quot;,canvas.height());
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;a href=&quot;../../../html5/canvas.html&quot;&gt;HTML5练习1&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;section-1&quot;&gt;2.绘图状态的保存，画布变换，阴影，渐变和贝塞尔曲线&lt;/h2&gt;
+
+&lt;h3 id=&quot;section-2&quot;&gt;保存和应用就是一个对栈进行存取的操作，存的是画布的状态信息，如颜色，阴影，变换信息等等，先进后出，后进先出&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;context.save();
+context.restore();
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;section-3&quot;&gt;变换，对画布的操作，只对之后绘制的图形产生影响，可以把画布当成有多个图层，每次绘制都会新开一个图层，而变换就是对之后新开图层产生影响，绘制目标完后可以对画布进行还原&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;//平移
+context.translate(100,100);
+//缩放，注意缩放中心
+context.scale(1,1.5);
+//缩放，注意旋转中心
+context.rotate(Math.PI/12);
+
+//全局阿尔法值
+context.globalAlpha = 0.5;
+//合成模式，PS上的混合模式
+context.globalCompositeOperation = &quot;xor&quot;;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;渐变的应用&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;//线性渐变
+context.restore();
+var gradient = context.createLinearGradient(0,0,0,canvas.height());
+gradient.addColorStop(0,&quot;rgb(0,0,0)&quot;);
+gradient.addColorStop(1,&quot;rgb(255,0,0)&quot;);
+context.fillStyle = gradient;
+context.fillRect(100,100,100,100);
+
+//放射渐变
+var canvasCentreX = canvas.width()/2;
+var canvasCentreY = canvas.height()/2;
+var gradient = context.createRadialGradient(canvasCentreX,canvasCentreY,0,canvasCentreX,canvasCentreY,250);
+gradient.addColorStop(0,&quot;rgb(0,0,0)&quot;);
+gradient.addColorStop(1,&quot;rgb(150,150,150)&quot;);
+context.fillStyle = gradient;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;贝塞尔曲线&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;//一阶贝塞尔曲线
+context.lineWidth = 15;
+context.beginPath();
+context.moveTo(200,200);
+context.quadraticCurveTo(350,200,450,450);
+context.stroke();
+//三阶贝塞尔曲线
+context.lineWidth = 15;
+context.beginPath();
+context.moveTo(200,200);
+context.bezierCurveTo(350,200,450,450,800,500);
+context.stroke();
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;a href=&quot;../../../html5/canvas2.html&quot;&gt;HTML5练习2&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;section-4&quot;&gt;3.把绘制的图像导出，并应用到其他地方&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;var dataURL = canvas.get(0).toDataURL();
+var img = $(&quot;&amp;lt;img&amp;gt;&amp;lt;/img&amp;gt;&quot;);
+img.attr(&quot;src&quot;,dataURL);
+canvas.replaceWith(img);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;a href=&quot;../../../html5/canvas3.html&quot;&gt;HTML5练习3&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;section-5&quot;&gt;4.对图片进行处理&lt;/h2&gt;
+
+&lt;p&gt;在画布上绘制图片&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;var image = new Image();
+image.src = &quot;example.jpg&quot;;
+$(image).load(function(e) {
+	//显示图像
+    context.drawImage(image,0,0);
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;section-6&quot;&gt;对图片进行处理，可以对每个像素点进行操作，图片大的话，不推荐&lt;/h3&gt;
+
+&lt;h3 id=&quot;section-7&quot;&gt;对图片马赛克化，风格化处理，是将图片分割，每个格子取一个像素点，用该颜色画一个图形取代原来的格子&lt;/h3&gt;
+
+&lt;h3 id=&quot;section-8&quot;&gt;对图片作灰度处理是将图片每一个像素点，取通道均值赋给各个通道&lt;/h3&gt;
+
+&lt;h3 id=&quot;section-9&quot;&gt;对图片反相是将各个通道值被255减之后赋回给各个通道&lt;/h3&gt;
+
+&lt;h3 id=&quot;section-10&quot;&gt;之前的模糊算法是将每个像素点和周边像素点的值做正态分布加权平均然后再赋回给该像素点，做的运算更复杂&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&quot;../../../html5/drawpicture.html&quot;&gt;HTML5练习4&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;section-11&quot;&gt;5.动画&lt;/h2&gt;
+
+&lt;h3 id=&quot;section-12&quot;&gt;加一个定时器，然后对画布进行绘制-擦除-绘制循环就是动画&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&quot;../../../html5/anim.html&quot;&gt;HTML5练习5&lt;/a&gt;&lt;/p&gt;
+</description>
+      </item>
+    
+      <item>
+        <title>HTML5绘图学习</title>
+        <link>http://www.liuschen.com/2016/02/03/html5.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2016/02/03/html5.html</guid>
+        <pubDate>Wed, 03 Feb 2016 00:00:00 +0800</pubDate>
+        <description>&lt;p&gt;这几天花了点儿时间了解了下HTML5，为现有的工作拓宽一下思路，都说HTML5如何强大，之前只是听说，并没有太多的体会。用后才发现的确没有夸张，众所周知，过去网页上要想播放视频都是需要有flash插件的支持的，而flash插件则是由Adobe公司提供的，Adobe公司在图形图像处理方面表现出众，过去一直很关注它的几款产品的更新。一两年时间没注意，才发现Adobe竟然已经停止产品的迭代，转主要做服务了。而HTML5出来也很长时间了，我也是才深入的体会到它的强大，毕竟它取代了在网页上长久以来占据核心地位的flash。&lt;/p&gt;
+
+&lt;p&gt;而对于我，主要发现有3点便利的地方:&lt;/p&gt;
+
+&lt;p&gt;1.html5绘图后可以直接保存成为图片，好方便；&lt;/p&gt;
+
+&lt;p&gt;2.html5绘图API的原理同android绘图一样，很多地方共通；&lt;/p&gt;
+
+&lt;p&gt;3.html5可以对图片做处理，可以对视频做处理，可以做动画，可以写游戏，而不需要另加插件，大大提升了网页的拓展性；&lt;/p&gt;
+</description>
+      </item>
+    
+      <item>
         <title>卧狐</title>
         <link>http://www.liuschen.com/2016/01/31/fox3.html</link>
         <guid isPermaLink="true">http://www.liuschen.com/2016/01/31/fox3.html</guid>
