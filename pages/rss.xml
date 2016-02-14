@@ -6,6 +6,33 @@
     <description>落风的博客</description>
     
       <item>
+        <title>android反编译</title>
+        <link>http://www.liuschen.com/2016/02/14/apk.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2016/02/14/apk.html</guid>
+        <pubDate>Sun, 14 Feb 2016 00:00:00 +0800</pubDate>
+        <description>&lt;p&gt;android程序是apk格式，其实就是一个压缩包，可以直接解压，但是直接解压后可以直接得到资源文件，以及c的动态链接库，但是打开布局文件却是乱码，并且没有的到直接可读的java源码，所以需要用到反编译相关的软件，而android逆向助手就是一个整合了多个反编译工具的软件。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://7xpui7.com1.z0.glb.clouddn.com/blog-apk.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;其中，反编译apk和反编译dex直接提取的都是smali格式的文件&lt;/p&gt;
+
+&lt;h3 id=&quot;androidjava&quot;&gt;获得android程序源码中java格式的源码：&lt;/h3&gt;
+&lt;p&gt;通过dex转成jar格式   通过js-gui可以直接读取其中的内容，如果里面代码经过了混淆，则被混淆过的代码名称均用无意义的英文字母来命名，因为更改了名称，所以该部分代码不能用到反射。&lt;/p&gt;
+
+&lt;h3 id=&quot;androidxml&quot;&gt;获得android程序源码中的xml文件：&lt;/h3&gt;
+
+&lt;p&gt;反编译apk中就能获得xml文件用的APKTool工具&lt;br /&gt;
+没有说明出错了, apktool.jar版本没更，跟不上android的版本&lt;br /&gt;
+直接替换反编译却又不能出结果&lt;/p&gt;
+
+&lt;h3 id=&quot;section&quot;&gt;结果：&lt;/h3&gt;
+
+&lt;p&gt;直接用里面的apktool d 文件 来解析xml文件&lt;br /&gt;
+用完整工具可以解析src中的Java文件&lt;/p&gt;
+</description>
+      </item>
+    
+      <item>
         <title>html5内嵌入android</title>
         <link>http://www.liuschen.com/2016/02/05/html5-2.html</link>
         <guid isPermaLink="true">http://www.liuschen.com/2016/02/05/html5-2.html</guid>
@@ -22,6 +49,12 @@
 
 &lt;pre&gt;&lt;code&gt;&amp;lt;uses-permission android:name=&quot;android.permission.INTERNET&quot; /&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;然后就可以在就可以写一些js代码来嵌入Android应用，所以我又写了一个简单的loading用来做嵌入Android的测试；&lt;/p&gt;
+
+&lt;p&gt;loading本来是想做的像玉器一样的，但是太耗费时间，所以配色上可能不太理想。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;../../../html5/loading.html&quot;&gt;loading动画&lt;/a&gt;&lt;/p&gt;
 </description>
       </item>
     

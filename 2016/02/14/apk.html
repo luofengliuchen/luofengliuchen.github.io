@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
 <!--[if lte IE 9]><meta http-equiv="refresh" content="0;url=/ie.html"><![endif]-->
 
-<title>HTML5绘图学习 | 落风的博客</title>
+<title>android反编译 | 落风的博客</title>
 <meta name="author" content="落风">
 
-  <meta name="keywords" content="html">
+  <meta name="keywords" content="反编译">
 
 
 
@@ -92,23 +92,33 @@
     <div id="post">
       <div id="pjax">
         <article id="post__content">
-  <h1 id="post__title" data-identifier="20160203">HTML5绘图学习</h1>
-  <p>这几天花了点儿时间了解了下HTML5，为现有的工作拓宽一下思路，都说HTML5如何强大，之前只是听说，并没有太多的体会。用后才发现的确没有夸张，众所周知，过去网页上要想播放视频都是需要有flash插件的支持的，而flash插件则是由Adobe公司提供的，Adobe公司在图形图像处理方面表现出众，过去一直很关注它的几款产品的更新。一两年时间没注意，才发现Adobe竟然已经停止产品的迭代，转主要做服务了。而HTML5出来也很长时间了，我也是才深入的体会到它的强大，毕竟它取代了在网页上长久以来占据核心地位的flash。</p>
+  <h1 id="post__title" data-identifier="20160214">android反编译</h1>
+  <p>android程序是apk格式，其实就是一个压缩包，可以直接解压，但是直接解压后可以直接得到资源文件，以及c的动态链接库，但是打开布局文件却是乱码，并且没有的到直接可读的java源码，所以需要用到反编译相关的软件，而android逆向助手就是一个整合了多个反编译工具的软件。</p>
 
-<p>而对于我，主要发现有3点便利的地方:</p>
+<p><img src="http://7xpui7.com1.z0.glb.clouddn.com/blog-apk.png" alt="" /></p>
 
-<p>1.html5绘图后可以直接保存成为图片，好方便；</p>
+<p>其中，反编译apk和反编译dex直接提取的都是smali格式的文件</p>
 
-<p>2.html5绘图API的原理同android绘图一样，很多地方共通；</p>
+<h3 id="androidjava">获得android程序源码中java格式的源码：</h3>
+<p>通过dex转成jar格式   通过js-gui可以直接读取其中的内容，如果里面代码经过了混淆，则被混淆过的代码名称均用无意义的英文字母来命名，因为更改了名称，所以该部分代码不能用到反射。</p>
 
-<p>3.html5可以对图片做处理，可以对视频做处理，可以做动画，可以写游戏，而不需要另加插件，大大提升了网页的拓展性；</p>
+<h3 id="androidxml">获得android程序源码中的xml文件：</h3>
+
+<p>反编译apk中就能获得xml文件用的APKTool工具<br />
+没有说明出错了, apktool.jar版本没更，跟不上android的版本<br />
+直接替换反编译却又不能出结果</p>
+
+<h3 id="section">结果：</h3>
+
+<p>直接用里面的apktool d 文件 来解析xml文件<br />
+用完整工具可以解析src中的Java文件</p>
 
 </article> <!-- end #post__content -->
 
 <div id="post__share">
-  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/02/03/html5.html&text=HTML5绘图学习" target="_blank"></a>
+  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/02/14/apk.html&text=android反编译" target="_blank"></a>
   <a id="icon-cc" class="fontello" href="http://creativecommons.org/licenses/by-nc-sa/3.0" target="_blank"></a>
-  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/02/03/html5.html&title=HTML5绘图学习" target="_blank"></a>
+  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/02/14/apk.html&title=android反编译" target="_blank"></a>
 </div> <!-- end #post__share -->
 <div id="disqus_thread" name="luofeng">
   <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
