@@ -29,11 +29,13 @@
 
   /2016/01/25/stackblur.html
 
-  /2016/01/22/android-logo.html
-
   /2016/01/18/listview-focus.html
 
   /2016/01/18/android-StringPicker.html
+
+  /2016/01/15/draw-a-logo2.html
+
+  /2016/01/15/android-logo1.html
 
   /2016/01/15/NDK.html
 

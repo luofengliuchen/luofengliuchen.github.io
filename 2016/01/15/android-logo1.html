@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
 <!--[if lte IE 9]><meta http-equiv="refresh" content="0;url=/ie.html"><![endif]-->
 
-<title>梦花 | 落风的博客</title>
+<title>Android绘图-LOGO-实现3 | 落风的博客</title>
 <meta name="author" content="落风">
 
-  <meta name="keywords" content="梦">
+  <meta name="keywords" content="logo">
 
 
 
@@ -94,31 +94,57 @@
     <div id="post">
       <div id="pjax">
         <article id="post__content">
-  <h1 id="post__title" data-identifier="20160127">梦花</h1>
+  <h1 id="post__title" data-identifier="20160115">Android绘图-LOGO-实现3</h1>
   <blockquote>
-  <p>想写些小说,但是老实说,写出来老是缺少画面感,并且多半时候今天写了，明天就会看得不顺，所以作罢了好多次，但是如果一直不写，也就谈不上进步。所有权当练习表达了。</p>
+  <p>之前版本首先是对绘制圆环的各种方法进行分析，由于圆环要添加动画效果。所以最终选择了Path和Path相加减的方式得到想要的圆环，前半部分动画效果由于是分开的所以用了3个track来分别处理他们，而用一个handler定时器来触发并维持动画效果。后半部分动画由于是整体动画，所以我选择了对画布整体进行变换操作来实现该退出动画，又由于是对画布进行的操作，所以必须放在绘制图形前面。</p>
 </blockquote>
 
-<p>初生一觉醒来，发现自己正坐在大巴里，大巴没动，看着正在陆续上来找座位的同学，初生明白了自己还没走，是要去哪里，一时之间却始终想不起来。</p>
+<p>再版，特殊情况:将内外圆的圆心统一设置为原点</p>
 
-<p>现在好像正值仲夏，烈日当空，蝉声的嘶鸣催动的空气中的燥热，在四处恣意的流动，弯曲了光线，仿佛用肉眼就能看到空气中那细小的流苏，灼人肌肤，燥人心房。</p>
+<p><img src="http://7xpui7.com1.z0.glb.clouddn.com/blog_logo.png" alt="" /><br />
+之前版本track1和track2以及track3内外圆的圆心是不同的。所以将圆环分成3个部分，才能使每一部分的间隙内外不至于差太大。之前右半部分的位移动画是靠圆心位置来定初始点和终点的。当然内外半径也可以做成动画效果。</p>
 
-<p>初生想不起来自己是要去哪里，回家？亦或是离去，游玩？也可能是逃离。</p>
+<p>如果内外圆心统一定为原点，依然可以用圆心的移动来做动画,但是这时候环块之间的间隙就会像环的其他部分一样，呈向外发散状，所以这是就需要另外用一个路径将环块之间的间隙切出来。这里就需要用到几何学来画图了。<br />
+<img src="http://7xpui7.com1.z0.glb.clouddn.com/blog_logo2.jpeg" alt="" /></p>
 
-<p>初生又打了个盹儿，梦里他看到一片圆形的雨云突然遮蔽了天空，四周顿时变得阴暗。初生来不及思考，只是见那雨云越来越厚，四周的空气也变的厚重起来，令他喘不过气。如果说此时的他的痛苦能够让他忘记思考，那么接下来他看到的也足以令他忘记这种苦痛的了，周遭的空气变得越发的重，突然，不可思议的事情发生了，初生隔着窗子外的建筑开始发生变化，掉落的砖瓦开始，重新砌好，因为年久剥落的涂料开始一点点的重新回到墙上，渐渐的，整个建筑焕然一新，只是这个过程却丝毫没有半分减缓的迹象，却仿佛更快了，建筑逐渐低矮，最后全部变成了堆积在一旁的砖瓦。又是一栋建筑在飞散的灰尘中瞬间立起，由旧变新，最后变化的速度太快，以至于仿佛本来是电影被点了快进一般却突然被人索性拖着进度条直溜的就朝尾声奔去了。</p>
+<p>如图在坐标系统沿着最大半圆的切痕画一条过原点的直线AC，然后平移一段距离得到另一条直线BD，垂直于两条直线的距离为固定的值，即trans，通过函数可以得到两条直线:</p>
 
-<p>初生隐隐约约明白了发生了什么。他睁开眼，大脑柔乎了一阵儿，仔细的观察了一下四周，一个激灵上来，瞬间清醒了好多，才明白眼前发生的不是梦。</p>
+<pre><code>public float line1(float x,float degree){
+    double dX = new BigDecimal(String.valueOf(x)).doubleValue();
+    double dDegree = new BigDecimal(String.valueOf(degree)).doubleValue();
+    return (float)((Math.tan(Math.toRadians(dDegree)))*dX);
+}
 
-<blockquote>
-  <p>其实就是我昨天做的梦，因为梦里很玄妙的样子，印象很深，不是有妙笔生花一说吗？这可以叫妙梦生花，故曰:梦花。</p>
-</blockquote>
+
+public float line2(float x,float degree,float trans){
+    double dX = new BigDecimal(String.valueOf(x)).doubleValue();
+    double dDegree = new BigDecimal(String.valueOf(degree)).doubleValue();
+    double dTrans = new BigDecimal(String.valueOf(trans)).doubleValue();
+    return (float)(Math.tan(Math.toRadians(dDegree))
+            *(dX) - dTrans/(Math.sin(Math.toRadians(dDegree))));
+}
+</code></pre>
+
+<p>计算这两条直线是为了取得A,B,C,D点的，而其中X点可以任取，只要大于外圆半径就行，输入的degree是为了切取另外两个地方通用。</p>
+
+<p><img src="http://7xpui7.com1.z0.glb.clouddn.com/blog_logo3.jpg" alt="" /></p>
+
+<p>通过自取x从而得到y，就可以的到想要的用来切取圆环的四边形，上图中绘制的是环中最为难切得一个间隙，需要同时对上下两部分圆环进行切取，且比例不一。</p>
+
+<p>另外，需要注意的有两点：</p>
+
+<p>一是android中的坐标系y轴正向是向下的，而这个数学上标准的坐标系y轴是向上的，需要考虑并转换。</p>
+
+<p>二是直线与y轴呈的夹角&amp;越小，取任意的x点，y=xtan&amp;所得到的y偏差越大。因为x值固定，&amp;角越小，y越趋近于无穷大，计算时本来可以忽略的近似误差也变的不可忽略。所以本来设定的trans值固定，但实际却是会随着&amp;角而改变。所以最后对几个间隙分别设置了trans值，使它们外观上变得近似。</p>
+
+<p>至此，logo绘制完毕，可能通用性不强(中间其实我还是发现不少变化的)，但是做这个动画logo一波三折，中间是改了又改，而解决问题这个过程我想还是值得记录下来的。</p>
 
 </article> <!-- end #post__content -->
 
 <div id="post__share">
-  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/01/27/dream-flower.html&text=梦花" target="_blank"></a>
+  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/01/15/android-logo1.html&text=Android绘图-LOGO-实现3" target="_blank"></a>
   <a id="icon-cc" class="fontello" href="http://creativecommons.org/licenses/by-nc-sa/3.0" target="_blank"></a>
-  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/01/27/dream-flower.html&title=梦花" target="_blank"></a>
+  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/01/15/android-logo1.html&title=Android绘图-LOGO-实现3" target="_blank"></a>
 </div> <!-- end #post__share -->
 <div id="disqus_thread" name="luofeng">
   <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>

@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
 <!--[if lte IE 9]><meta http-equiv="refresh" content="0;url=/ie.html"><![endif]-->
 
-<title>梦花 | 落风的博客</title>
+<title>Android绘图-LOGO-实现3 | 落风的博客</title>
 <meta name="author" content="落风">
 
-  <meta name="keywords" content="梦">
+  <meta name="keywords" content="android ,绘图,logo">
 
 
 
@@ -76,7 +76,7 @@
     
       <a class="技术 pl__all" href="/2016/01/18/android-StringPicker.html"><span class="pl__circle"></span><span class="pl__title">NumberPicker与StringPicker</span><span class="pl__date">Jan 2016</span></a>
     
-      <a class="技术 pl__all" href="/2016/01/15/draw-a-logo2.html"><span class="pl__circle"></span><span class="pl__title">Android绘图-LOGO兼容低版本</span><span class="pl__date">Jan 2016</span></a>
+      <a class="技术 pl__all" href="/2016/01/15/draw-a-logo.html"><span class="pl__circle"></span><span class="pl__title">Android绘图-LOGO-实现3</span><span class="pl__date">Jan 2016</span></a>
     
       <a class="技术 pl__all" href="/2016/01/15/android-logo1.html"><span class="pl__circle"></span><span class="pl__title">Android绘图-LOGO-实现3</span><span class="pl__date">Jan 2016</span></a>
     
@@ -94,31 +94,44 @@
     <div id="post">
       <div id="pjax">
         <article id="post__content">
-  <h1 id="post__title" data-identifier="20160127">梦花</h1>
-  <blockquote>
-  <p>想写些小说,但是老实说,写出来老是缺少画面感,并且多半时候今天写了，明天就会看得不顺，所以作罢了好多次，但是如果一直不写，也就谈不上进步。所有权当练习表达了。</p>
-</blockquote>
+  <h1 id="post__title" data-identifier="20160115">Android绘图-LOGO-实现3</h1>
+  <p>最开始被带沟里了，走了不少弯路，兼容方法:通过圆弧相接画圆环</p>
 
-<p>初生一觉醒来，发现自己正坐在大巴里，大巴没动，看着正在陆续上来找座位的同学，初生明白了自己还没走，是要去哪里，一时之间却始终想不起来。</p>
+<pre><code>private void drawRing(Canvas canvas, Paint paint,float interX, float innerY,float outerX, float outerY,float outerStartAngle,float outerSweepAngle,float innerStartAngle,float innerSweepAnglefloat ,float inner_circle,float outter_circle) {
 
-<p>现在好像正值仲夏，烈日当空，蝉声的嘶鸣催动的空气中的燥热，在四处恣意的流动，弯曲了光线，仿佛用肉眼就能看到空气中那细小的流苏，灼人肌肤，燥人心房。</p>
+        Path mPath = new Path();
+        arcTo(mPath,outerX,outerY,outter_circle,outerStartAngle,outerSweepAngle,false);
+        arcTo(mPath,interX,innerY,inner_circle,innerStartAngle+innerSweepAnglefloat,-innerSweepAnglefloat,false);
+        mPath.close();
+        canvas.drawPath(mPath,paint);
 
-<p>初生想不起来自己是要去哪里，回家？亦或是离去，游玩？也可能是逃离。</p>
+    }
+</code></pre>
 
-<p>初生又打了个盹儿，梦里他看到一片圆形的雨云突然遮蔽了天空，四周顿时变得阴暗。初生来不及思考，只是见那雨云越来越厚，四周的空气也变的厚重起来，令他喘不过气。如果说此时的他的痛苦能够让他忘记思考，那么接下来他看到的也足以令他忘记这种苦痛的了，周遭的空气变得越发的重，突然，不可思议的事情发生了，初生隔着窗子外的建筑开始发生变化，掉落的砖瓦开始，重新砌好，因为年久剥落的涂料开始一点点的重新回到墙上，渐渐的，整个建筑焕然一新，只是这个过程却丝毫没有半分减缓的迹象，却仿佛更快了，建筑逐渐低矮，最后全部变成了堆积在一旁的砖瓦。又是一栋建筑在飞散的灰尘中瞬间立起，由旧变新，最后变化的速度太快，以至于仿佛本来是电影被点了快进一般却突然被人索性拖着进度条直溜的就朝尾声奔去了。</p>
+<p>构造的方法同html5中的对应方法用相似的参数，只是最后forceMoveTo是是否强制封闭圆弧，和js中的最后参数控制绘制顺逆方向不同</p>
 
-<p>初生隐隐约约明白了发生了什么。他睁开眼，大脑柔乎了一阵儿，仔细的观察了一下四周，一个激灵上来，瞬间清醒了好多，才明白眼前发生的不是梦。</p>
+<pre><code>/**
+ * 通过已知圆心半径和夹角画圆心
+ * */
+private void arcTo(Path path ,float circleX,float circleY,float circleR, float startAngle,
+                   float sweepAngle, boolean forceMoveTo){
 
-<blockquote>
-  <p>其实就是我昨天做的梦，因为梦里很玄妙的样子，印象很深，不是有妙笔生花一说吗？这可以叫妙梦生花，故曰:梦花。</p>
-</blockquote>
+    float left = circleX - circleR;
+    float right = circleX + circleR;
+    float top = circleY -circleR;
+    float bottom = circleY + circleR;
+
+    path.arcTo(new RectF(left, top, right, bottom), startAngle,
+            sweepAngle, forceMoveTo);
+}
+</code></pre>
 
 </article> <!-- end #post__content -->
 
 <div id="post__share">
-  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/01/27/dream-flower.html&text=梦花" target="_blank"></a>
+  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/01/15/draw-a-logo.html&text=Android绘图-LOGO-实现3" target="_blank"></a>
   <a id="icon-cc" class="fontello" href="http://creativecommons.org/licenses/by-nc-sa/3.0" target="_blank"></a>
-  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/01/27/dream-flower.html&title=梦花" target="_blank"></a>
+  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/01/15/draw-a-logo.html&title=Android绘图-LOGO-实现3" target="_blank"></a>
 </div> <!-- end #post__share -->
 <div id="disqus_thread" name="luofeng">
   <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
