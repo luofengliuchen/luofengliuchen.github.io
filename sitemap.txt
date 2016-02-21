@@ -9,6 +9,14 @@
 
 
 
+  /2016/02/21/studio.html
+
+  /2016/02/19/c++.html
+
+  /2016/02/17/socket.html
+
+  /2016/02/16/apk.html
+
   /2016/02/14/apk.html
 
   /2016/02/05/html5-2.html

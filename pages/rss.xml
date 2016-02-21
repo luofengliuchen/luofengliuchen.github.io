@@ -6,6 +6,364 @@
     <description>落风的博客</description>
     
       <item>
+        <title>Visual Studio开发Android程序</title>
+        <link>http://www.liuschen.com/2016/02/21/studio.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2016/02/21/studio.html</guid>
+        <pubDate>Sun, 21 Feb 2016 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;早就听说微软在新版的visual studio上增强了对移动开发的便利，而且提供的Android模拟器比Google提供的性能上要好很多，所以周末就弄了一下，简单说一下遇到的问题&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h1 id=&quot;visual-studio-2015&quot;&gt;1.安装Visual Studio 2015&lt;/h1&gt;
+
+&lt;p&gt;安装Visual Studio 2015时，要联网下载很多东西，虽然安装包已经不小了，很显然，安装的要更多。装了近10个小时（只能说我够闲），完了后仍然提示我说android 的sdk和一个git相关的什么东西没装上，最重要的是sdk没装上肯定就不能开发Android了，下载是不现实的，所以就用了我本地存放的sdk,更改sdk路径的设置需要依次点击&lt;/p&gt;
+
+&lt;h3 id=&quot;cross-platform&quot;&gt;工具-选项-Cross Platform&lt;/h3&gt;
+
+&lt;p&gt;就能看到，然后勾选Android SDK前面的选择框就可以更改路径了。&lt;/p&gt;
+
+&lt;p&gt;调试Android程序，如果是真机调试一般选ARM，连接上手机开发者一般就能看到设备了，如果是window的虚拟机则是选x86。&lt;/p&gt;
+
+&lt;h1 id=&quot;window&quot;&gt;2.安装window的虚拟机&lt;/h1&gt;
+
+&lt;p&gt;安装window提供的Android虚拟机需要window对Hyper-V的支持，这个功能家庭版上没有，至少要专业版才行，然后再控制面板中打开该功能，电脑在此期间会重启来完成功能的添加。之后就能安装虚拟机了，如果没有添加该功能直接安装会出错，安装虚拟机要升级到最新版本，安装完后就能使用了。&lt;/p&gt;
+
+&lt;p&gt;window提供的Android虚拟机的基础Hyper-V感觉和workstation以及virtualbox差不多，但是毕竟是在window系统自家提供的功能，相必必有一些过人的地方，只是Android的模拟器虽然速度比Google自己的要快很多，但是总有些似曾相识的感觉，之前用sdk自带的虚拟机，在window上其实也是可以加速的，也就是单独针对x86架构有加速的独立window程序可以安装，和这个差不多，都是针对同一种架构的优化，从这个意义上来讲，其实这个虚拟机对我做开发意义并不是太大。&lt;/p&gt;
+
+&lt;h1 id=&quot;visual-studio-2015-1&quot;&gt;3.Visual Studio 2015编程&lt;/h1&gt;
+
+&lt;p&gt;我最期待的是Visual Studio 2015用c++来架构程序的效果，新建工程时,我发现没有Java构建代码的模板，好像在这里面C#是Java的等效语言，除此之外就是Visual c++，在里面的跨平台中还是找到了一个模板可以构建Java的Android程序，同时也可以建c++共享库，也有纯c++来开发Android的模板，遗憾的是，我看过之后发现这个模板是完全照抄的NDK中的示例源码，可见这并不是visualstudio的主要功能。其中也有Apache Cordova的模板，用网页前端语言构建app的框架，这个可以使代码可以轻松的跨平台，在节省开发成本上具有广泛意义，但传统的仍然认为这种方式在运行速度上仍不理想，所以现在还是以Java+html5混合编程为主。&lt;/p&gt;
+</description>
+      </item>
+    
+      <item>
+        <title>C++学习整理</title>
+        <link>http://www.liuschen.com/2016/02/19/c++.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2016/02/19/c++.html</guid>
+        <pubDate>Fri, 19 Feb 2016 00:00:00 +0800</pubDate>
+        <description>&lt;h2 id=&quot;section&quot;&gt;打印字符串&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;#include &amp;lt;iostream&amp;gt;
+extern int pow(int, int);
+int main()
+{
+	int val = 2;
+	int exp = 15;
+	cout &amp;lt;&amp;lt; &quot;The Powers of 2\n&quot;;
+	for ( int cnt=0; cnt &amp;lt;= exp; ++cnt )
+	cout &amp;lt;&amp;lt; cnt &amp;lt;&amp;lt; &quot;: &quot;
+	&amp;lt;&amp;lt; pow(val, cnt) &amp;lt;&amp;lt; endl;
+	return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&quot;inline&quot;&gt;内联函数inline,最好放在头文件中&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;inline int min( int v1, int v2 ) { /* ... */ }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&quot;extern-c&quot;&gt;链接指示符 extern “c”,告诉编译器函数编写语言类型&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;// 单一语句形式的链接指示符
+extern &quot;C&quot; void exit(int);
+// 复合语句形式的链接指示符
+extern &quot;C&quot; {
+int printf( const char* ... );
+int scanf( const char* ... );
+}
+// 复合语句形式的链接指示符
+extern &quot;C&quot; {
+	#include &amp;lt;cmath&amp;gt;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;链接指示符不能出现在函数体中，并且如果需要c调用c++程序也需要在前面生命链接指示符,链接指示符如果声明多次，可以只声明一次，自动作用于后面&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;// ---- myMath.h ----
+extern &quot;C&quot; double calc( double );
+// ---- myMath.C ----
+// 在 Math.h 中的calc() 的声明
+#include &quot;myMath.h&quot;
+// 定义了 extern &quot;C&quot; calc() 函数
+// calc() 可以从C 程序中被调用
+double calc( double dparm ) { // ...
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+      </item>
+    
+      <item>
+        <title>Socket编程笔记</title>
+        <link>http://www.liuschen.com/2016/02/17/socket.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2016/02/17/socket.html</guid>
+        <pubDate>Wed, 17 Feb 2016 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;android中的socket连接HttpURLConnection来实现的。而HttpClient是对HttpURLConnection做了一层封装，HttpClient6.0之后被废弃了,推荐用HttpURLConnection。而HttpURLConnection继承于HttpConnection，两者都是抽象类，想了解其中的实现原理，就要深入的剖析一下代码，但是其中一些关键的方法如connect()方法却是抽象的，所以需要找到它的实现类。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;首先，是找到connect()的实现，最可能的是在URL类中找线索，因为是在url中获取的&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;URL url = new URL(httpUrl);//此处有异常抛出
+HttpURLConnection urlConn = (HttpURLConnection) url.openConnection();
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;然而，URL中却显示streamHandler中取得的&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;public URLConnection openConnection() throws IOException {
+    return streamHandler.openConnection(this);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;而streamHandler这个实例所属的对象实现的方法仍然是抽象的&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;protected abstract URLConnection openConnection(URL u) throws IOException;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;也就是说单独知道这个出处还不够，还需要知道streamHandler是在什么时候被赋值的，这时候可以注意到URL中有URLStreamHandlerFactory streamHandlerFactory的工厂声明，点击去发现还是抽象的(晕)，然后顺着streamHandlerFactory就找到了下面的方法，是对streamHandler赋值的关键&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt; void setupStreamHandler() {
+    // Check for a cached (previously looked up) handler for
+    // the requested protocol.
+    streamHandler = streamHandlers.get(protocol);
+    if (streamHandler != null) {
+        return;
+    }
+
+    // If there is a stream handler factory, then attempt to
+    // use it to create the handler.
+    if (streamHandlerFactory != null) {
+        streamHandler = streamHandlerFactory.createURLStreamHandler(protocol);
+        if (streamHandler != null) {
+            streamHandlers.put(protocol, streamHandler);
+            return;
+        }
+    }
+
+    // Check if there is a list of packages which can provide handlers.
+    // If so, then walk this list looking for an applicable one.
+    String packageList = System.getProperty(&quot;java.protocol.handler.pkgs&quot;);
+    ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+    if (packageList != null &amp;amp;&amp;amp; contextClassLoader != null) {
+        for (String packageName : packageList.split(&quot;\\|&quot;)) {
+            String className = packageName + &quot;.&quot; + protocol + &quot;.Handler&quot;;
+            try {
+                Class&amp;lt;?&amp;gt; c = contextClassLoader.loadClass(className);
+                streamHandler = (URLStreamHandler) c.newInstance();
+                if (streamHandler != null) {
+                    streamHandlers.put(protocol, streamHandler);
+                }
+                return;
+            } catch (IllegalAccessException ignored) {
+            } catch (InstantiationException ignored) {
+            } catch (ClassNotFoundException ignored) {
+            }
+        }
+    }
+
+    // Fall back to a built-in stream handler if the user didn&#39;t supply one
+    if (protocol.equals(&quot;file&quot;)) {
+        streamHandler = new FileHandler();
+    } else if (protocol.equals(&quot;ftp&quot;)) {
+        streamHandler = new FtpHandler();
+    } else if (protocol.equals(&quot;http&quot;)) {
+        try {
+            String name = &quot;com.android.okhttp.HttpHandler&quot;;
+            streamHandler = (URLStreamHandler) Class.forName(name).newInstance();
+        } catch (Exception e) {
+            throw new AssertionError(e);
+        }
+    } else if (protocol.equals(&quot;https&quot;)) {
+        try {
+            String name = &quot;com.android.okhttp.HttpsHandler&quot;;
+            streamHandler = (URLStreamHandler) Class.forName(name).newInstance();
+        } catch (Exception e) {
+            throw new AssertionError(e);
+        }
+    } else if (protocol.equals(&quot;jar&quot;)) {
+        streamHandler = new JarHandler();
+    }
+    if (streamHandler != null) {
+        streamHandlers.put(protocol, streamHandler);
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;看注释区分，总共分为4个部分&lt;/p&gt;
+
+&lt;h1 id=&quot;section&quot;&gt;第一部分&lt;/h1&gt;
+
+&lt;pre&gt;&lt;code&gt; streamHandler = streamHandlers.get(protocol);
+    if (streamHandler != null) {
+        return;
+    }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;是取缓存的streamHandler实例，如果已经存在了，就不会往下执行了。&lt;/p&gt;
+
+&lt;h1 id=&quot;section-1&quot;&gt;第二部分&lt;/h1&gt;
+
+&lt;pre&gt;&lt;code&gt;if (streamHandlerFactory != null) {
+        streamHandler = streamHandlerFactory.createURLStreamHandler(protocol);
+        if (streamHandler != null) {
+            streamHandlers.put(protocol, streamHandler);
+            return;
+        }
+    }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;明显用到了工厂，所以需要知道工厂的出处，是这里:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;/**
+ * Sets the stream handler factory for this VM.
+ *
+ * @throws Error if a URLStreamHandlerFactory has already been installed
+ *     for the current VM.
+ */
+public static synchronized void setURLStreamHandlerFactory(URLStreamHandlerFactory factory) {
+    if (streamHandlerFactory != null) {
+        throw new Error(&quot;Factory already set&quot;);
+    }
+    streamHandlers.clear();
+    streamHandlerFactory = factory;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;得了，这个是公共的设置方法:Sets the stream handler factory for this VM顿时感觉好高大上，总之，不通。&lt;/p&gt;
+
+&lt;h1 id=&quot;section-2&quot;&gt;第三部分&lt;/h1&gt;
+
+&lt;p&gt;在系统属性指定的包中寻找相应的URLStreamHandler处理类，因为没怎么用过这种方法，值得注意，不过不是这里的重点&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;String packageList = System.getProperty(&quot;java.protocol.handler.pkgs&quot;);
+    ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+    if (packageList != null &amp;amp;&amp;amp; contextClassLoader != null) {
+        for (String packageName : packageList.split(&quot;\\|&quot;)) {
+            String className = packageName + &quot;.&quot; + protocol + &quot;.Handler&quot;;
+            try {
+                Class&amp;lt;?&amp;gt; c = contextClassLoader.loadClass(className);
+                streamHandler = (URLStreamHandler) c.newInstance();
+                if (streamHandler != null) {
+                    streamHandlers.put(protocol, streamHandler);
+                }
+                return;
+            } catch (IllegalAccessException ignored) {
+            } catch (InstantiationException ignored) {
+            } catch (ClassNotFoundException ignored) {
+            }
+        }
+    }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id=&quot;section-3&quot;&gt;第四部分&lt;/h1&gt;
+
+&lt;p&gt;再不成只能做最后的挣扎了&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;if (protocol.equals(&quot;file&quot;)) {
+        streamHandler = new FileHandler();
+    } else if (protocol.equals(&quot;ftp&quot;)) {
+        streamHandler = new FtpHandler();
+    } else if (protocol.equals(&quot;http&quot;)) {
+        try {
+            String name = &quot;com.android.okhttp.HttpHandler&quot;;
+            streamHandler = (URLStreamHandler) Class.forName(name).newInstance();
+        } catch (Exception e) {
+            throw new AssertionError(e);
+        }
+    } else if (protocol.equals(&quot;https&quot;)) {
+        try {
+            String name = &quot;com.android.okhttp.HttpsHandler&quot;;
+            streamHandler = (URLStreamHandler) Class.forName(name).newInstance();
+        } catch (Exception e) {
+            throw new AssertionError(e);
+        }
+    } else if (protocol.equals(&quot;jar&quot;)) {
+        streamHandler = new JarHandler();
+    }
+    if (streamHandler != null) {
+        streamHandlers.put(protocol, streamHandler);
+    }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;其中https依然是在特定包com.android.okhttp.HttpsHandler中找&lt;br /&gt;
+而其他的则是直接new一个对象，这些对象的导入&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;import libcore.net.url.FileHandler;
+import libcore.net.url.FtpHandler;
+import libcore.net.url.JarHandler;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;在androidstudio中显示的是灰色的，表示没有没有提供相关源码，至此，线索全断了，不过通过这些查找也并非没有收获。&lt;/p&gt;
+
+&lt;p&gt;一直以来找的URLStreamHandler streamHandler其实是一个协议流处理器，每一个&lt;br /&gt;
+对应一个URLHttpConnection，至于实现它们的源码，限于sdk中源码包没有所以没看到，不过却找到了出处，网上查了一下知道了其中实现也是通过Socket，大体的关系总是理清了。&lt;/p&gt;
+
+&lt;h1 id=&quot;section-4&quot;&gt;总结：&lt;/h1&gt;
+
+&lt;p&gt;1.URLHttpConnection和URLHttpsConnection都继承了URLConnection都是基于应用层对http或https协议的封装，里面通信还是用的socket&lt;/p&gt;
+
+&lt;p&gt;2.URLConnection里面调用的Socket是传输层对应用层提供的抽象接口,是下层黑箱的一个门面，其中包括的协议有传输层的TCP协议和UDP协议，以及网络层的IP协议。当然也可以直接用socket通信，可以在应用层通过socket来架构网络框架，但是需要考虑多线程，以及状态监控（其实用URLConnection也要自己写多线程）等因素，更省流量以及更可控，但是如果要用到http等应用层协议，还是用URLConnection方便些。&lt;/p&gt;
+
+&lt;p&gt;3.每个URLConnection都有一个相对应的URLStreamHandler实例用来处理协议，URL类中还有关于file，ftp,jar对应类型的URLStreamHandler应该也是一些协议的封装的处理器，也就是说每一种协议需要对应一种处理模型。&lt;/p&gt;
+
+&lt;h1 id=&quot;section-5&quot;&gt;最后，温习一下网络模型：&lt;/h1&gt;
+
+&lt;h2 id=&quot;section-6&quot;&gt;应用层-应用层，表示层，会话层&lt;/h2&gt;
+
+&lt;h2 id=&quot;section-7&quot;&gt;传输层-传输层&lt;/h2&gt;
+
+&lt;h2 id=&quot;section-8&quot;&gt;网际互联层-网络层&lt;/h2&gt;
+
+&lt;h2 id=&quot;section-9&quot;&gt;网络接入层-数据链路层，物理层&lt;/h2&gt;
+
+</description>
+      </item>
+    
+      <item>
+        <title>git常用命令行</title>
+        <link>http://www.liuschen.com/2016/02/16/apk.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2016/02/16/apk.html</guid>
+        <pubDate>Tue, 16 Feb 2016 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;首先将git目录下的cmd配置到环境变量，打开cmd就可以使用git命令，git仓库就是目录下隐藏的.git文件夹&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://www.bootcss.com/p/git-guide/&quot;&gt;git简易使用说明(外链)&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;创建版本库&lt;br /&gt;
+git init&lt;/p&gt;
+
+&lt;p&gt;查看分支&lt;br /&gt;
+git branch&lt;br /&gt;
+git branch -a&lt;/p&gt;
+
+&lt;p&gt;从远端拉取&lt;br /&gt;
+git clone 地址&lt;/p&gt;
+
+&lt;p&gt;显示状态&lt;br /&gt;
+git status&lt;/p&gt;
+
+&lt;p&gt;修改加入缓存&lt;br /&gt;
+git add filename&lt;/p&gt;
+
+&lt;p&gt;修改提交到HEAD(本地库最近版本)&lt;br /&gt;
+git commit -m “提交注释内容”&lt;/p&gt;
+
+&lt;p&gt;创建分支并切换  单独切换分支 删除本地分支&lt;br /&gt;
+git checkout -b name&lt;br /&gt;
+git checkout name&lt;/p&gt;
+
+&lt;p&gt;还没提交到远端的分支可以直接删除&lt;br /&gt;
+git branch -d name&lt;/p&gt;
+
+&lt;p&gt;更新不需要密码&lt;br /&gt;
+git pull&lt;br /&gt;
+提交到远端库&lt;br /&gt;
+git push&lt;/p&gt;
+
+&lt;p&gt;本地有一个远端的拷贝，和远端同步&lt;/p&gt;
+</description>
+      </item>
+    
+      <item>
         <title>android反编译</title>
         <link>http://www.liuschen.com/2016/02/14/apk.html</link>
         <guid isPermaLink="true">http://www.liuschen.com/2016/02/14/apk.html</guid>
@@ -832,177 +1190,6 @@ protected void onDraw(Canvas canvas) {
     }
 }
 &lt;/code&gt;&lt;/pre&gt;
-</description>
-      </item>
-    
-      <item>
-        <title>Android绘图-LOGO-实现1</title>
-        <link>http://www.liuschen.com/2016/01/12/draw-a-logo.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2016/01/12/draw-a-logo.html</guid>
-        <pubDate>Tue, 12 Jan 2016 00:00:00 +0800</pubDate>
-        <description>&lt;p&gt;整体通过继承View来绘制自定义的logo；&lt;br /&gt;
-logo动画分为3个部分，所以通过3个track来实现对3部分动画的分别控制，3个track函数分别在ondraw里面绘制&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;@Override
-protected void onDraw(Canvas canvas) {
-    super.onDraw(canvas);
-    track1(canvas);
-    track2(canvas);
-    track3(canvas);
-    invalidate();
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;2.绘制圆环&lt;/p&gt;
-
-&lt;p&gt;圆环的绘制是基于android Java层的API来实现的&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;public void drawArc(float left, float top, float right, float bottom, float startAngle,
-            float sweepAngle, boolean useCenter, @NonNull Paint paint) {
-        native_drawArc(mNativeCanvasWrapper, left, top, right, bottom, startAngle, sweepAngle,
-                useCenter, paint.getNativeInstance());
-    }
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;其中前四个参数：&lt;br /&gt;
-左上右下是绘制图形的左边上边右边下边分别与右上角为原点的笛卡尔坐标系两坐标轴的距离&lt;br /&gt;
-startAngle:是扇形开始的角度；&lt;br /&gt;
-sweepAngle:扇形扫过的角度；&lt;strong&gt;正数为顺时针，负数为逆时针(之所以这样,是因为AndroidView中的坐标是y轴正向向下)&lt;/strong&gt;&lt;br /&gt;
-useCenter:是否包以圆心为中心点&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;paint.setColor(Color.RED);
-canvas.drawArc(-OUTTER_CIRCLE, -OUTTER_CIRCLE, OUTTER_CIRCLE, OUTTER_CIRCLE, 270, endAngle, true, paint);
-paint.setColor(Color.BLACK);
-canvas.drawArc(-INNER_CIRCLE, -INNER_CIRCLE, INNER_CIRCLE, INNER_CIRCLE, 270,endAngle, true, paint);
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;这种方法，会将圆环中心的颜色填充，不再支持透明，对于画圆环除了以上一种方法外，还可以用path来画&lt;br /&gt;
-但是path添加圆弧存在一个问题&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;Path outterpath = new Path();
-outterpath.addArc(-OUTTER_CIRCLE, -OUTTER_CIRCLE, OUTTER_CIRCLE, OUTTER_CIRCLE, 270, endAngle);
-outterpath.addArc(-INNER_CIRCLE, -INNER_CIRCLE, INNER_CIRCLE, INNER_CIRCLE, 270, endAngle);
-outterpath.setFillType(Path.FillType.EVEN_ODD);
-canvas.drawPath(outterpath,paint);
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;就是addARC里面没有useCenter参数，默认是不以圆心为中心画的，达不到效果要求。所以要画圆弧需要自己画，比较麻烦。&lt;br /&gt;
-贝塞尔曲线可以考虑，但太麻烦，需要计算。&lt;br /&gt;
-QuadTo一阶贝塞尔曲线&lt;br /&gt;
-CubicTo二阶贝塞尔曲线&lt;br /&gt;
-带r的跟去掉字母r的相对应的函数一样，但是都会考虑提供的点跟轮廓的相对位置。&lt;/p&gt;
-
-&lt;p&gt;可以依然用path但换一种方式来实现&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;	Path outterpath = new Path();
-
-    outterpath.moveTo(0, 0);
-    outterpath.lineTo(0, -OUTTER_CIRCLE);
-    outterpath.arcTo(-OUTTER_CIRCLE, -OUTTER_CIRCLE, OUTTER_CIRCLE, OUTTER_CIRCLE, 270, endAngle, true);
-    outterpath.lineTo(0, 0);
-    outterpath.close();
-
-    Path innerpath = new Path();
-
-    innerpath.moveTo(0, 0);
-    innerpath.lineTo(0, -INNER_CIRCLE);
-    innerpath.arcTo(-INNER_CIRCLE, -INNER_CIRCLE, INNER_CIRCLE, INNER_CIRCLE, 270, endAngle, true);
-    innerpath.lineTo(0, 0);
-    innerpath.close();
-
-    outterpath.setFillType(Path.FillType.EVEN_ODD);
-    outterpath.addPath(innerpath);
-    canvas.drawPath(outterpath,paint);
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;3.最后的动画效果同过定时重绘来实现&lt;/p&gt;
-
-&lt;p&gt;总的来说，在Java层通过API来调用已有的绘图函数画自己想要的图形不难，里面既有现成的绘制图形的函数比如圆，矩形等等，也有Path工具可以定制自己想要的图形，和Photoshop的绘图原理基本相同。还有贝塞尔曲线，只要数学可以，任何图形都可以画。&lt;/p&gt;
-
-&lt;p&gt;项目地址:&lt;a href=&quot;https://github.com/luofengliuchen/QJLogo&quot;&gt;github&lt;/a&gt;&lt;/p&gt;
-</description>
-      </item>
-    
-      <item>
-        <title>android图像处理:像素过滤</title>
-        <link>http://www.liuschen.com/2016/01/11/deal-with-pix.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2016/01/11/deal-with-pix.html</guid>
-        <pubDate>Mon, 11 Jan 2016 00:00:00 +0800</pubDate>
-        <description>&lt;blockquote&gt;
-  &lt;p&gt;第一次用photoshop时给我印象最深的是里面的&lt;strong&gt;色相/饱和度&lt;/strong&gt;功能&lt;/p&gt;
-
-  &lt;p&gt;用它来替换图片中的颜色特别方便。要知道我最早用来处理图片用的是微软的画图工具，在高放大率下对每一个像素点进行处理，现在想想也是醉。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;现在做程序，更多的方法也变的可行，毕竟在计算机上做的一切事情都是各种程序在下面默默付出辛劳的结果。虽然语言不同，但转换成二进制都是执行的同一件事。不同的只是有些语言，为了追求个别功能，扩展性等等再转换成底层语言时绕了远路，所以才有了效率上的差异。&lt;/p&gt;
-
-&lt;p&gt;我现在要写的是在Android上对图像像素的过滤。&lt;/p&gt;
-
-&lt;p&gt;首先如果要对bitmap里面的像素点进行操作需要将里面的一个参数&lt;/p&gt;
-
-&lt;p&gt;mIsMutable设置为true&lt;br /&gt;
-可以在copy Bitmap时设置&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;bitmap.copy(bitmap.getConfig(), true);
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;而我最开始是在写的工具方法里面通过反射设置的&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;	try {
-        Field mIsMutable = Bitmap.class.getDeclaredField(&quot;mIsMutable&quot;);
-        mIsMutable.setAccessible(true);
-        mIsMutable.setBoolean(bitmap,true);
-    } catch (NoSuchFieldException e) {
-        e.printStackTrace();
-    } catch (IllegalAccessException e) {
-        e.printStackTrace();
-    }
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;然后就对bitmap图像进行点的操作&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;int bitmapWidth = bitmap.getWidth();
-int bitmapHeight = bitmap.getHeight();
-for (int i = 0; i &amp;lt; bitmapHeight; i++) {
-    for (int j = 0; j &amp;lt; bitmapWidth; j++) {
-        int singleColor = bitmap.getPixel(j,i);
-        if(addFilter(singleColor,filter)){
-            continue;
-        }else{
-            bitmap.setPixel(j, i, color);
-        }
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;其中添加了一个过滤函数&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;private static boolean addFilter(int singleColor,ColorFilter filter) {
-
-    int a = Color.alpha(singleColor);
-    switch(filter){
-        case TRANSLATE:
-            if(a==0){
-                return true;
-            }else{
-                break;
-            }
-        case WHITE:
-            if(singleColor == 0xffffffff){
-                return true;
-            }else{
-                break;
-            }
-    }
-    return false;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;这个过滤函数可以自由定制，我这里添加了一个透明像素点和白色像素的的忽略。可以自由选择并且修改。因为要对每一个像素点进行操作，肯定需要耗费CPU资源，至于到什么程度，我也没测就是了。这个在可以在需要严控应用资源大小时用到。内部对颜色不多的图片进行色相操作，满足对资源的需求。&lt;/p&gt;
-
-&lt;p&gt;现在已知操作后图片以原分辨率显示会有明显锯齿，还没想到合适的解决办法。&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://github.com/luofengliuchen/AndroidColorMaster&quot;&gt;本篇DEMO地址&lt;/a&gt;&lt;/p&gt;
 </description>
       </item>
     
