@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
 <!--[if lte IE 9]><meta http-equiv="refresh" content="0;url=/ie.html"><![endif]-->
 
-<title>Android绘图-LOGO兼容低版本 | 落风的博客</title>
+<title>荒原日记-开篇 | 落风的博客</title>
 <meta name="author" content="落风">
 
-  <meta name="keywords" content="android ,绘图,logo">
+  <meta name="keywords" content="日记">
 
 
 
@@ -108,44 +108,20 @@
     <div id="post">
       <div id="pjax">
         <article id="post__content">
-  <h1 id="post__title" data-identifier="20160115">Android绘图-LOGO兼容低版本</h1>
-  <p>最开始被带沟里了，走了不少弯路，兼容方法:通过圆弧相接画圆环</p>
+  <h1 id="post__title" data-identifier="20160416">荒原日记-开篇</h1>
+  <p>我从哪里来，又往哪里去？在我7，8岁的时候，常常在考虑这个问题，因为小，不理解前路漫长，总是觉得人生不过弹指岁月，所以总是充满了对死亡的恐惧。</p>
 
-<pre><code>private void drawRing(Canvas canvas, Paint paint,float interX, float innerY,float outerX, float outerY,float outerStartAngle,float outerSweepAngle,float innerStartAngle,float innerSweepAnglefloat ,float inner_circle,float outter_circle) {
+<p>都说时间能抚平一切，当我将藏在幼小心中的想法封印，企图在时间之海中将它沉溺，缓缓流逝的时间却告诉我，它可以使炽烈的热恋冷却，将绝对冰点的感情消融，却无法使我遗忘自己追问本源的这种淡淡的想法。</p>
 
-        Path mPath = new Path();
-        arcTo(mPath,outerX,outerY,outter_circle,outerStartAngle,outerSweepAngle,false);
-        arcTo(mPath,interX,innerY,inner_circle,innerStartAngle+innerSweepAnglefloat,-innerSweepAnglefloat,false);
-        mPath.close();
-        canvas.drawPath(mPath,paint);
+<p>慢慢的，我也逐渐找到了自己的答案，也许每个人来到世上都是为了寻找到这一个答案，只是或许有些人不愿意分享，在喧闹的城市抑或宁静的乡村，只有当你在午夜，万物沉寂，而你独自一人时才会有机会偶然想起你此刻立于此地的意义。我们每个人都有一个答案，只是有些人一生可能都不会想起。幸运抑或不幸，只是人对自己过往的追问和总结罢了。</p>
 
-    }
-</code></pre>
-
-<p>构造的方法同html5中的对应方法用相似的参数，只是最后forceMoveTo是是否强制封闭圆弧，和js中的最后参数控制绘制顺逆方向不同</p>
-
-<pre><code>/**
- * 通过已知圆心半径和夹角画圆心
- * */
-private void arcTo(Path path ,float circleX,float circleY,float circleR, float startAngle,
-                   float sweepAngle, boolean forceMoveTo){
-
-    float left = circleX - circleR;
-    float right = circleX + circleR;
-    float top = circleY -circleR;
-    float bottom = circleY + circleR;
-
-    path.arcTo(new RectF(left, top, right, bottom), startAngle,
-            sweepAngle, forceMoveTo);
-}
-</code></pre>
 
 </article> <!-- end #post__content -->
 
 <div id="post__share">
-  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/01/15/draw-a-logo2.html&text=Android绘图-LOGO兼容低版本" target="_blank"></a>
+  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/04/16/wildernessdiary-start.html&text=荒原日记-开篇" target="_blank"></a>
   <a id="icon-cc" class="fontello" href="http://creativecommons.org/licenses/by-nc-sa/3.0" target="_blank"></a>
-  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/01/15/draw-a-logo2.html&title=Android绘图-LOGO兼容低版本" target="_blank"></a>
+  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/04/16/wildernessdiary-start.html&title=荒原日记-开篇" target="_blank"></a>
 </div> <!-- end #post__share -->
 <div id="disqus_thread" name="luofeng">
   <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>

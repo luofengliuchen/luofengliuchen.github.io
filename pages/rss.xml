@@ -6,6 +6,122 @@
     <description>落风的博客</description>
     
       <item>
+        <title>Android数据库和Bean的交互</title>
+        <link>http://www.liuschen.com/2016/04/29/sqlite.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2016/04/29/sqlite.html</guid>
+        <pubDate>Fri, 29 Apr 2016 00:00:00 +0800</pubDate>
+        <description>&lt;p&gt;Android中数据库使用的轻量级的Sqlite数据库，创建数据库的过程，因为系统都封装好了，所以比较简单。只要继承SQLiteOpenHelper即可。然后再写一些增删改查的函数就可以了。&lt;/p&gt;
+
+&lt;p&gt;Android系统对数据的操作，就我的理解，主要是&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;网络请求-内存(数据模型)-本地存储
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;而 JSON数据-本地Bean对象-数据库 则是其中一种通用的路子。&lt;br /&gt;
+json到Bean对象以及Bean和数据库的交互转化，虽然可以针对每一种数据模型来实现，但是那样做未免太麻烦，同时也会浪费太多不必要的精力。&lt;br /&gt;
+fastjson（阿里工程师开发的）和GSON(谷歌带的)就是很好的实现了json和Bean转化的框架，里面都是用的反射来实现的，其实也只能用反射，只不过牛逼的框架一般做的都很全，在性能上也处理的比较的当，我等也能佩服。&lt;/p&gt;
+
+&lt;p&gt;当然我现在要说的是数据库和Bean的交互，因为时间比较匆忙，也没精力找别人写好的框架用，所以自己就简单的写了个。&lt;/p&gt;
+
+&lt;p&gt;用到了反射，但是因为数据库中的字段名称和我自己的命名习惯不符(数据库字段名是已经定好的),所以便退而求其次，用了注解。首先，定义了一个注解:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+public @interface DBDataType {
+    /**为数据库中的信息，type=0时表示该为主键，-1为默认值，1,2,3,4为预留值，普通值请从5起，
+     * 并且表示了该列值在数据库中的添加顺序*/
+    int type() default -1;
+
+    /**数据库中的元素名*/
+    String elementName() default &quot;&quot;;
+    /**数据库中的元素类型*/
+    String elementType() default &quot;text&quot;;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;接着在建立的Bean对象中，对每一个field添加注解:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;@DBDataType(type = 0, elementName = &quot;ID&quot;)
+public String id;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;其中type是字段在数据库建表时的排列顺序，从5开始，0时表示该字段定义为主键，1，2，3，4为预留值，elementName表示该值在表中的字段名，其实还有一个elementType表示字段的属性，默认是文本类型，其他可以指定&lt;/p&gt;
+
+&lt;p&gt;然后就是关键代码，对sql语句进行拼接&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;try {
+
+		/**通过反射获取局部变量*/
+		Field[] fields = clazz.getDeclaredFields();
+		/**存储列的序号*/
+		int[] cloumns = new int[fields.length];
+		HashMap&amp;lt;Integer,DBDataType&amp;gt; hashMap = new HashMap&amp;lt;Integer,DBDataType&amp;gt;();
+		/**建立序号到每个field对应的注解DBDataType映射关系*/
+		for (int i=0;i&amp;lt;fields.length;i++){
+			DBDataType dbDataTypes = fields[i].getAnnotation(DBDataType.class);
+			int cloumnNumber = dbDataTypes.type();
+			cloumns[i] = cloumnNumber;
+			hashMap.put(cloumnNumber,dbDataTypes);
+		}
+		/**
+		 * 对序号进行排序
+		 * */
+		Arrays.sort(cloumns);
+
+		/**开始拼接sql语句*/
+		String sqlfont = &quot;create table if not exists &quot; + tableName + &quot; (&quot;;
+		String sqlContent = &quot;&quot;;
+		String sqlOver = &quot;)&quot;;
+
+		for(int i=0;i&amp;lt;cloumns.length;i++){
+
+			String elementType = hashMap.get(cloumns[i]).elementType();
+			String elementName = hashMap.get(cloumns[i]).elementName();
+
+			if(cloumns[i]==0){
+				//该值为主键
+				sqlContent += elementName + &quot; &quot; + elementType + &quot; primary key&quot; +&quot;,&quot;;
+			}else{
+				sqlContent += elementName + &quot; &quot; + elementType +((i==cloumns.length-1)?&quot;&quot;:&quot;,&quot;);
+			}
+
+		}
+		String sql = sqlfont + sqlContent + sqlOver;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这里传入的clazz为一个Bean对象，就是通过对field进行注解标记的Bean，这些代码是封装到数据库操作类中的，所以之后创建表，只需要传入一个Bean对象即可。对数据库的插入，查询也是，只需用注解和反射去写好一个通用的方法即可。&lt;/p&gt;
+</description>
+      </item>
+    
+      <item>
+        <title>荒原日记-习惯</title>
+        <link>http://www.liuschen.com/2016/04/25/wildernessdiary-habby.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2016/04/25/wildernessdiary-habby.html</guid>
+        <pubDate>Mon, 25 Apr 2016 00:00:00 +0800</pubDate>
+        <description>&lt;p&gt;站在现在的角度看过去的自己，不得不说，我，是一个奇怪的小孩。&lt;/p&gt;
+
+&lt;p&gt;“这是一个美丽的世界，关闭。”也许你会好奇我说的这句话的意义，但是正如我所说，我以前是一个很奇怪的孩子，而这句话就是我常常在心中念叨的一句咒语。它的功用在于它能帮我清除心中的杂念，当然，如果杂念太多那我就还需要点时间好好捋捋。你可能会说，你看，这孩子把自己当机器了，还要关机开机呢。当不当机器不好说，不过强迫症肯定是有的，这个习惯不知道是从什么时候开始的，我也不清楚是从什么时候结束的。我总是强迫自己尽善尽美的处理遇到的任何事情，所以在此期间没丢过东西也没遗忘过什么。像提前设定的程序，日子平平淡淡，却也无味至极，甚至对我来说，知道别人不会这样做，而对这种习惯和未来联系到的日子充满恐惧。&lt;/p&gt;
+
+&lt;p&gt;后来证明，这种担心多余了，甚至现在的我竟然搞不清，我舍弃掉的这个习惯是否一并带走了我更重要的东西。我试着和过去划清界限，并不是要证明我的进步或是堕落，只是我想，该静下心好好重新的认识一下自己了，不是自我剖析，而是以朋友的身份~&lt;/p&gt;
+</description>
+      </item>
+    
+      <item>
+        <title>荒原日记-开篇</title>
+        <link>http://www.liuschen.com/2016/04/16/wildernessdiary-start.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2016/04/16/wildernessdiary-start.html</guid>
+        <pubDate>Sat, 16 Apr 2016 00:00:00 +0800</pubDate>
+        <description>&lt;p&gt;我从哪里来，又往哪里去？在我7，8岁的时候，常常在考虑这个问题，因为小，不理解前路漫长，总是觉得人生不过弹指岁月，所以总是充满了对死亡的恐惧。&lt;/p&gt;
+
+&lt;p&gt;都说时间能抚平一切，当我将藏在幼小心中的想法封印，企图在时间之海中将它沉溺，缓缓流逝的时间却告诉我，它可以使炽烈的热恋冷却，将绝对冰点的感情消融，却无法使我遗忘自己追问本源的这种淡淡的想法。&lt;/p&gt;
+
+&lt;p&gt;慢慢的，我也逐渐找到了自己的答案，也许每个人来到世上都是为了寻找到这一个答案，只是或许有些人不愿意分享，在喧闹的城市抑或宁静的乡村，只有当你在午夜，万物沉寂，而你独自一人时才会有机会偶然想起你此刻立于此地的意义。我们每个人都有一个答案，只是有些人一生可能都不会想起。幸运抑或不幸，只是人对自己过往的追问和总结罢了。&lt;/p&gt;
+
+</description>
+      </item>
+    
+      <item>
         <title>Visual Studio开发Android程序</title>
         <link>http://www.liuschen.com/2016/02/21/studio.html</link>
         <guid isPermaLink="true">http://www.liuschen.com/2016/02/21/studio.html</guid>
@@ -979,215 +1095,6 @@ private void arcTo(Path path ,float circleX,float circleY,float circleR, float s
 
     path.arcTo(new RectF(left, top, right, bottom), startAngle,
             sweepAngle, forceMoveTo);
-}
-&lt;/code&gt;&lt;/pre&gt;
-</description>
-      </item>
-    
-      <item>
-        <title>Android绘图-LOGO-实现3</title>
-        <link>http://www.liuschen.com/2016/01/15/android-logo1.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2016/01/15/android-logo1.html</guid>
-        <pubDate>Fri, 15 Jan 2016 00:00:00 +0800</pubDate>
-        <description>&lt;blockquote&gt;
-  &lt;p&gt;之前版本首先是对绘制圆环的各种方法进行分析，由于圆环要添加动画效果。所以最终选择了Path和Path相加减的方式得到想要的圆环，前半部分动画效果由于是分开的所以用了3个track来分别处理他们，而用一个handler定时器来触发并维持动画效果。后半部分动画由于是整体动画，所以我选择了对画布整体进行变换操作来实现该退出动画，又由于是对画布进行的操作，所以必须放在绘制图形前面。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;再版，特殊情况:将内外圆的圆心统一设置为原点&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;http://7xpui7.com1.z0.glb.clouddn.com/blog_logo.png&quot; alt=&quot;&quot; /&gt;&lt;br /&gt;
-之前版本track1和track2以及track3内外圆的圆心是不同的。所以将圆环分成3个部分，才能使每一部分的间隙内外不至于差太大。之前右半部分的位移动画是靠圆心位置来定初始点和终点的。当然内外半径也可以做成动画效果。&lt;/p&gt;
-
-&lt;p&gt;如果内外圆心统一定为原点，依然可以用圆心的移动来做动画,但是这时候环块之间的间隙就会像环的其他部分一样，呈向外发散状，所以这是就需要另外用一个路径将环块之间的间隙切出来。这里就需要用到几何学来画图了。&lt;br /&gt;
-&lt;img src=&quot;http://7xpui7.com1.z0.glb.clouddn.com/blog_logo2.jpeg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;如图在坐标系统沿着最大半圆的切痕画一条过原点的直线AC，然后平移一段距离得到另一条直线BD，垂直于两条直线的距离为固定的值，即trans，通过函数可以得到两条直线:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;public float line1(float x,float degree){
-    double dX = new BigDecimal(String.valueOf(x)).doubleValue();
-    double dDegree = new BigDecimal(String.valueOf(degree)).doubleValue();
-    return (float)((Math.tan(Math.toRadians(dDegree)))*dX);
-}
-
-
-public float line2(float x,float degree,float trans){
-    double dX = new BigDecimal(String.valueOf(x)).doubleValue();
-    double dDegree = new BigDecimal(String.valueOf(degree)).doubleValue();
-    double dTrans = new BigDecimal(String.valueOf(trans)).doubleValue();
-    return (float)(Math.tan(Math.toRadians(dDegree))
-            *(dX) - dTrans/(Math.sin(Math.toRadians(dDegree))));
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;计算这两条直线是为了取得A,B,C,D点的，而其中X点可以任取，只要大于外圆半径就行，输入的degree是为了切取另外两个地方通用。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;http://7xpui7.com1.z0.glb.clouddn.com/blog_logo3.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;通过自取x从而得到y，就可以的到想要的用来切取圆环的四边形，上图中绘制的是环中最为难切得一个间隙，需要同时对上下两部分圆环进行切取，且比例不一。&lt;/p&gt;
-
-&lt;p&gt;另外，需要注意的有两点：&lt;/p&gt;
-
-&lt;p&gt;一是android中的坐标系y轴正向是向下的，而这个数学上标准的坐标系y轴是向上的，需要考虑并转换。&lt;/p&gt;
-
-&lt;p&gt;二是直线与y轴呈的夹角&amp;amp;越小，取任意的x点，y=xtan&amp;amp;所得到的y偏差越大。因为x值固定，&amp;amp;角越小，y越趋近于无穷大，计算时本来可以忽略的近似误差也变的不可忽略。所以本来设定的trans值固定，但实际却是会随着&amp;amp;角而改变。所以最后对几个间隙分别设置了trans值，使它们外观上变得近似。&lt;/p&gt;
-
-&lt;p&gt;至此，logo绘制完毕，可能通用性不强(中间其实我还是发现不少变化的)，但是做这个动画logo一波三折，中间是改了又改，而解决问题这个过程我想还是值得记录下来的。&lt;/p&gt;
-</description>
-      </item>
-    
-      <item>
-        <title>Androidstudio下jni的一些问题</title>
-        <link>http://www.liuschen.com/2016/01/15/NDK.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2016/01/15/NDK.html</guid>
-        <pubDate>Fri, 15 Jan 2016 00:00:00 +0800</pubDate>
-        <description>&lt;blockquote&gt;
-  &lt;p&gt;android NDK 支持纯jni的方式构建app&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;此处是AndroidStudio下构建jni程序方法，通用&lt;/p&gt;
-
-&lt;p&gt;成功运行程序后，可以逐渐接触jni代码了。和熟悉AndroidStudio的过程一样，对工具的使用都是一个慢慢累积的过程。&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;试着将NDK android-ndk-r10e\samples下的代码在androidstudio下跑，果然没那么顺利。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;运行的是native-activity这个项目，遇到了如下错误:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;F:\androidstudio\JNIActivity\app\src\main\jni\main.c
-Error:(27, 37) android_native_app_glue.h: No such file or directory
-compilation terminated.
-make.exe: *** [F:\androidstudio\JNIActivity\app\build\intermediates\ndk\debug\obj/local/arm64-v8a/objs/jniLibs/F_\androidstudio\JNIActivity\app\src\main\jni\main.o] Error 1
-Error:Execution failed for task &#39;:app:compileDebugNdk&#39;.
-&amp;gt; com.android.ide.common.process.ProcessException: org.gradle.process.internal.ExecException: Process &#39;command &#39;F:\BaiduYunDownload\android-ndk-r10e\ndk-build.cmd&#39;&#39; finished with non-zero exit value 2
-Information:BUILD FAILED
-Information:Total time: 0.89 secs
-Information:2 errors
-Information:0 warnings
-Information:See complete output in console
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;网上大部分都是说在Android.mk文件里少了&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;include $(BUILD_SHARED_LIBRARY)
-$(call import-module,android/native_app_glue)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;但我是拷贝的文件里面是有的，并且在已经通过编译的项目中加上上述依赖并引用该库依然没有通过编译。&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;所以要找突破口&lt;br /&gt;
-1.Android.mk是Android提供的一种makefile文件，多个模块的项目每个目录中定义对应的Android.mk文件（类似于上面的写法）， &lt;br /&gt;
-最后，在根目录放置一个Android.mk文件,需要先明白里面变量的意义:&lt;a href=&quot;http://blog.csdn.net/ly131420/article/details/9619269&quot;&gt;Android.mk释义&lt;/a&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;后来绕过来了Android.mk是eclipse下组织编译JNI的文件，而studio使用gradle来组织编译的&lt;br /&gt;
-在项目下的build.gradle文件中&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;android {
-	defaultConfig {
-        ndk {
-            moduleName &quot;jniLibs&quot;   // 生成so文件的名字
-            ldLibs &quot;EGL&quot;, &quot;GLESv3&quot;, &quot;dl&quot;, &quot;log&quot;	   // Link with these libraries!
-            stl &quot;stlport_shared&quot;					  // Use shared stlport library
-    }
-	}
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;即是用来编译的设置，之前在android.mk下的设置并没有起到相应的作用，现在要做的就是如何将引用的外部库添加到这个位置。&lt;br /&gt;
-暂时没有想到对应方法。&lt;/p&gt;
-
-&lt;p&gt;最后可以手动编译出.so文件供程序调用。&lt;br /&gt;
-然后运行成功了。&lt;/p&gt;
-
-&lt;p&gt;总结:&lt;br /&gt;
-当前我运行jni没有通过gradle中的设置实现全自动的编译打包&lt;br /&gt;
-还是要切换到jni的目录下先运行ndk-build命令生成so动态库，当然前提是先把ndk-build命令添加到path路径中去会方便些。&lt;/p&gt;
-
-&lt;p&gt;在androidstudio的配置文件中需要加3个地方&lt;/p&gt;
-
-&lt;p&gt;1.gradle.properties中添加&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;android.useDeprecatedNdk=true
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;2.module下的build.gradle下添加两处代码&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;android {
-    defaultConfig {
-        ndk {
-            moduleName &quot;jniLibs&quot;  // 1.生成so文件的名字，和system.loadlibrary引入的名字相同
-        }
-    }
-
-	//2.定义jni的so文件的存放目录，缺的话生成so文件程序也找不到
-    sourceSets.main {
-        jni.srcDirs = [] // This prevents the auto generation of Android.mk
-	//        sourceSets.main.jni.srcDirs = []
-        jniLibs.srcDir &#39;src/main/libs&#39; // This is not necessary unless you have precompiled libraries in your project.
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-</description>
-      </item>
-    
-      <item>
-        <title>Android绘图-LOGO-实现2</title>
-        <link>http://www.liuschen.com/2016/01/14/draw-a-logo.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2016/01/14/draw-a-logo.html</guid>
-        <pubDate>Thu, 14 Jan 2016 00:00:00 +0800</pubDate>
-        <description>&lt;p&gt;首先对半圆的绘制考虑到之前版本并不能精确的满足绘制的要求（内圆和外圆并不一定是同心圆，用Path.FillType.EVEN_ODD来实现的话可能会产生多余的部分），要是能够像ps中单纯对路径进行相加相减就好了。所幸在Path中找到了一个Op的枚举类型（和FillType距离不远），最终就是用Path的这个属性完美的解决了这个问题&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-private void drawRing(Canvas canvas, Paint paint,float interX, float innerY,float outerX, float outerY,float startAngle,float sweepAngle,float inner_circle,float outter_circle) {
-
-    Path outterpath = new Path();
-
-    outterpath.moveTo(outerX, outerY);
-    outterpath.lineTo(outerX, outerY - outter_circle);
-    outterpath.arcTo(outerX - outter_circle, outerY - outter_circle, outerX + outter_circle, outerY + outter_circle, startAngle, sweepAngle, true);
-    outterpath.lineTo(outerX, outerY);
-    outterpath.close();
-
-    Path innerpath = new Path();
-
-    innerpath.moveTo(interX, innerY);
-    innerpath.lineTo(interX, innerY - inner_circle);
-    innerpath.arcTo(interX - inner_circle, innerY - inner_circle, interX + inner_circle, innerY + inner_circle, startAngle, -360, true);
-    innerpath.lineTo(interX, innerY);
-    innerpath.close();
-
-    outterpath.op(innerpath,Path.Op.DIFFERENCE);
-    canvas.drawPath(outterpath,paint);
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;最终整个动画由一个定时器控制速率，通过定时重绘View实现了整个动画，最后的退出动画是通过对画布操作完成的（对画布的操作必须在绘制之前）。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;@Override
-protected void onDraw(Canvas canvas) {
-    super.onDraw(canvas);
-
-    canvas.translate(TRACK1_OUTTER_CIRCLE * 1.5f, TRACK1_OUTTER_CIRCLE * 1.5f);
-    scaleAnim(canvas);
-
-    Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    paint.setStyle(Paint.Style.FILL);
-    track1(canvas, paint);
-    track2(canvas, paint);
-    track3(canvas, paint);
-
-    if(!isTimerRunning){
-        mHandler.post(mRunnable);
-        isTimerRunning = true;
-    }else{
-        mHandler.postDelayed(mRunnable, mFrameTime);
-    }
-    if(mFrameNumber&amp;gt;60){
-        resetAnim();
-    }
 }
 &lt;/code&gt;&lt;/pre&gt;
 </description>

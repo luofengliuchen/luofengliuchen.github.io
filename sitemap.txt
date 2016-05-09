@@ -9,6 +9,12 @@
 
 
 
+  /2016/04/29/sqlite.html
+
+  /2016/04/25/wildernessdiary-habby.html
+
+  /2016/04/16/wildernessdiary-start.html
+
   /2016/02/21/studio.html
 
   /2016/02/19/c++.html
