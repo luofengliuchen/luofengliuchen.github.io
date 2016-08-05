@@ -6,6 +6,457 @@
     <description>落风的博客</description>
     
       <item>
+        <title>Proguard</title>
+        <link>http://www.liuschen.com/2016/08/05/proguard.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2016/08/05/proguard.html</guid>
+        <pubDate>Fri, 05 Aug 2016 00:00:00 +0800</pubDate>
+        <description>
+&lt;hr /&gt;
+&lt;p&gt;layout: post&lt;br /&gt;
+title: Androidstudio下的代码混淆&lt;br /&gt;
+category: 技术&lt;br /&gt;
+keywords: 混淆&lt;br /&gt;
+—&lt;/p&gt;
+
+&lt;p&gt;首先在项目的build.gradle中Android标签下添加&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;signingConfigs {
+    release {
+        keyAlias &#39;xxx&#39;
+        keyPassword &#39;xxx&#39;
+        storeFile file(&#39;xxx&#39;)
+        storePassword &#39;xxx&#39;
+    }
+}
+
+buildTypes {
+    release {
+        signingConfig signingConfigs.release
+        minifyEnabled true
+        proguardFiles getDefaultProguardFile(&#39;proguard-android.txt&#39;), &#39;proguard-rules.pro&#39;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;其中第二个是混淆的设置，第一个配置的是数字签名的路径以及密码等信息，&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;signingConfig signingConfigs.release
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;个是依赖于这项配置的，不然会报错&lt;/p&gt;
+
+&lt;p&gt;然后，就是配置混淆的文件&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;-ignorewarnings
+-optimizationpasses 5          # 指定代码的压缩级别
+-dontusemixedcaseclassnames   # 是否使用大小写混合
+-dontpreverify           # 混淆时是否做预校验
+-verbose                # 混淆时是否记录日志
+
+
+-optimizations !code/simplification/arithmetic,!field/*,!class/merging/*  # 混淆时所采用的算法
+
+-keep public class * extends android.app.Activity      # 保持哪些类不被混淆
+-keep public class * extends android.app.Application   # 保持哪些类不被混淆
+-keep public class * extends android.app.Service       # 保持哪些类不被混淆
+-keep public class * extends android.content.BroadcastReceiver  # 保持哪些类不被混淆
+-keep public class * extends android.content.ContentProvider    # 保持哪些类不被混淆
+-keep public class * extends android.app.backup.BackupAgentHelper # 保持哪些类不被混淆
+-keep public class * extends android.preference.Preference        # 保持哪些类不被混淆
+-keep public class com.android.vending.licensing.ILicensingService    # 保持哪些类不被混淆
+
+-keep class javax.security.** { *; }
+
+
+-keepclasseswithmembernames class * {  # 保持 native 方法不被混淆
+    native &amp;lt;methods&amp;gt;;
+}
+-keepclasseswithmembers class * {   # 保持自定义控件类不被混淆
+    public &amp;lt;init&amp;gt;(android.content.Context, android.util.AttributeSet);
+}
+-keepclasseswithmembers class * {# 保持自定义控件类不被混淆
+    public &amp;lt;init&amp;gt;(android.content.Context, android.util.AttributeSet, int);
+}
+-keepclassmembers class * extends android.app.Activity { # 保持自定义控件类不被混淆
+    public void *(android.view.View);
+}
+-keepclassmembers enum * {     # 保持枚举 enum 类不被混淆
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
+-keep class * implements android.os.Parcelable { # 保持 Parcelable 不被混淆
+    public static final android.os.Parcelable$Creator *;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;一般情况下，系统的控件不必要混淆，如activity，service等，其次由于默在Androidstudio中默认已经将libs包中的jar添加了，重复添加反而会报错，最后项目中用到反射的地方一定不能混淆。&lt;br /&gt;
+添加完后却还是报错了，先添加了-dontwarn，然并没什么用，然后加了-ignorewarnings忽略警告，成功生成apk,只是一定要注意确保警告中的地方没被项目调用，否则实际运行时还会出错，后果更严重。&lt;/p&gt;
+</description>
+      </item>
+    
+      <item>
+        <title>Nine</title>
+        <link>http://www.liuschen.com/2016/08/02/nine.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2016/08/02/nine.html</guid>
+        <pubDate>Tue, 02 Aug 2016 00:00:00 +0800</pubDate>
+        <description>
+&lt;hr /&gt;
+&lt;p&gt;layout: post&lt;br /&gt;
+title: .9图片的用法绘制以及作用&lt;br /&gt;
+category: 技术&lt;br /&gt;
+keywords: .9图片&lt;br /&gt;
+—&lt;/p&gt;
+
+&lt;p&gt;问题:&lt;/p&gt;
+
+&lt;p&gt;今天从网上down下了一个eclipse下的项目，导入到androidStudio中后，结果出现了如下异常：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;D:\myAllProject\androidstudio_ajlast\321Browser\uCBrowser_1113\src\main\res\layout\above_slidingmenu.xml
+Error:(111, 30) No resource found that matches the given name (at &#39;src&#39; with value &#39;@drawable/menubar_tabcenter_d&#39;).
+
+Error:(20, 38) No resource found that matches the given name (at &#39;src&#39; with value &#39;@drawable/url_progress_fullscreen&#39;).
+D:\myAllProject\androidstudio_ajlast\321Browser\uCBrowser_1113\src\main\res\drawable\search_btn_bg.xml
+Error:(5, 87) No resource found that matches the given name (at &#39;drawable&#39; with value &#39;@drawable/search_engines_switcher_item_bg_p&#39;).
+Error:(6, 87) No resource found that matches the given name (at &#39;drawable&#39; with value &#39;@drawable/search_engines_switcher_item_bg_p&#39;).
+Error:Execution failed for task &#39;:uCBrowser_1113:processDebugResources&#39;.
+com.android.ide.common.process.ProcessException: org.gradle.process.internal.ExecException: Process &#39;command &#39;F:\programer\android_sdk\build-tools\23.0.2\aapt.exe&#39;&#39; finished with non-zero exit value 1
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;纠结了很久发现都是.9图片的问题，于是按照网上说的在android的gradle中android标签下加入下面代码，避免了对 .9图片的检查&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;aaptOptions.cruncherEnabled = false
+aaptOptions.useNewCruncher = false
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;然而会继续报错，原因是图片上的像素定位点没有添加,最后还是一个一个改的。&lt;/p&gt;
+
+&lt;p&gt;问题核心：&lt;/p&gt;
+
+&lt;p&gt;.9图片可以根据ps绘制，同时，android里面也有专门的绘制工具。&lt;br /&gt;
+.9图片区别于普通图片主要是通过两点：&lt;br /&gt;
+1.特殊的扩展名，供专门的应用识别&lt;br /&gt;
+2.图片上下左右4个特殊的黑色像素条，宽一个像素，也可以仅仅是一个点，其中上边和左边像素条标记的分别是图片在横向和纵向的可拉伸区域，至于右边和下边的像素条，网上说是表示“前景能显示的范围”，用了这么久，没见过可以区别的效果，所以也不大理解是什么意思。&lt;/p&gt;
+
+</description>
+      </item>
+    
+      <item>
+        <title>Android解压缩zip文件</title>
+        <link>http://www.liuschen.com/2016/07/22/zip.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2016/07/22/zip.html</guid>
+        <pubDate>Fri, 22 Jul 2016 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;期望:使项目apk包中的大文件批量数据可以单独作为一个apk来管理，所以需要将Android assets文件夹下的zip打包文件解压到SDCard上。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;解压缩的操作由于比较耗时，所以新开一个线程执行以下函数&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;/**将assets对应文件解压到对应的sdcard目录中*/
+public void unPress2Sdcard(String fileName){
+    try {
+        /**目标路径*/
+        String destDir = rootPath + File.separator + fileName;
+        /**将压缩文件拷贝到内存卡中*/
+        mAssetCopyer.copyBigDataToSD(destDir, fileName);
+        /**解压文件到目标路径*/
+        unzip(destDir, offlinePath);
+        /**删除在内存卡上临时存在的压缩文件*/
+        FileUtils.deleteFile(destDir);
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;对应的先将assets下的zip文件拷贝到SDCard中，这个是直接在网上找的方法拿来用&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;public void copyBigDataToSD(String strOutFileName,String file) throws IOException{
+    InputStream myInput;
+    OutputStream myOutput = new FileOutputStream(strOutFileName);
+    myInput = mContext.getAssets().open(file);
+    byte[] buffer = new byte[1024];
+    int length = myInput.read(buffer);
+    while(length &amp;gt; 0){
+        myOutput.write(buffer, 0, length);
+        length = myInput.read(buffer);
+    }
+    myOutput.flush();
+    myInput.close();
+    myOutput.close();
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;然后解压缩操作&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;@SuppressWarnings(&quot;unchecked&quot;)  
+public static void unzip(String zipFilePath, String unzipFilePath) throws Exception{
+    /**验证是否为空*/
+    if (isEmpty(zipFilePath) || isEmpty(unzipFilePath)){
+
+    }
+    File zipFile = new File(zipFilePath);
+    /**创建解压缩文件保存的路径*/
+    File unzipFileDir = new File(unzipFilePath);
+    if (!unzipFileDir.exists()){
+        unzipFileDir.mkdirs();
+    }
+    //开始解压
+    ZipEntry entry = null;
+    String entryFilePath = null;
+    int count = 0, bufferSize = 1024;
+    byte[] buffer = new byte[bufferSize];  
+    BufferedInputStream bis = null;
+    BufferedOutputStream bos = null;  
+    ZipFile zip = new ZipFile(zipFile);
+    Enumeration&amp;lt;ZipEntry&amp;gt; entries = (Enumeration&amp;lt;ZipEntry&amp;gt;)zip.entries();  
+    //循环对压缩包里的每一个文件进行解压
+    while(entries.hasMoreElements()){
+        entry = entries.nextElement();
+        log(&quot;log ing5:&quot;+entry.getName());
+        /**这里提示如果当前元素是文件夹时，在目录中创建对应文件夹
+         * ，如果是文件，得出路径交给下一步处理*/
+        entryFilePath = unzipFilePath + File.separator + entry.getName();
+        File file = new File(entryFilePath);
+        log(&quot;~~是否是文件夹:&quot;+file.isDirectory());
+        if(entryFilePath.endsWith(&quot;/&quot;)){
+            if(!file.exists()){
+                file.mkdir();
+            }
+            continue;
+        }
+        /***这里即是上一步所说的下一步，负责文件的写入，不服来咬(≖ ‿ ≖)✧*/
+        bos = new BufferedOutputStream(new FileOutputStream(entryFilePath+&quot;/&quot;));
+        bis = new BufferedInputStream(zip.getInputStream(entry));
+        while ((count = bis.read(buffer, 0, bufferSize)) != -1){
+            bos.write(buffer, 0, count);
+        }
+        bos.flush();
+        bos.close();
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;用的也是直接网上down下来的，但是在解压缩操作中遇到的是这一句bos = new BufferedOutputStream(new FileOutputStream(entryFilePath));传入的entryFilePath运行的时候却老提示不是文件夹，于是把中间循环解压元素的代码以及一些冗余的逻辑删除了，改成了现在这样，进入循环先判断是否是文件夹(我这里是靠尾部的字符判断的)，如果是，在目标路径中创建，开始下一循环，不是，就把文件解压到对应路径。&lt;/p&gt;
+
+&lt;p&gt;最后一步删除SDcard下的压缩文件&lt;br /&gt;
+FileUtils.deleteFile(destDir);&lt;/p&gt;
+
+&lt;p&gt;注意:源压缩包必须是zip格式的并且是快速压缩，超高压缩算法不同，解析不了，我是在window上用快压打包的。&lt;/p&gt;
+</description>
+      </item>
+    
+      <item>
+        <title>程序员编程语录</title>
+        <link>http://www.liuschen.com/2016/06/07/person.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2016/06/07/person.html</guid>
+        <pubDate>Tue, 07 Jun 2016 00:00:00 +0800</pubDate>
+        <description>&lt;ol&gt;
+  &lt;li&gt;
+    &lt;p&gt;一个好的程序员是那种过单行线马路都要往两边看的人。(Doug Linder)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;程序有问题时不要担心。如果所有东西都没问题，你就失业了。(软件工程的Mosher定律)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;程序员的麻烦在于，你无法弄清他在捣腾什么，当你最终弄明白时，也许已经晚了。(超级计算机之父Seymour Cray)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;我想大部分人都知道通常一个程序员会具有的美德。当然了，有三种：懒惰，暴躁，傲慢。(Perl语言发明者Larry Wall)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;编程时要保持这种心态：就好象将来要维护你这些代码的人是一位残暴的精神病患者，而且他知道你住在哪。(Martin Golding)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;一个人写的烂软件将会给另一个人带来一份全职工作。(Jessica Gaston)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;如果建筑工人像程序员写软件那样盖房子，那第一只飞来的啄木鸟就能毁掉人类文明。(Gerald Weinberg)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;这世界最有可能毁灭的方式——大多数专家都同意——是次意外。这就是为什么会有我们，我们是计算机专家，我们创造意外。(Nathaniel Borenstein)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;我们这个行业有个特别奇怪的现象：不仅我们不从失败里吸取教训，同时也不从成功中学习经验。 (Keith  Braithwaite)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;一种新技术一旦开始流行，你要么坐上压路机，要么成为铺路石。(Stewart Brand)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;如果没能一次成功，那就叫它1.0版吧。(unknown)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;所有的程序员都是编剧，所有的计算机都是烂演员。(Anonymous Hack Actor)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;工作进度上越早落后，你就会有越充足的时间赶上。(Anonymous Scheduler)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;当有这样的一种编程语言出现：它能让程序员用简单的英语编程，你将会发现，程序员都开始不会说英语。(Anonymous Linguist)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;为什么我们没有时间把事情做对，却总有时间把事情做过头？(Anonymous)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;傻瓜都能写出计算机能理解的程序。优秀的程序员写出的是人类能读懂的代码。&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;任何你写的代码，超过6个月不去看它，当你再看时，都像是别人写的。(Eagleson’s law)&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;编程/软件开发语录&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;
+    &lt;p&gt;按代码行数来评估软件开发的进度，就如同按重量来评估飞机建造的进度。(Bill Gates)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;软件就像做爱。一次犯错，你需要用余下一生来维护支持。(Michael Sinz)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;在水上行走和按需求文档开发软件都很容易——前提是它们都是冻结状态。(Edward V Berard)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;最初90%的代码用去了最初90%的开发时间…余下10%的代码用去了另外90%的开发时间。(Tom Cargill)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;注释代码很像清洁你的厕所——你不想干，但如果你做了，这绝对会给你和你的客人带来更愉悦的体验。(Ryan Campbell)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;如今的编程是一场程序员和上帝的竞赛，程序员要开发出更大更好、傻瓜都会用到软件。而上帝在努力创造出更大更傻的傻瓜。目前为止，上帝是赢的。(Rick Cook)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;软件设计最困难的部分…是阻挡新功能的引入。(Donald Norman)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;为了理解递归，我们首先要理解的是递归。(Anonymous)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;世上只有两类编程语言：那些拥有被人诟病的和那些没人用的。(Bjarne Stroustrup)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;The best thing about a boolean is even if you are wrong, you are only off by a bit. (Anonymous)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;如果Java能实现真的垃圾回收，那大部分的程序都会在执行时删除自己。(Robert Swell)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;理论上，理论和实践是没有差异的。但实践中，是有的。(Jan L. A. van de Snepscheut)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;预备，开火，瞄准：这是最快的软件开发方法。预备，瞄准，瞄准，瞄准，瞄准：这是最慢的软件开发方法。(Anonymous)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;编程是10%的科学，20%天份，和70%的让这天份符合科学。(Anonymous)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;评估一个事情要比去理解你评估了什么容易。(Anonymous)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;测评不会撒谎，但测评的人会。(Anonymous)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;培养员工，即使他们有跳槽的风险。什么都不做而留他们在公司，这样风险更大。(Anonymous)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;计算机科学的目标是做出一个东西，并且保证它至少能坚持到我们将它开发完成。(Anonymous)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Java之于JavaScript如同Car之于Carpet。 (Chris Heilmann)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;起初就把事情做对是完全没必要的。但最后要把事情做对是绝对必要的。(Andrew Hunt and David Thomas)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;数组的起始索引应该从0开始还是从1开始？我的0.5的折中提议被他们未经认真考虑到拒绝了——我认为是这样的。(Stan Kelly-Bootle)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;程序必须是为了给人看而写，给机器去执行只是附带任务。 (Abelson / Sussman)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;编程可以很有趣，你可以用它做密码学研究，但两者绝对不能合二为一。(Kreitzberg and Shneiderman)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;拷贝-粘贴是一种设计错误。(David Parnas)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;计算机善于遵循指令，但不善于理解你的思维。(Donald Knuth)&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;软件纠错语录&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;
+    &lt;p&gt;删除的代码是没有bug的代码。(Jeff Sickel)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;如果纠错是消除软件bug的过程，那编程一定是把它们放进去的过程。(Edsger Dijkstra)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;代码纠错要比新编写代码困难一倍。因为，如果你写出了最聪明的代码，按此推算，你将没有更大的智慧来debug它。&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;想在自己的代码里找出一个错误是十分困难的。而当你认为你的代码没有错误时，那就更难了。(Steve McConnel)&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;软件bug语录&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;
+    &lt;p&gt;这不是个bug——这一个未注明的功能特征。(Anonymous)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;没有需求或设计，编程就是一种将bug添加到一个空文本文件里的艺术。(Louis Srygley)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;烂代码并不烂，只是被误解了。(Anonymous Code Behaviorist)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;有两种方法能写出没有错误的程序；但只有第三种好用。(Alan J. Perlis)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;小心上面代码中的bug；我只知道这些代码是正确的，但没有试过。(Donald Knuth)&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;软件产品/成品语录&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;
+    &lt;p&gt;软件能够复用前，它必须要可用。(Ralph Johnson)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;软件通常在beta测试完成不久后发布。Beta在拉丁语中是“还不能用”的意思。(Anonymous)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;最好的性能改进是将软件从不能用的状态变成可用。(J. Osterhout)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;最廉价、最快速、最可信赖的组件是那些还未出现的组件。(Gordon Bell)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;I think Microsoft named .Net so it wouldn’t show up in a Unix directory listing. (Oktal)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;软件和教堂非常相似——建成之后我们就在祈祷。(Sam Redwine)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;除非最后一个用户死掉，软件是不会有完工的时候的。(Anonymous)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;如今的大部分软件都非常像埃及金字塔，由成千上万的石块一个摞一个构成，没有结构上的集成，是由暴力强制和成千上万的奴隶完成。(Alan Kay)&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;摘自网上&lt;/p&gt;
+&lt;/blockquote&gt;
+</description>
+      </item>
+    
+      <item>
         <title>Android数据库和Bean的交互</title>
         <link>http://www.liuschen.com/2016/04/29/sqlite.html</link>
         <guid isPermaLink="true">http://www.liuschen.com/2016/04/29/sqlite.html</guid>
@@ -851,252 +1302,6 @@ $(image).load(function(e) {
 
 &lt;p&gt;敏捷开发则是瀑布开发模式在互联网思维的进化，说是进化也许有些不妥，因为瀑布开发模式重在管理，易于驾驭，而敏捷开发，则是剥离了管理的外壳，把精力完全放在了个人，产品，和客户需求这个最重要的3个要素之上，并不好驾驭，如果你要管理整个项目，就必须要参与其中，并且具有指导其他成员的能力。&lt;/p&gt;
 
-</description>
-      </item>
-    
-      <item>
-        <title>Android滤镜-快速模糊</title>
-        <link>http://www.liuschen.com/2016/01/25/stackblur.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2016/01/25/stackblur.html</guid>
-        <pubDate>Mon, 25 Jan 2016 00:00:00 +0800</pubDate>
-        <description>&lt;blockquote&gt;
-  &lt;p&gt;github上有一个stackblur的开源项目，可以对图片进行快速模糊处理&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;有通过Java写的，而我主要看的是通过jni调用的c代码，其实算法都是一样的&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;//bitmapOut ：bitmap图片
-//radius模糊半径
-//threadCount 线程总数
-//threadIndex 第几个处理线程
-//round 第几步
-
-
-JNIEXPORT void JNICALL Java_luofeng_myjnitest_jni_JniHelper_toBlur(JNIEnv* env, jclass clzz, jobject bitmapOut, jint radius, jint threadCount, jint threadIndex, jint round) {
-// Properties
-AndroidBitmapInfo   infoOut;
-void*               pixelsOut;
-
-int ret;
-
-// Get image info
-if ((ret = AndroidBitmap_getInfo(env, bitmapOut, &amp;amp;infoOut)) != 0) {
-    LOGE(&quot;AndroidBitmap_getInfo() failed ! error=%d&quot;, ret);
-    return;
-}
-
-// Check image
-if (infoOut.format != ANDROID_BITMAP_FORMAT_RGBA_8888) {
-    LOGE(&quot;Bitmap format is not RGBA_8888!&quot;);
-    LOGE(&quot;==&amp;gt; %d&quot;, infoOut.format);
-    return;
-}
-
-// Lock all images
-if ((ret = AndroidBitmap_lockPixels(env, bitmapOut, &amp;amp;pixelsOut)) != 0) {
-    LOGE(&quot;AndroidBitmap_lockPixels() failed ! error=%d&quot;, ret);
-    return;
-}
-
-int h = infoOut.height;
-int w = infoOut.width;
-stackblurJob((unsigned char*)pixelsOut, w, h, radius, threadCount, threadIndex, round);
-// Unlocks everything
-AndroidBitmap_unlockPixels(env, bitmapOut);
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;其中，模糊半径是用来确定模糊的程度的，高斯模糊是通过每个像素点和周围像素点运算求平均值来实现的，这个模糊半径就是确定一个点的运算范围的。&lt;/p&gt;
-
-&lt;p&gt;threadCount，threadIndex：外部通过n个线程来同时处理提速的。而内部传入这几个值是为了计算每个线程分别处理的区域的，和多线程下载类似。&lt;/p&gt;
-
-&lt;p&gt;round：为1时是水平模糊，为2时是竖直模糊。&lt;/p&gt;
-
-&lt;p&gt;Java层通过同时启动n个线程来处理&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;static final int EXECUTOR_THREADS = Runtime.getRuntime().availableProcessors();
-static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(EXECUTOR_THREADS);
-
-public Bitmap blur(Bitmap original, float radius) {
-    Bitmap bitmapOut = original.copy(Bitmap.Config.ARGB_8888, true);
-
-    int cores = EXECUTOR_THREADS;
-
-    ArrayList&amp;lt;NativeTask&amp;gt; horizontal = new ArrayList&amp;lt;NativeTask&amp;gt;(cores);
-    ArrayList&amp;lt;NativeTask&amp;gt; vertical = new ArrayList&amp;lt;NativeTask&amp;gt;(cores);
-    for (int i = 0; i &amp;lt; cores; i++) {
-        horizontal.add(new NativeTask(bitmapOut, (int) radius, cores, i, 1));
-        vertical.add(new NativeTask(bitmapOut, (int) radius, cores, i, 2));
-    }
-
-    try {
-        EXECUTOR.invokeAll(horizontal);
-    } catch (InterruptedException e) {
-        return bitmapOut;
-    }
-
-    try {
-        EXECUTOR.invokeAll(vertical);
-    } catch (InterruptedException e) {
-        return bitmapOut;
-    }
-    return bitmapOut;
-}
-
-private static class NativeTask implements Callable&amp;lt;Void&amp;gt; {
-    private final Bitmap _bitmapOut;
-    private final int _radius;
-    private final int _totalCores;
-    private final int _coreIndex;
-    private final int _round;
-
-    public NativeTask(Bitmap bitmapOut, int radius, int totalCores, int coreIndex, int round) {
-        _bitmapOut = bitmapOut;
-        _radius = radius;
-        _totalCores = totalCores;
-        _coreIndex = coreIndex;
-        _round = round;
-    }
-
-    @Override
-    public Void call() throws Exception {
-        JniHelper.toBlur(_bitmapOut, _radius, _totalCores, _coreIndex, _round);
-        return null;
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;但是图片有时可能会很大，由于模糊就是丢失精度的操作，为了提高效率，可以先对图片进行缩放从而丢失部分像素精度。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;private static Bitmap scaleBitmap(Bitmap bitmap,float scale) {
-    Matrix matrix = new Matrix();
-    matrix.postScale(scale,scale); //长和宽放大缩小的比例
-    Bitmap resizeBmp = Bitmap.createBitmap(bitmap,0,0,bitmap.getWidth(),bitmap.getHeight(),matrix,true);
-    return resizeBmp;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;提高了处理速度，而最终效果区别却不会太大。&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://github.com/luofengliuchen/MyJniTest/tree/bulr&quot;&gt;Demo地址&lt;/a&gt;&lt;/p&gt;
-</description>
-      </item>
-    
-      <item>
-        <title>listview焦点冲突</title>
-        <link>http://www.liuschen.com/2016/01/18/listview-focus.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2016/01/18/listview-focus.html</guid>
-        <pubDate>Mon, 18 Jan 2016 00:00:00 +0800</pubDate>
-        <description>&lt;p&gt;listView中经常出现焦点冲突问题，导致Item不可点击，解决方法是在条目Item的跟布局添加如下属性:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;android:descendantFocusability=&quot;blocksDescendants&quot; 
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;该属性有3个值:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;	beforeDescendants：viewgroup会优先其子类控件而获取到焦点
-
-    afterDescendants：viewgroup只有当其子类控件不需要获取焦点时才获取焦点
-
-    blocksDescendants：viewgroup会覆盖子类控件而直接获得焦点
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;而在StringPicker中除了对NumberPicker中&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;mClazz.getMethod(&quot;setMaxValue&quot;, int.class).invoke(mInstance, values.length - 1);
-mClazz.getMethod(&quot;setMinValue&quot;, int.class).invoke(mInstance, 0);
-mClazz.getMethod(&quot;setDisplayedValues&quot;, String[].class).invoke(mInstance, new Object[]{values});
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;还有setValue和getValue进行反射调用外，就是对这个属性的设置&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;setDescendantFocusability
-值为:
-NumberPicker.FOCUS_BLOCK_DESCENDANTS
-&lt;/code&gt;&lt;/pre&gt;
-</description>
-      </item>
-    
-      <item>
-        <title>NumberPicker与StringPicker</title>
-        <link>http://www.liuschen.com/2016/01/18/android-StringPicker.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2016/01/18/android-StringPicker.html</guid>
-        <pubDate>Mon, 18 Jan 2016 00:00:00 +0800</pubDate>
-        <description>&lt;blockquote&gt;
-  &lt;p&gt;NumberPicker是一款开源的控件，被收入goole的android包里面，原本我以为它不支持不连续的数字组合，后来找到了StringPicker看了它的源码才知道里面用的也是NumberPicker。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;StringPicker里面用反射获取了并调用了setDisplayedValues的方法：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;	try {
-            mClazz.getMethod(&quot;setMaxValue&quot;, int.class).invoke(mInstance, values.length - 1);
-            mClazz.getMethod(&quot;setMinValue&quot;, int.class).invoke(mInstance, 0);
-            mClazz.getMethod(&quot;setDisplayedValues&quot;, String[].class).invoke(mInstance, new Object[]{values});
-        } catch (final Exception e) {
-            throw new RuntimeException(e);
-        }
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;用来设置进去一个字符串数组。&lt;br /&gt;
-因为setDisplayedValues这个方法并不是私有的所以可以直接调用修改，但是经过初步尝试，嵌入在dialog中的NumberPicker在构造方法中实例化后不能直接调用setDisplayedValues传入数组对其进行赋值操作。在这一步只能通过设置大小极值来获得一个连续区间，同时调用的setDisplayedValues不会起作用。必须将这一步作为一个方法分离，分开调用才能得到StringPicker的效果。&lt;/p&gt;
-
-&lt;p&gt;这时，setValue和getValue的值需要在dialog中进行转换，因为NumberPicker可以直接传入和获取数字，但此时setValue传入的值需要转换成values数组对应元素的序号，同理getValue也是从NumberPicker中获取的序号，需要转化成values中对应的元素。&lt;/p&gt;
-
-&lt;p&gt;单独分离的setValues方法:mElseNum是一个不连续的String数组，作为一个连续数字区间的额外补充。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;public void setValues(){
-    values = new String[mMax-mMin+mElseNum.length+1];
-    for (int i=0;i&amp;lt;mMax-mMin+mElseNum.length+1;i++){
-        if(mMin+i&amp;lt;=mMax){
-            values[i] = String.valueOf(mMin+i);
-        }else{
-            values[i] = String.valueOf(mElseNum[i-(mMax-mMin)-1]);
-        }
-    }
-    numberPickerView.setMaxValue(mMax + mElseNum.length - mMin);
-    numberPickerView.setMinValue(0);
-    numberPickerView.setDisplayedValues(values);
-    numberPickerView.setValue(currentValue);
-}
-&lt;/code&gt;&lt;/pre&gt;
-</description>
-      </item>
-    
-      <item>
-        <title>Android绘图-LOGO兼容低版本</title>
-        <link>http://www.liuschen.com/2016/01/15/draw-a-logo2.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2016/01/15/draw-a-logo2.html</guid>
-        <pubDate>Fri, 15 Jan 2016 00:00:00 +0800</pubDate>
-        <description>&lt;p&gt;最开始被带沟里了，走了不少弯路，兼容方法:通过圆弧相接画圆环&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;private void drawRing(Canvas canvas, Paint paint,float interX, float innerY,float outerX, float outerY,float outerStartAngle,float outerSweepAngle,float innerStartAngle,float innerSweepAnglefloat ,float inner_circle,float outter_circle) {
-
-        Path mPath = new Path();
-        arcTo(mPath,outerX,outerY,outter_circle,outerStartAngle,outerSweepAngle,false);
-        arcTo(mPath,interX,innerY,inner_circle,innerStartAngle+innerSweepAnglefloat,-innerSweepAnglefloat,false);
-        mPath.close();
-        canvas.drawPath(mPath,paint);
-
-    }
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;构造的方法同html5中的对应方法用相似的参数，只是最后forceMoveTo是是否强制封闭圆弧，和js中的最后参数控制绘制顺逆方向不同&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;/**
- * 通过已知圆心半径和夹角画圆心
- * */
-private void arcTo(Path path ,float circleX,float circleY,float circleR, float startAngle,
-                   float sweepAngle, boolean forceMoveTo){
-
-    float left = circleX - circleR;
-    float right = circleX + circleR;
-    float top = circleY -circleR;
-    float bottom = circleY + circleR;
-
-    path.arcTo(new RectF(left, top, right, bottom), startAngle,
-            sweepAngle, forceMoveTo);
-}
-&lt;/code&gt;&lt;/pre&gt;
 </description>
       </item>
     

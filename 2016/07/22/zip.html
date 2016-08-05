@@ -5,8 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
 <!--[if lte IE 9]><meta http-equiv="refresh" content="0;url=/ie.html"><![endif]-->
 
-<title>404 Not Found Error | 落风的博客</title>
+<title>Android解压缩zip文件 | 落风的博客</title>
 <meta name="author" content="落风">
+
+  <meta name="keywords" content="解压缩">
 
 
 
@@ -114,8 +116,141 @@
     <div id="post">
       <div id="pjax">
         <article id="post__content">
-  <h1 id="post__title">404 Not Found Error</h1>
+  <h1 id="post__title" data-identifier="20160722">Android解压缩zip文件</h1>
+  <blockquote>
+  <p>期望:使项目apk包中的大文件批量数据可以单独作为一个apk来管理，所以需要将Android assets文件夹下的zip打包文件解压到SDCard上。</p>
+</blockquote>
+
+<p>解压缩的操作由于比较耗时，所以新开一个线程执行以下函数</p>
+
+<pre><code>/**将assets对应文件解压到对应的sdcard目录中*/
+public void unPress2Sdcard(String fileName){
+    try {
+        /**目标路径*/
+        String destDir = rootPath + File.separator + fileName;
+        /**将压缩文件拷贝到内存卡中*/
+        mAssetCopyer.copyBigDataToSD(destDir, fileName);
+        /**解压文件到目标路径*/
+        unzip(destDir, offlinePath);
+        /**删除在内存卡上临时存在的压缩文件*/
+        FileUtils.deleteFile(destDir);
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
+</code></pre>
+
+<p>对应的先将assets下的zip文件拷贝到SDCard中，这个是直接在网上找的方法拿来用</p>
+
+<pre><code>public void copyBigDataToSD(String strOutFileName,String file) throws IOException{
+    InputStream myInput;
+    OutputStream myOutput = new FileOutputStream(strOutFileName);
+    myInput = mContext.getAssets().open(file);
+    byte[] buffer = new byte[1024];
+    int length = myInput.read(buffer);
+    while(length &gt; 0){
+        myOutput.write(buffer, 0, length);
+        length = myInput.read(buffer);
+    }
+    myOutput.flush();
+    myInput.close();
+    myOutput.close();
+}
+</code></pre>
+
+<p>然后解压缩操作</p>
+
+<pre><code>@SuppressWarnings("unchecked")  
+public static void unzip(String zipFilePath, String unzipFilePath) throws Exception{
+    /**验证是否为空*/
+    if (isEmpty(zipFilePath) || isEmpty(unzipFilePath)){
+
+    }
+    File zipFile = new File(zipFilePath);
+    /**创建解压缩文件保存的路径*/
+    File unzipFileDir = new File(unzipFilePath);
+    if (!unzipFileDir.exists()){
+        unzipFileDir.mkdirs();
+    }
+    //开始解压
+    ZipEntry entry = null;
+    String entryFilePath = null;
+    int count = 0, bufferSize = 1024;
+    byte[] buffer = new byte[bufferSize];  
+    BufferedInputStream bis = null;
+    BufferedOutputStream bos = null;  
+    ZipFile zip = new ZipFile(zipFile);
+    Enumeration&lt;ZipEntry&gt; entries = (Enumeration&lt;ZipEntry&gt;)zip.entries();  
+    //循环对压缩包里的每一个文件进行解压
+    while(entries.hasMoreElements()){
+        entry = entries.nextElement();
+        log("log ing5:"+entry.getName());
+        /**这里提示如果当前元素是文件夹时，在目录中创建对应文件夹
+         * ，如果是文件，得出路径交给下一步处理*/
+        entryFilePath = unzipFilePath + File.separator + entry.getName();
+        File file = new File(entryFilePath);
+        log("~~是否是文件夹:"+file.isDirectory());
+        if(entryFilePath.endsWith("/")){
+            if(!file.exists()){
+                file.mkdir();
+            }
+            continue;
+        }
+        /***这里即是上一步所说的下一步，负责文件的写入，不服来咬(≖ ‿ ≖)✧*/
+        bos = new BufferedOutputStream(new FileOutputStream(entryFilePath+"/"));
+        bis = new BufferedInputStream(zip.getInputStream(entry));
+        while ((count = bis.read(buffer, 0, bufferSize)) != -1){
+            bos.write(buffer, 0, count);
+        }
+        bos.flush();
+        bos.close();
+    }
+}
+</code></pre>
+
+<p>用的也是直接网上down下来的，但是在解压缩操作中遇到的是这一句bos = new BufferedOutputStream(new FileOutputStream(entryFilePath));传入的entryFilePath运行的时候却老提示不是文件夹，于是把中间循环解压元素的代码以及一些冗余的逻辑删除了，改成了现在这样，进入循环先判断是否是文件夹(我这里是靠尾部的字符判断的)，如果是，在目标路径中创建，开始下一循环，不是，就把文件解压到对应路径。</p>
+
+<p>最后一步删除SDcard下的压缩文件<br />
+FileUtils.deleteFile(destDir);</p>
+
+<p>注意:源压缩包必须是zip格式的并且是快速压缩，超高压缩算法不同，解析不了，我是在window上用快压打包的。</p>
+
 </article> <!-- end #post__content -->
+
+<div id="post__share">
+  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/07/22/zip.html&text=Android解压缩zip文件" target="_blank"></a>
+  <a id="icon-cc" class="fontello" href="http://creativecommons.org/licenses/by-nc-sa/3.0" target="_blank"></a>
+  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/07/22/zip.html&title=Android解压缩zip文件" target="_blank"></a>
+</div> <!-- end #post__share -->
+<div id="disqus_thread" name="luofeng">
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink" target="_blank">Loading Disqus comments...</a>
+</div>
+
+<!-- <div id="disqus_thread"></div>
+<script>
+/**
+* RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+* LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL; // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+
+s.src = '//luofeng.disqus.com/embed.js';
+
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript> -->
+
+
         <p id="copyright">Powered by <a href="http://jekyllrb.com" target="_blank">Jekyll</a>&nbsp;&nbsp;|&nbsp;&nbsp;Theme <a href="https://github.com/P233/3-Jekyll" target="_blank">3-Jekyll</a>&nbsp;&nbsp;|&nbsp;&nbsp;Hosted on <a href="https://pages.github.com" target="_blank">Github</a></p>
       </div> <!-- end #pjax -->
 
