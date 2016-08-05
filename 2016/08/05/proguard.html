@@ -1,12 +1,123 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+<!--[if lte IE 9]><meta http-equiv="refresh" content="0;url=/ie.html"><![endif]-->
 
-<hr />
-<p>layout: post<br />
-title: Androidstudio下的代码混淆<br />
-category: 技术<br />
-keywords: 混淆<br />
-—</p>
+<title>Androidstudio下的代码混淆 | 落风的博客</title>
+<meta name="author" content="落风">
 
-<p>首先在项目的build.gradle中Android标签下添加</p>
+  <meta name="keywords" content="混淆">
+
+
+
+
+<link rel="shortcut icon" href="http://7xpui7.com1.z0.glb.clouddn.com/blog-site-favicon.ico" />
+
+<link rel="stylesheet" type="text/css" href="/assets/css/style.css">
+
+<link href="/pages/rss.xml" rel="alternate" title="落风的博客" type="application/atom+xml">
+  </head>
+  <body>
+    <aside id="sidebar">
+  <nav id="tags">
+    <a href="/index.html" id="avatar" style="background-image:url(http://7xpui7.com1.z0.glb.clouddn.com/blog-site-avatar.png)"></a>
+
+    <ul id="tags__ul">
+      <li id="pl__all" class="tags__li tags-btn active">全部</li>
+       
+        <li id="技术" class="tags__li tags-btn">技术</li>
+       
+        <li id="杂说" class="tags__li tags-btn">杂说</li>
+       
+        <li id="小说" class="tags__li tags-btn">小说</li>
+       
+        <li id="照片" class="tags__li tags-btn">照片</li>
+      
+    </ul>
+
+    <div id="tags__bottom">
+      <a href="mailto:luofengliuchen@gmail.com" id="icon-email" class="tags-btn fontello"></a>
+      <a href="/pages/rss.xml" id="icon-feed" class="tags-btn fontello"></a>
+    </div>
+  </nav> <!-- end #tags -->
+
+  <div id="posts-list">
+    <form action="" id="search-form">
+      <a href="/index.html" id="mobile-avatar" style="background-image:url(http://7xpui7.com1.z0.glb.clouddn.com/blog-site-avatar.png)"></a>
+      <!-- NOTE: input field is disabled by default -->
+      <input id="search-input" type="text" placeholder="Search...">
+    </form>
+
+    <nav id="pl__container">
+    
+      <a class="技术 pl__all" href="/2016/08/05/proguard.html"><span class="pl__circle"></span><span class="pl__title">Androidstudio下的代码混淆</span><span class="pl__date">Aug 2016</span></a>
+    
+      <a class="技术 pl__all" href="/2016/08/02/nine.html"><span class="pl__circle"></span><span class="pl__title">nine patch图片的用法绘制以及作用</span><span class="pl__date">Aug 2016</span></a>
+    
+      <a class="技术 pl__all" href="/2016/07/22/zip.html"><span class="pl__circle"></span><span class="pl__title">Android解压缩zip文件</span><span class="pl__date">Jul 2016</span></a>
+    
+      <a class="杂说 pl__all" href="/2016/06/07/person.html"><span class="pl__circle"></span><span class="pl__title">程序员编程语录</span><span class="pl__date">Jun 2016</span></a>
+    
+      <a class="技术 pl__all" href="/2016/04/29/sqlite.html"><span class="pl__circle"></span><span class="pl__title">Android数据库和Bean的交互</span><span class="pl__date">Apr 2016</span></a>
+    
+      <a class="杂说 pl__all" href="/2016/04/25/wildernessdiary-habby.html"><span class="pl__circle"></span><span class="pl__title">荒原日记-习惯</span><span class="pl__date">Apr 2016</span></a>
+    
+      <a class="杂说 pl__all" href="/2016/04/16/wildernessdiary-start.html"><span class="pl__circle"></span><span class="pl__title">荒原日记-开篇</span><span class="pl__date">Apr 2016</span></a>
+    
+      <a class="技术 pl__all" href="/2016/02/21/studio.html"><span class="pl__circle"></span><span class="pl__title">Visual Studio开发Android程序</span><span class="pl__date">Feb 2016</span></a>
+    
+      <a class="技术 pl__all" href="/2016/02/19/c++.html"><span class="pl__circle"></span><span class="pl__title">C++学习整理</span><span class="pl__date">Feb 2016</span></a>
+    
+      <a class="技术 pl__all" href="/2016/02/17/socket.html"><span class="pl__circle"></span><span class="pl__title">Socket编程笔记</span><span class="pl__date">Feb 2016</span></a>
+    
+      <a class="技术 pl__all" href="/2016/02/16/apk.html"><span class="pl__circle"></span><span class="pl__title">git常用命令行</span><span class="pl__date">Feb 2016</span></a>
+    
+      <a class="技术 pl__all" href="/2016/02/14/apk.html"><span class="pl__circle"></span><span class="pl__title">android反编译</span><span class="pl__date">Feb 2016</span></a>
+    
+      <a class="技术 pl__all" href="/2016/02/05/html5-2.html"><span class="pl__circle"></span><span class="pl__title">html5内嵌入android</span><span class="pl__date">Feb 2016</span></a>
+    
+      <a class="技术 pl__all" href="/2016/02/04/html5-1.html"><span class="pl__circle"></span><span class="pl__title">HTML5绘图学习记录</span><span class="pl__date">Feb 2016</span></a>
+    
+      <a class="技术 pl__all" href="/2016/02/03/html5.html"><span class="pl__circle"></span><span class="pl__title">HTML5绘图学习</span><span class="pl__date">Feb 2016</span></a>
+    
+      <a class="照片 pl__all" href="/2016/01/31/fox3.html"><span class="pl__circle"></span><span class="pl__title">想要冬眠的狐狸</span><span class="pl__date">Jan 2016</span></a>
+    
+      <a class="照片 pl__all" href="/2016/01/31/fox2.html"><span class="pl__circle"></span><span class="pl__title">擅长卖萌的狐狸</span><span class="pl__date">Jan 2016</span></a>
+    
+      <a class="照片 pl__all" href="/2016/01/31/fox1.html"><span class="pl__circle"></span><span class="pl__title">正在找东西的狐狸</span><span class="pl__date">Jan 2016</span></a>
+    
+      <a class="小说 pl__all" href="/2016/01/27/dream-flower.html"><span class="pl__circle"></span><span class="pl__title">梦花</span><span class="pl__date">Jan 2016</span></a>
+    
+      <a class="杂说 pl__all" href="/2016/01/27/project-mode.html"><span class="pl__circle"></span><span class="pl__title">我对瀑布开发模式和敏捷开发模式的理解</span><span class="pl__date">Jan 2016</span></a>
+    
+      <a class="技术 pl__all" href="/2016/01/25/stackblur.html"><span class="pl__circle"></span><span class="pl__title">Android滤镜-快速模糊</span><span class="pl__date">Jan 2016</span></a>
+    
+      <a class="技术 pl__all" href="/2016/01/18/listview-focus.html"><span class="pl__circle"></span><span class="pl__title">listview焦点冲突</span><span class="pl__date">Jan 2016</span></a>
+    
+      <a class="技术 pl__all" href="/2016/01/18/android-StringPicker.html"><span class="pl__circle"></span><span class="pl__title">NumberPicker与StringPicker</span><span class="pl__date">Jan 2016</span></a>
+    
+      <a class="技术 pl__all" href="/2016/01/15/draw-a-logo2.html"><span class="pl__circle"></span><span class="pl__title">Android绘图-LOGO兼容低版本</span><span class="pl__date">Jan 2016</span></a>
+    
+      <a class="技术 pl__all" href="/2016/01/15/android-logo1.html"><span class="pl__circle"></span><span class="pl__title">Android绘图-LOGO-实现3</span><span class="pl__date">Jan 2016</span></a>
+    
+      <a class="技术 pl__all" href="/2016/01/15/NDK.html"><span class="pl__circle"></span><span class="pl__title">Androidstudio下jni的一些问题</span><span class="pl__date">Jan 2016</span></a>
+    
+      <a class="技术 pl__all" href="/2016/01/14/draw-a-logo.html"><span class="pl__circle"></span><span class="pl__title">Android绘图-LOGO-实现2</span><span class="pl__date">Jan 2016</span></a>
+    
+      <a class="技术 pl__all" href="/2016/01/12/draw-a-logo.html"><span class="pl__circle"></span><span class="pl__title">Android绘图-LOGO-实现1</span><span class="pl__date">Jan 2016</span></a>
+    
+      <a class="技术 pl__all" href="/2016/01/11/deal-with-pix.html"><span class="pl__circle"></span><span class="pl__title">android图像处理:像素过滤</span><span class="pl__date">Jan 2016</span></a>
+    
+    </nav>
+  </div> <!-- end #posts-list -->
+</aside> <!-- end #sidebar -->
+    <div id="post">
+      <div id="pjax">
+        <article id="post__content">
+  <h1 id="post__title" data-identifier="20160805">Androidstudio下的代码混淆</h1>
+  <p>首先在项目的build.gradle中Android标签下添加</p>
 
 <pre><code>signingConfigs {
     release {
@@ -79,3 +190,59 @@ buildTypes {
 
 <p>一般情况下，系统的控件不必要混淆，如activity，service等，其次由于默在Androidstudio中默认已经将libs包中的jar添加了，重复添加反而会报错，最后项目中用到反射的地方一定不能混淆。<br />
 添加完后却还是报错了，先添加了-dontwarn，然并没什么用，然后加了-ignorewarnings忽略警告，成功生成apk,只是一定要注意确保警告中的地方没被项目调用，否则实际运行时还会出错，后果更严重。</p>
+
+</article> <!-- end #post__content -->
+
+<div id="post__share">
+  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/08/05/proguard.html&text=Androidstudio下的代码混淆" target="_blank"></a>
+  <a id="icon-cc" class="fontello" href="http://creativecommons.org/licenses/by-nc-sa/3.0" target="_blank"></a>
+  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/08/05/proguard.html&title=Androidstudio下的代码混淆" target="_blank"></a>
+</div> <!-- end #post__share -->
+<div id="disqus_thread" name="luofeng">
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com" class="dsq-brlink" target="_blank">Loading Disqus comments...</a>
+</div>
+
+<!-- <div id="disqus_thread"></div>
+<script>
+/**
+* RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+* LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL; // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+
+s.src = '//luofeng.disqus.com/embed.js';
+
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript> -->
+
+
+        <p id="copyright">Powered by <a href="http://jekyllrb.com" target="_blank">Jekyll</a>&nbsp;&nbsp;|&nbsp;&nbsp;Theme <a href="https://github.com/P233/3-Jekyll" target="_blank">3-Jekyll</a>&nbsp;&nbsp;|&nbsp;&nbsp;Hosted on <a href="https://pages.github.com" target="_blank">Github</a></p>
+      </div> <!-- end #pjax -->
+
+      <div id="post__toc-trigger">
+        <div id="post__toc">
+          <span id="post__toc-title">Table of Contents</span>
+          <ul id="post__toc-ul"></ul>
+        </div>
+      </div>
+    </div> <!-- end #post -->
+
+    <button id="js-fullscreen"><span id="icon-arrow" class="fontello"></span></button>
+
+<script src="/assets/js/jquery.js"></script>
+<script src="/assets/js/jquery.pjax.js"></script>
+<script src="/assets/js/nprogress.js"></script>
+<script src="/assets/js/script.js"></script>
+  </body>
+</html>

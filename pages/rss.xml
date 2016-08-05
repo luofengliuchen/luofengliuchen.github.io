@@ -6,19 +6,11 @@
     <description>落风的博客</description>
     
       <item>
-        <title>Proguard</title>
+        <title>Androidstudio下的代码混淆</title>
         <link>http://www.liuschen.com/2016/08/05/proguard.html</link>
         <guid isPermaLink="true">http://www.liuschen.com/2016/08/05/proguard.html</guid>
         <pubDate>Fri, 05 Aug 2016 00:00:00 +0800</pubDate>
-        <description>
-&lt;hr /&gt;
-&lt;p&gt;layout: post&lt;br /&gt;
-title: Androidstudio下的代码混淆&lt;br /&gt;
-category: 技术&lt;br /&gt;
-keywords: 混淆&lt;br /&gt;
-—&lt;/p&gt;
-
-&lt;p&gt;首先在项目的build.gradle中Android标签下添加&lt;/p&gt;
+        <description>&lt;p&gt;首先在项目的build.gradle中Android标签下添加&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;signingConfigs {
     release {
@@ -95,19 +87,11 @@ buildTypes {
       </item>
     
       <item>
-        <title>Nine</title>
+        <title>nine patch图片的用法绘制以及作用</title>
         <link>http://www.liuschen.com/2016/08/02/nine.html</link>
         <guid isPermaLink="true">http://www.liuschen.com/2016/08/02/nine.html</guid>
         <pubDate>Tue, 02 Aug 2016 00:00:00 +0800</pubDate>
-        <description>
-&lt;hr /&gt;
-&lt;p&gt;layout: post&lt;br /&gt;
-title: .9图片的用法绘制以及作用&lt;br /&gt;
-category: 技术&lt;br /&gt;
-keywords: .9图片&lt;br /&gt;
-—&lt;/p&gt;
-
-&lt;p&gt;问题:&lt;/p&gt;
+        <description>&lt;p&gt;问题:&lt;/p&gt;
 
 &lt;p&gt;今天从网上down下了一个eclipse下的项目，导入到androidStudio中后，结果出现了如下异常：&lt;/p&gt;
 
