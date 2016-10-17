@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
 <!--[if lte IE 9]><meta http-equiv="refresh" content="0;url=/ie.html"><![endif]-->
 
-<title>nine patch图片的用法绘制以及作用 | 落风的博客</title>
+<title>android svg动画 | 落风的博客</title>
 <meta name="author" content="落风">
 
-  <meta name="keywords" content="nine patch图片">
+  <meta name="keywords" content="android,svg">
 
 
 
@@ -132,44 +132,51 @@
     <div id="post">
       <div id="pjax">
         <article id="post__content">
-  <h1 id="post__title" data-identifier="20160802">nine patch图片的用法绘制以及作用</h1>
-  <p>问题:</p>
+  <h1 id="post__title" data-identifier="20160812">android svg动画</h1>
+  <p>用过矢量绘图的人都应该知道svg是一种矢量图的格式，内容如下：</p>
 
-<p>今天从网上down下了一个eclipse下的项目，导入到androidStudio中后，结果出现了如下异常：</p>
-
-<pre><code>D:\myAllProject\androidstudio_ajlast\321Browser\uCBrowser_1113\src\main\res\layout\above_slidingmenu.xml
-Error:(111, 30) No resource found that matches the given name (at 'src' with value '@drawable/menubar_tabcenter_d').
-
-Error:(20, 38) No resource found that matches the given name (at 'src' with value '@drawable/url_progress_fullscreen').
-D:\myAllProject\androidstudio_ajlast\321Browser\uCBrowser_1113\src\main\res\drawable\search_btn_bg.xml
-Error:(5, 87) No resource found that matches the given name (at 'drawable' with value '@drawable/search_engines_switcher_item_bg_p').
-Error:(6, 87) No resource found that matches the given name (at 'drawable' with value '@drawable/search_engines_switcher_item_bg_p').
-Error:Execution failed for task ':uCBrowser_1113:processDebugResources'.
-com.android.ide.common.process.ProcessException: org.gradle.process.internal.ExecException: Process 'command 'F:\programer\android_sdk\build-tools\23.0.2\aapt.exe'' finished with non-zero exit value 1
+<pre><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;!-- Generator: Adobe Illustrator 19.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  --&gt;
+&lt;svg version="1.1" id="图层_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 595.3 841.9" style="enable-background:new 0 0 595.3 841.9;" xml:space="preserve"&gt;
+&lt;style type="text/css"&gt;
+	.st0{fill:none;stroke:#000000;stroke-miterlimit:10;}
+	.st1{fill:url(#XMLID_18_);stroke:#131320;stroke-miterlimit:10;}
+	.st2{fill:#E21B15;stroke:#131320;stroke-miterlimit:10;}
+	.st3{fill:none;stroke:#131320;stroke-miterlimit:10;}
+&lt;/style&gt;
+&lt;line id="XMLID_1_" class="st0" x1="133.3" y1="145.4" x2="54.7" y2="344.4"/&gt;
+&lt;line id="XMLID_2_" class="st0" x1="183.3" y1="393.4" x2="297.6" y2="448.5"/&gt;
+&lt;line id="XMLID_3_" class="st0" x1="268" y1="203.6" x2="159.8" y2="274"/&gt;
+&lt;line id="XMLID_4_" class="st0" x1="94" y1="444.4" x2="202.7" y2="626.1"/&gt;
+&lt;line id="XMLID_5_" class="st0" x1="426.2" y1="256.7" x2="240.5" y2="330.1"/&gt;
+&lt;line id="XMLID_6_" class="st0" x1="285.3" y1="368.9" x2="437.4" y2="420.9"/&gt;
+&lt;line id="XMLID_7_" class="st0" x1="437.4" y1="256.7" x2="589.4" y2="308.7"/&gt;
+&lt;line id="XMLID_8_" class="st0" x1="589.4" y1="308.7" x2="461.9" y2="421"/&gt;
+&lt;linearGradient id="XMLID_18_" gradientUnits="userSpaceOnUse" x1="262.8693" y1="119.1227" x2="533.773" y2="121.9446"&gt;
+	&lt;stop  offset="0" style="stop-color:#FFFFFF"/&gt;
+	&lt;stop  offset="1" style="stop-color:#000000"/&gt;
+&lt;/linearGradient&gt;
+&lt;rect id="XMLID_9_" x="254.7" y="76.1" class="st1" width="270.9" height="88.8"/&gt;
+&lt;path id="XMLID_10_" class="st2" d="M420,525L291.5,775c-5.1-1-115.8-23.3-133.7-93.9c-19.5-77.1,87.3-151.4,154.1-178.6
+	c55.7-22.7,154.6-41.6,183.7,0c29,41.5-14.9,138.2-115.3,233.7c-3.1,0.3-6.1,0.7-9.2,1"/&gt;
+&lt;path id="XMLID_11_" class="st2" d="M-165.7,640.3"/&gt;
+&lt;path id="XMLID_12_" class="st3" d="M365,333.4c21.5,0.8,43.1-0.7,64.2-4.6"/&gt;
+&lt;path id="XMLID_13_" class="st3" d="M428.6,292.9c-3.3,5.5-5.7,11.5-8.4,17.2c-9.1,19.4-22.3,37-38.4,51.1"/&gt;
+&lt;path id="XMLID_14_" class="st3" d="M398.7,334c4.2-1.5,8,2.8,10.4,6.6c6.3,10.2,12.7,20.3,19,30.5"/&gt;
+&lt;line id="XMLID_15_" class="st3" x1="36.4" y1="371.1" x2="-92.2" y2="621.1"/&gt;
+&lt;line id="XMLID_16_" class="st3" x1="-92.2" y1="631.2" x2="306.8" y2="198.5"/&gt;
+&lt;/svg&gt;
 </code></pre>
 
-<p>纠结了很久发现都是.9图片的问题，于是按照网上说的在android的gradle中android标签下加入下面代码，避免了对 .9图片的检查</p>
-
-<pre><code>aaptOptions.cruncherEnabled = false
-aaptOptions.useNewCruncher = false
-</code></pre>
-
-<p>然而会继续报错，原因是图片上的像素定位点没有添加,最后还是一个一个改的。</p>
-
-<p>问题核心：</p>
-
-<p>.9图片可以根据ps绘制，同时，android里面也有专门的绘制工具。<br />
-.9图片区别于普通图片主要是通过两点：<br />
-1.特殊的扩展名，供专门的应用识别<br />
-2.图片上下左右4个特殊的黑色像素条，宽一个像素，也可以仅仅是一个点，其中上边和左边像素条标记的分别是图片在横向和纵向的可拉伸区域，至于右边和下边的像素条，网上说是表示“前景能显示的范围”，用了这么久，没见过可以区别的效果，所以也不大理解是什么意思。</p>
-
+<p>有点像js和xml,如果要在android上绘制，就需要先对它进行解析操作，再进行绘制。</p>
 
 </article> <!-- end #post__content -->
 
 <div id="post__share">
-  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/08/02/nine.html&text=nine patch图片的用法绘制以及作用" target="_blank"></a>
+  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/08/12/AndroidSVG.html&text=android svg动画" target="_blank"></a>
   <a id="icon-cc" class="fontello" href="http://creativecommons.org/licenses/by-nc-sa/3.0" target="_blank"></a>
-  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/08/02/nine.html&title=nine patch图片的用法绘制以及作用" target="_blank"></a>
+  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/08/12/AndroidSVG.html&title=android svg动画" target="_blank"></a>
 </div> <!-- end #post__share -->
 <div id="disqus_thread" name="luofeng">
   <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>

@@ -9,6 +9,22 @@
 
 
 
+  /2016/10/02/wildernessdiary-time.html
+
+  /2016/09/18/net-analysis.html
+
+  /2016/09/15/BLocation.html
+
+  /2016/08/26/netty-point.html
+
+  /2016/08/25/netty_connect.html
+
+  /2016/08/20/netty-beat.html
+
+  /2016/08/12/AndroidSVG.html
+
+  /2016/08/11/Androidstudioupdatelike.html
+
   /2016/08/05/proguard.html
 
   /2016/08/02/nine.html

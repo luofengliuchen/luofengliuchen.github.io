@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
 <!--[if lte IE 9]><meta http-equiv="refresh" content="0;url=/ie.html"><![endif]-->
 
-<title>nine patch图片的用法绘制以及作用 | 落风的博客</title>
+<title>AndroidStudio版本更新记录 | 落风的博客</title>
 <meta name="author" content="落风">
 
-  <meta name="keywords" content="nine patch图片">
+  <meta name="keywords" content="Androidstudio,update">
 
 
 
@@ -132,44 +132,72 @@
     <div id="post">
       <div id="pjax">
         <article id="post__content">
-  <h1 id="post__title" data-identifier="20160802">nine patch图片的用法绘制以及作用</h1>
-  <p>问题:</p>
+  <h1 id="post__title" data-identifier="20160811">AndroidStudio版本更新记录</h1>
+  <p>对于开发者而言，最重要的无疑是开发工具的使用，做Android开发之前用的是eclipse，现在用的则是Google的Androidstudio，我不常更新工具，太麻烦也常常会出现很多问题，但是也会因此错过很多新的东西，比如Google的版本，每次更新总会带来很多新奇的特性，懒惰即是错过，虽然之前有同事因为更新出现了诸多问题，耗费了时间，最终也没能成功。但是，仔细想想这些都不是什么问题，尤其是现在我相对比较闲的情况下。</p>
 
-<p>今天从网上down下了一个eclipse下的项目，导入到androidStudio中后，结果出现了如下异常：</p>
+<p>首先是下载，在官网上下在<br />
+android-studio-bundle-143.2915827-windows.exe<br />
+当然如无法下载也可以在网上搜索下载。<br />
+我安装的2.1.2貌似是最新的版本。但是安装完后运行之前的程序，果不其然，报了一堆错.</p>
 
-<pre><code>D:\myAllProject\androidstudio_ajlast\321Browser\uCBrowser_1113\src\main\res\layout\above_slidingmenu.xml
-Error:(111, 30) No resource found that matches the given name (at 'src' with value '@drawable/menubar_tabcenter_d').
+<p>首先是gradle版本不匹配，当前是2.1.2而我之前项目是1.3<br />
+然后就提示我是否更新，更新项目gradle到新版本有好处云云。然后我就同意了，然后就报错了</p>
 
-Error:(20, 38) No resource found that matches the given name (at 'src' with value '@drawable/url_progress_fullscreen').
-D:\myAllProject\androidstudio_ajlast\321Browser\uCBrowser_1113\src\main\res\drawable\search_btn_bg.xml
-Error:(5, 87) No resource found that matches the given name (at 'drawable' with value '@drawable/search_engines_switcher_item_bg_p').
-Error:(6, 87) No resource found that matches the given name (at 'drawable' with value '@drawable/search_engines_switcher_item_bg_p').
-Error:Execution failed for task ':uCBrowser_1113:processDebugResources'.
-com.android.ide.common.process.ProcessException: org.gradle.process.internal.ExecException: Process 'command 'F:\programer\android_sdk\build-tools\23.0.2\aapt.exe'' finished with non-zero exit value 1
+<pre><code>Error:Gradle version 2.10 is required. Current version is 2.4. If using the gradle wrapper, try editing the distributionUrl in D:\softku\wangpan\AndroidAppBook\gradle\wrapper\gradle-wrapper.properties to gradle-2.10-all.zip
+&lt;a href="fixGradleVersionInWrapper"&gt;Fix Gradle wrapper and re-import project&lt;/a&gt;&lt;br&gt;&lt;a href="openGradleSettings"&gt;Gradle settings&lt;/a&gt;
 </code></pre>
 
-<p>纠结了很久发现都是.9图片的问题，于是按照网上说的在android的gradle中android标签下加入下面代码，避免了对 .9图片的检查</p>
+<p>这个是gradle版本问题，需要翻墙下载，当然也可以单独下载</p>
 
-<pre><code>aaptOptions.cruncherEnabled = false
-aaptOptions.useNewCruncher = false
+<p><a href="http://services.gradle.org/distributions">http://services.gradle.org/distributions</a></p>
+
+<p>而在项目的gradle\wrapper下面的gradle-wrapper.properties文件</p>
+
+<pre><code>#Thu Aug 11 08:37:08 CST 2016
+distributionBase=GRADLE_USER_HOME
+distributionPath=wrapper/dists
+zipStoreBase=GRADLE_USER_HOME
+zipStorePath=wrapper/dists
+distributionUrl=https\://services.gradle.org/distributions/gradle-2.10-all.zip
 </code></pre>
 
-<p>然而会继续报错，原因是图片上的像素定位点没有添加,最后还是一个一个改的。</p>
+<p>可以修改项目依赖的gradle版本下载地址</p>
 
-<p>问题核心：</p>
+<p>最后也就是做这些的目的，运行一些之前由于需要版本过高运行不了的项目，运行后依然报错，由于用的sdk是老的，缺少高版本的sdk，于是我将新安装的sdk下add-ons,platforms，system-images,build-tools和platform-tools下对应的版本sdk文件copy到了旧的Sdk(因为下的版本较多，很大)中，再次运行程序，成功。AndroidStudio更新成功。</p>
 
-<p>.9图片可以根据ps绘制，同时，android里面也有专门的绘制工具。<br />
-.9图片区别于普通图片主要是通过两点：<br />
-1.特殊的扩展名，供专门的应用识别<br />
-2.图片上下左右4个特殊的黑色像素条，宽一个像素，也可以仅仅是一个点，其中上边和左边像素条标记的分别是图片在横向和纵向的可拉伸区域，至于右边和下边的像素条，网上说是表示“前景能显示的范围”，用了这么久，没见过可以区别的效果，所以也不大理解是什么意思。</p>
+<p>有时候导入版本较早工程时会报<br />
+Gradle DSL method not found: ‘runProguard()’</p>
 
+<p>原因是这个</p>
+
+<pre><code>buildTypes {
+    release {
+
+        runProguard false // 已经被废弃并且停止使用了
+
+        ......
+    }
+}
+new:
+
+buildTypes {
+    release {
+
+        minifyEnabled false // 替代的方式
+
+        ......
+    }
+}
+</code></pre>
+
+<p>改一下就好了。</p>
 
 </article> <!-- end #post__content -->
 
 <div id="post__share">
-  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/08/02/nine.html&text=nine patch图片的用法绘制以及作用" target="_blank"></a>
+  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/08/11/Androidstudioupdatelike.html&text=AndroidStudio版本更新记录" target="_blank"></a>
   <a id="icon-cc" class="fontello" href="http://creativecommons.org/licenses/by-nc-sa/3.0" target="_blank"></a>
-  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/08/02/nine.html&title=nine patch图片的用法绘制以及作用" target="_blank"></a>
+  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/08/11/Androidstudioupdatelike.html&title=AndroidStudio版本更新记录" target="_blank"></a>
 </div> <!-- end #post__share -->
 <div id="disqus_thread" name="luofeng">
   <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>

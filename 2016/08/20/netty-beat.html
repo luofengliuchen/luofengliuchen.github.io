@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
 <!--[if lte IE 9]><meta http-equiv="refresh" content="0;url=/ie.html"><![endif]-->
 
-<title>nine patch图片的用法绘制以及作用 | 落风的博客</title>
+<title>netty自带心跳响应 | 落风的博客</title>
 <meta name="author" content="落风">
 
-  <meta name="keywords" content="nine patch图片">
+  <meta name="keywords" content="netty,心跳">
 
 
 
@@ -132,44 +132,157 @@
     <div id="post">
       <div id="pjax">
         <article id="post__content">
-  <h1 id="post__title" data-identifier="20160802">nine patch图片的用法绘制以及作用</h1>
-  <p>问题:</p>
+  <h1 id="post__title" data-identifier="20160820">netty自带心跳响应</h1>
+  <blockquote>
+  <p>文章链接:<a href="http://www.liuschen.com">http://www.liuschen.com</a></p>
+</blockquote>
 
-<p>今天从网上down下了一个eclipse下的项目，导入到androidStudio中后，结果出现了如下异常：</p>
+<p>netty客户端的写法，不再赘述：</p>
 
-<pre><code>D:\myAllProject\androidstudio_ajlast\321Browser\uCBrowser_1113\src\main\res\layout\above_slidingmenu.xml
-Error:(111, 30) No resource found that matches the given name (at 'src' with value '@drawable/menubar_tabcenter_d').
+<pre><code>b.group(group).channel(NioSocketChannel.class)
+				.option(ChannelOption.TCP_NODELAY, true)
+				.handler(new ChannelInitializer&lt;SocketChannel&gt;() {
+					@Override
+					protected void initChannel(SocketChannel ch) throws Exception {
+						
+						ch.pipeline().addLast(new IdleStateHandler(HEARTBEAT_READABLE_INTERVAL_TIME,
+									HEARTBEAT_WRITABLE_INTERVAL_TIME, HEARTBEAT_READ_WRITE_INTERVAL_TIME));
+							ch.pipeline().addLast("HeartBeatHandler", new HeartBeatHandler(client));
 
-Error:(20, 38) No resource found that matches the given name (at 'src' with value '@drawable/url_progress_fullscreen').
-D:\myAllProject\androidstudio_ajlast\321Browser\uCBrowser_1113\src\main\res\drawable\search_btn_bg.xml
-Error:(5, 87) No resource found that matches the given name (at 'drawable' with value '@drawable/search_engines_switcher_item_bg_p').
-Error:(6, 87) No resource found that matches the given name (at 'drawable' with value '@drawable/search_engines_switcher_item_bg_p').
-Error:Execution failed for task ':uCBrowser_1113:processDebugResources'.
-com.android.ide.common.process.ProcessException: org.gradle.process.internal.ExecException: Process 'command 'F:\programer\android_sdk\build-tools\23.0.2\aapt.exe'' finished with non-zero exit value 1
+					}
+
+				});
 </code></pre>
 
-<p>纠结了很久发现都是.9图片的问题，于是按照网上说的在android的gradle中android标签下加入下面代码，避免了对 .9图片的检查</p>
+<p>IdleStateHandler类是为了监听空闲的状态，传入的参数分别为，读空闲，写空闲，以及读写空闲<br />
+而自定义的一个handler HeartBeatHandler则是为了复写其中的一个处理心跳的方法 userEventTriggered</p>
 
-<pre><code>aaptOptions.cruncherEnabled = false
-aaptOptions.useNewCruncher = false
+<h3 id="idlestatehandler">IdleStateHandler类中有三个内部函数（任务函数）</h3>
+
+<ul>
+  <li>AllIdleTimeoutTask</li>
+  <li>ReaderIdleTimeoutTask</li>
+  <li>WriterIdleTimeoutTask</li>
+</ul>
+
+<p>而通过每一个任务函数中实现IdleStateEvent状态的赋值以及向下的透传，最终传到HeartBeatHandler中处理:</p>
+
+<pre><code>try {
+         IdleStateEvent t;
+         if(IdleStateHandler.this.firstWriterIdleEvent) {
+         IdleStateHandler.this.firstWriterIdleEvent = false;
+          t = IdleStateEvent.FIRST_WRITER_IDLE_STATE_EVENT;
+             } else {
+                        t = IdleStateEvent.WRITER_IDLE_STATE_EVENT;
+                }
+
+         IdleStateHandler.this.channelIdle(this.ctx, t);
+
+
+protected void channelIdle(ChannelHandlerContext ctx, IdleStateEvent evt) throws Exception {
+    ctx.fireUserEventTriggered(evt);
+}
 </code></pre>
 
-<p>然而会继续报错，原因是图片上的像素定位点没有添加,最后还是一个一个改的。</p>
+<p>至于三个超时任务的执行主要是通过时间戳的对比来判断的</p>
 
-<p>问题核心：</p>
+<h2 id="section">读:</h2>
 
-<p>.9图片可以根据ps绘制，同时，android里面也有专门的绘制工具。<br />
-.9图片区别于普通图片主要是通过两点：<br />
-1.特殊的扩展名，供专门的应用识别<br />
-2.图片上下左右4个特殊的黑色像素条，宽一个像素，也可以仅仅是一个点，其中上边和左边像素条标记的分别是图片在横向和纵向的可拉伸区域，至于右边和下边的像素条，网上说是表示“前景能显示的范围”，用了这么久，没见过可以区别的效果，所以也不大理解是什么意思。</p>
+<pre><code>public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+    if(this.readerIdleTimeNanos &gt; 0L || this.allIdleTimeNanos &gt; 0L) {
+        this.lastReadTime = System.nanoTime();
+        this.reading = false;
+    }
 
+    ctx.fireChannelReadComplete();
+}
+</code></pre>
+
+<h2 id="section-1">写:</h2>
+
+<pre><code>this.writeListener = new ChannelFutureListener() {
+        public void operationComplete(ChannelFuture future) throws Exception {
+            IdleStateHandler.this.lastWriteTime = System.nanoTime();
+            IdleStateHandler.this.firstWriterIdleEvent = IdleStateHandler.this.firstAllIdleEvent = true;
+        }
+    };
+</code></pre>
+
+<p>在超时任务中，真正判断是否执行超时动作的是下面的函数（以读超时为例）</p>
+
+<pre><code>long nextDelay = IdleStateHandler.this.readerIdleTimeNanos;
+            if(!IdleStateHandler.this.reading) {
+                nextDelay -= System.nanoTime() - IdleStateHandler.this.lastReadTime;
+            }
+</code></pre>
+
+<p>nextDelay：赋的值是用户设置的也就是传IdleStateHandler构造函数的的值，然后该值减去（当前时间-上次动作完成的时间），如果结果小于0就表示超时了。</p>
+
+<p>而读写超时略有不同，取的是上次读写完成时间中距离现在最近的时间为上次读写完成时间</p>
+
+<pre><code>long nextDelay = IdleStateHandler.this.allIdleTimeNanos;
+            if(!IdleStateHandler.this.reading) {
+                nextDelay -= System.nanoTime() - Math.max(IdleStateHandler.this.lastReadTime, IdleStateHandler.this.lastWriteTime);
+            }
+</code></pre>
+
+<p>另外，超时任务是从handler添加时就已经开始执行的</p>
+
+<pre><code>public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
+    if(ctx.channel().isActive() &amp;&amp; ctx.channel().isRegistered()) {
+        this.initialize(ctx);
+    }
+}
+
+private void initialize(ChannelHandlerContext ctx) {
+    switch(this.state) {
+    case 1:
+    case 2:
+        return;
+    default:
+        this.state = 1;
+        EventExecutor loop = ctx.executor();
+        this.lastReadTime = this.lastWriteTime = System.nanoTime();
+        if(this.readerIdleTimeNanos &gt; 0L) {
+            this.readerIdleTimeout = loop.schedule(new IdleStateHandler.ReaderIdleTimeoutTask(ctx), this.readerIdleTimeNanos, TimeUnit.NANOSECONDS);
+        }
+
+        if(this.writerIdleTimeNanos &gt; 0L) {
+            this.writerIdleTimeout = loop.schedule(new IdleStateHandler.WriterIdleTimeoutTask(ctx), this.writerIdleTimeNanos, TimeUnit.NANOSECONDS);
+        }
+
+        if(this.allIdleTimeNanos &gt; 0L) {
+            this.allIdleTimeout = loop.schedule(new IdleStateHandler.AllIdleTimeoutTask(ctx), this.allIdleTimeNanos, TimeUnit.NANOSECONDS);
+        }
+
+    }
+}
+</code></pre>
+
+<p>鉴于此，也就是说，IdleStateHandler在添加到handler链中时就已经开始执行它的超时任务，以设置的时间间隔为周期，不停的检查是否超时，一旦超时就会执行超时任务对应动作向下透传，在自定义的心跳handler中通过特定函数捕获</p>
+
+<pre><code>@Override
+public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+	if(IdleStateEvent.class.isAssignableFrom(evt.getClass())){
+		IdleStateEvent event = (IdleStateEvent) evt;
+		if(event.state() == IdleState.WRITER_IDLE){
+
+		}else if(event.state() == IdleState.READER_IDLE){
+
+		}else if (event.state() == IdleState.ALL_IDLE){
+			
+		}
+	}
+	ctx.fireUserEventTriggered(evt);
+}
+</code></pre>
 
 </article> <!-- end #post__content -->
 
 <div id="post__share">
-  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/08/02/nine.html&text=nine patch图片的用法绘制以及作用" target="_blank"></a>
+  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/08/20/netty-beat.html&text=netty自带心跳响应" target="_blank"></a>
   <a id="icon-cc" class="fontello" href="http://creativecommons.org/licenses/by-nc-sa/3.0" target="_blank"></a>
-  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/08/02/nine.html&title=nine patch图片的用法绘制以及作用" target="_blank"></a>
+  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/08/20/netty-beat.html&title=netty自带心跳响应" target="_blank"></a>
 </div> <!-- end #post__share -->
 <div id="disqus_thread" name="luofeng">
   <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>

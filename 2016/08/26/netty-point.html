@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
 <!--[if lte IE 9]><meta http-equiv="refresh" content="0;url=/ie.html"><![endif]-->
 
-<title>nine patch图片的用法绘制以及作用 | 落风的博客</title>
+<title>netty point | 落风的博客</title>
 <meta name="author" content="落风">
 
-  <meta name="keywords" content="nine patch图片">
+  <meta name="keywords" content="netty">
 
 
 
@@ -132,44 +132,67 @@
     <div id="post">
       <div id="pjax">
         <article id="post__content">
-  <h1 id="post__title" data-identifier="20160802">nine patch图片的用法绘制以及作用</h1>
-  <p>问题:</p>
+  <h1 id="post__title" data-identifier="20160826">netty point</h1>
+  <h2 id="channelfuture">1. ChannelFuture的作用</h2>
+<p>channelFuture 是为了保存channel异步操作的结果的，在Netty中所有的IO操作都是异步的，因此，你不能立刻得知消息是否被正确处理，但是我们可以过一会等它执行完成或者直接注册一个监听，具体的实现就是通过Future和ChannelFuture,他们可以注册一个监听，当操作执行成功或失败时监听会自动触发。总之，所有的操作都会返回一个ChannelFuture。</p>
 
-<p>今天从网上down下了一个eclipse下的项目，导入到androidStudio中后，结果出现了如下异常：</p>
+<h2 id="ctxclose-and-ctxchannelcloseoverflowhttpstackoverflowcomquestions21240981in-netty-4-whats-the-difference-between-ctx-close-and-ctx-channel-close">2. ctx.close and ctx.channel.close的区别（<a href="http://stackoverflow.com/questions/21240981/in-netty-4-whats-the-difference-between-ctx-close-and-ctx-channel-close">引用自overflow</a>）</h2>
 
-<pre><code>D:\myAllProject\androidstudio_ajlast\321Browser\uCBrowser_1113\src\main\res\layout\above_slidingmenu.xml
-Error:(111, 30) No resource found that matches the given name (at 'src' with value '@drawable/menubar_tabcenter_d').
+<blockquote>
+  <p>Let’s say we have three handlers in the pipeline, and they all intercept the close() operation, and calls ctx.close() in it.</p>
+</blockquote>
 
-Error:(20, 38) No resource found that matches the given name (at 'src' with value '@drawable/url_progress_fullscreen').
-D:\myAllProject\androidstudio_ajlast\321Browser\uCBrowser_1113\src\main\res\drawable\search_btn_bg.xml
-Error:(5, 87) No resource found that matches the given name (at 'drawable' with value '@drawable/search_engines_switcher_item_bg_p').
-Error:(6, 87) No resource found that matches the given name (at 'drawable' with value '@drawable/search_engines_switcher_item_bg_p').
-Error:Execution failed for task ':uCBrowser_1113:processDebugResources'.
-com.android.ide.common.process.ProcessException: org.gradle.process.internal.ExecException: Process 'command 'F:\programer\android_sdk\build-tools\23.0.2\aapt.exe'' finished with non-zero exit value 1
+<pre><code>ChannelPipeline p = ...;
+p.addLast("A", new SomeHandler());
+p.addLast("B", new SomeHandler());
+p.addLast("C", new SomeHandler());
+...
+
+public class SomeHandler extends ChannelInboundHandlerAdapter {
+    @Override
+    public void close(ChannelHandlerContext ctx, ChannelPromise promise) {
+        ctx.close(promise);
+    }
+}
 </code></pre>
 
-<p>纠结了很久发现都是.9图片的问题，于是按照网上说的在android的gradle中android标签下加入下面代码，避免了对 .9图片的检查</p>
+<blockquote>
+  <p>Channel.close() will trigger C.close(), B.close(), A.close(), and then close the channel.</p>
+</blockquote>
 
-<pre><code>aaptOptions.cruncherEnabled = false
-aaptOptions.useNewCruncher = false
-</code></pre>
+<blockquote>
+  <p>ChannelPipeline.context(“C”).close() will trigger B.close(), A.close(), and then close the channel.</p>
+</blockquote>
 
-<p>然而会继续报错，原因是图片上的像素定位点没有添加,最后还是一个一个改的。</p>
+<blockquote>
+  <p>ChannelPipeline.context(“B”).close() will trigger A.close(), and then close the channel.</p>
+</blockquote>
 
-<p>问题核心：</p>
+<blockquote>
+  <p>ChannelPipeline.context(“A”).close() will close the channel. No handlers will be called.</p>
+</blockquote>
 
-<p>.9图片可以根据ps绘制，同时，android里面也有专门的绘制工具。<br />
-.9图片区别于普通图片主要是通过两点：<br />
-1.特殊的扩展名，供专门的应用识别<br />
-2.图片上下左右4个特殊的黑色像素条，宽一个像素，也可以仅仅是一个点，其中上边和左边像素条标记的分别是图片在横向和纵向的可拉伸区域，至于右边和下边的像素条，网上说是表示“前景能显示的范围”，用了这么久，没见过可以区别的效果，所以也不大理解是什么意思。</p>
+<blockquote>
+  <p>So, when you should use Channel.close() and ChannelHandlerContext.close()? The rule of thumb is:</p>
+</blockquote>
 
+<p>If you are writing a ChannelHandler and wanna close the channel in the handler, call ctx.close().<br />
+If you are closing the channel from outside the handler (e.g. you have a background thread which is not an I/O thread, and you want to close the connection from that thread.)</p>
+
+<h2 id="channelpromise">3. ChannelPromise的作用</h2>
+
+<p>Promise与future的不同在于它可以设置自己的状态，是在future之上的扩展。所以Promise是netty内部用到的，给返回给用户的对象Future是同一个。</p>
+
+<h2 id="shutdowngracefully">4. 优雅关闭shutdownGracefully</h2>
+
+<p>这是一个有效的关闭客户端/服务端的方法，会向对方发送结束连接请求，同时关闭信道和Pipeline，同时退出循环(结束线程等待，向下执行)。</p>
 
 </article> <!-- end #post__content -->
 
 <div id="post__share">
-  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/08/02/nine.html&text=nine patch图片的用法绘制以及作用" target="_blank"></a>
+  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/08/26/netty-point.html&text=netty point" target="_blank"></a>
   <a id="icon-cc" class="fontello" href="http://creativecommons.org/licenses/by-nc-sa/3.0" target="_blank"></a>
-  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/08/02/nine.html&title=nine patch图片的用法绘制以及作用" target="_blank"></a>
+  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/08/26/netty-point.html&title=netty point" target="_blank"></a>
 </div> <!-- end #post__share -->
 <div id="disqus_thread" name="luofeng">
   <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
