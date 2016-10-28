@@ -9,7 +9,17 @@
 
 
 
+  /2016/10/27/red5.html
+
+  /2016/10/25/ffmpeg-jna.html
+
+  /2016/10/17/ffmpeg.html
+
+  /2016/10/12/ffmpeg-decode.html
+
   /2016/10/02/wildernessdiary-time.html
+
+  /2016/09/25/javah.html
 
   /2016/09/18/net-analysis.html
 

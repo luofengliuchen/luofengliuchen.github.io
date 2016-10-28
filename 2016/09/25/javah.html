@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
 <!--[if lte IE 9]><meta http-equiv="refresh" content="0;url=/ie.html"><![endif]-->
 
-<title>Android绘图-LOGO-实现2 | 落风的博客</title>
+<title>Androidstudio解决javah生成头文件时找不到类的问题 | 落风的博客</title>
 <meta name="author" content="落风">
 
-  <meta name="keywords" content="android ,绘图,logo">
+  <meta name="keywords" content="javah">
 
 
 
@@ -142,66 +142,48 @@
     <div id="post">
       <div id="pjax">
         <article id="post__content">
-  <h1 id="post__title" data-identifier="20160114">Android绘图-LOGO-实现2</h1>
-  <p>首先对半圆的绘制考虑到之前版本并不能精确的满足绘制的要求（内圆和外圆并不一定是同心圆，用Path.FillType.EVEN_ODD来实现的话可能会产生多余的部分），要是能够像ps中单纯对路径进行相加相减就好了。所幸在Path中找到了一个Op的枚举类型（和FillType距离不远），最终就是用Path的这个属性完美的解决了这个问题</p>
+  <h1 id="post__title" data-identifier="20160925">Androidstudio解决javah生成头文件时找不到类的问题</h1>
+  <blockquote>
+  <p>文章链接:<a href="http://www.liuschen.com">http://www.liuschen.com</a></p>
+</blockquote>
 
-<pre><code>@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-private void drawRing(Canvas canvas, Paint paint,float interX, float innerY,float outerX, float outerY,float startAngle,float sweepAngle,float inner_circle,float outter_circle) {
+<p>首先将命令行的工作目录切换到D:*<strong>*</strong>\app\build\intermediates\classes\debug下，而不要切换到具体类的目录中，然后执行的命令是Javah (-classpath如果当前目录在别的目录可以跟这个，后面写上面所说路径) -jni 类名.文件名（只是文件名，不要加class扩展名）然后就会生成想要的头文件了。</p>
 
-    Path outterpath = new Path();
+<p>在目录中执行ndk-build的前提是该目录名必须是jni,否则会有如下异常：</p>
 
-    outterpath.moveTo(outerX, outerY);
-    outterpath.lineTo(outerX, outerY - outter_circle);
-    outterpath.arcTo(outerX - outter_circle, outerY - outter_circle, outerX + outter_circle, outerY + outter_circle, startAngle, sweepAngle, true);
-    outterpath.lineTo(outerX, outerY);
-    outterpath.close();
-
-    Path innerpath = new Path();
-
-    innerpath.moveTo(interX, innerY);
-    innerpath.lineTo(interX, innerY - inner_circle);
-    innerpath.arcTo(interX - inner_circle, innerY - inner_circle, interX + inner_circle, innerY + inner_circle, startAngle, -360, true);
-    innerpath.lineTo(interX, innerY);
-    innerpath.close();
-
-    outterpath.op(innerpath,Path.Op.DIFFERENCE);
-    canvas.drawPath(outterpath,paint);
-}
+<pre><code>Android NDK: Could not find application project directory !
+Android NDK: Please define the NDK_PROJECT_PATH variable to point to it.
+F:\programer\android-ndk-r10e\build/core/build-local.mk:143: *** Android NDK: Aborting    .  Stop.
 </code></pre>
 
-<p>最终整个动画由一个定时器控制速率，通过定时重绘View实现了整个动画，最后的退出动画是通过对画布操作完成的（对画布的操作必须在绘制之前）。</p>
+<p>Application.mk是配置编译的一些全局属性，最好还是写一下，如：</p>
 
-<pre><code>@Override
-protected void onDraw(Canvas canvas) {
-    super.onDraw(canvas);
+<pre><code>APP_PLATFORM = android-21
+APP_ABI := armeabi-v7a armeabi
+APP_STL := stlport_static
+APP_OPTIM := debug
 
-    canvas.translate(TRACK1_OUTTER_CIRCLE * 1.5f, TRACK1_OUTTER_CIRCLE * 1.5f);
-    scaleAnim(canvas);
+(1)APP_PLATFORM  使用的ndk库函数版本号。一般和SDK的版本相对应，各个版本在NDK目录下的platforms文件夹中
 
-    Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    paint.setStyle(Paint.Style.FILL);
-    track1(canvas, paint);
-    track2(canvas, paint);
-    track3(canvas, paint);
+(2)APP_ABI  编译成什么类型的cpu的so, 拥有三个属性armeabi  armeabi-v7a  x86可以全选 也可以只用一个，如果全选也可以使用all.
 
-    if(!isTimerRunning){
-        mHandler.post(mRunnable);
-        isTimerRunning = true;
-    }else{
-        mHandler.postDelayed(mRunnable, mFrameTime);
-    }
-    if(mFrameNumber&gt;60){
-        resetAnim();
-    }
-}
+(3)APP_STL       如何连接c++标准库 。
+      stlport_static    静态链接 
+      stlport_shared    动态链接 
+      system    系统默认
+
+(4)APP_OPTIM   编译版本，如果是DEBUG版本就会带上调试信息。可以使用gdb-server进行动态断点低调试。
+      debug   调试版本    so中带调试信息
+      release  发布版本   so不带调试信息
 </code></pre>
+
 
 </article> <!-- end #post__content -->
 
 <div id="post__share">
-  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/01/14/draw-a-logo.html&text=Android绘图-LOGO-实现2" target="_blank"></a>
+  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/09/25/javah.html&text=Androidstudio解决javah生成头文件时找不到类的问题" target="_blank"></a>
   <a id="icon-cc" class="fontello" href="http://creativecommons.org/licenses/by-nc-sa/3.0" target="_blank"></a>
-  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/01/14/draw-a-logo.html&title=Android绘图-LOGO-实现2" target="_blank"></a>
+  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/09/25/javah.html&title=Androidstudio解决javah生成头文件时找不到类的问题" target="_blank"></a>
 </div> <!-- end #post__share -->
 <div id="disqus_thread" name="luofeng">
   <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>

@@ -6,13 +6,436 @@
     <description>落风的博客</description>
     
       <item>
+        <title>red5流媒体服务器的搭建以及Tomcat上的集成</title>
+        <link>http://www.liuschen.com/2016/10/27/red5.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2016/10/27/red5.html</guid>
+        <pubDate>Thu, 27 Oct 2016 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h1 id=&quot;section&quot;&gt;1.流媒体服务器的搭建&lt;/h1&gt;
+
+&lt;p&gt;首先需要安装Java环境，此步略过，然后下载&lt;a href=&quot;https://github.com/Red5/red5-server/releases/tag/v1.0.7-RELEASE&quot;&gt;red5&lt;/a&gt;文件，解压得到一个类似tomcat的服务器，点击red5.bat（window下下载的zip文件中的）启动，在浏览器中访问http://localhost:5080/如果能访问到red5就证明服务已经启动了。&lt;/p&gt;
+
+&lt;p&gt;首先第一个问题，点击此时网页中的install，跳转的应用列表为空，这里只是说明由于某些原因网站上的资源被墙了，或不提供了，这个显示的并不是本地资源。如果想要示例程序自己在网上找就好了。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;修改IP地址和端口：red5目录下conf文件夹中的red5.properties，主要改的是HTTP和RTMP的地址，如果想要在主机外访问，将0.0.0.0改为自己局域网中或是对外网提供的IP地址&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;如果自己webapps文件夹内没有应用，也就是没有示例程序，也可以从网上下载别人打包好的red5-1.0.0-webapps-demos.zip解压到里面，先把应用跑起来走通功能才不至于被打击主动性。里面的Demo主要用了oflaDemo和Publisher（直接在webapps是没有这个名字的程序的，需要访问主界面，点击demo连接到的界面才能看到），oflaDemo是一个点播程序，而Publisher是一个兼具发布与直播的flash程序&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;这时候如果之前已经改过IP那么在demo里面连接的时候一定要把localhost改为自己设置的IP地址&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;然后此时就可以直播了，可以现在Publisher程序中测试一下，然后改为用手机客户端推流，之前的地址是固定的，如&lt;strong&gt;rtmp://ip地址/oflaDemo&lt;/strong&gt;，后面在加上就是推流的地址，只要不是太离谱，可以随便取，如2334,322df什么的，由客户端指定，完整就是&lt;strong&gt;rtmp://ip地址/oflaDemo/自己取得流名称&lt;/strong&gt;，然后再在另一端用一个有流媒体播放的播放器，输入同一个地址就可以播放了。&lt;/p&gt;
+
+&lt;h1 id=&quot;red5tomcat&quot;&gt;2.将red5集成在tomcat上启动&lt;/h1&gt;
+
+&lt;p&gt;red5据说原本就是在tomcat上跑的，后来分开，而下载的red5的目录结构像极了tomcat，里面也有webapps跑着小程序，一度让我非常困惑。想把red5集成到tomcat中但是网上说的要么年代久远，要么大部分繁琐非常，试了几种方式，大概出了个思路，即使用网上给出的war包&lt;strong&gt;red5-war-1.0-RC1.zip&lt;/strong&gt;，中间我下载了n个red5版本的程序，也渐渐没了耐心。最后发现red5-war-1.0-RC1.zip里面包含了移植需要的所有东西。&lt;/p&gt;
+
+&lt;h2 id=&quot;section-1&quot;&gt;一.验证&lt;/h2&gt;
+
+&lt;p&gt;将red5-war-1.0-RC1.zip包解压后，把ROOT.war解压到tomcat目录下webapps对应的ROOT包中，启动tomcat，如果正常启动并且能够访问到red5界面，说明这个包能用。&lt;/p&gt;
+
+&lt;h2 id=&quot;section-2&quot;&gt;二.新建项目&lt;/h2&gt;
+
+&lt;p&gt;在myeclipse中新建一个web工程。&lt;/p&gt;
+
+&lt;h2 id=&quot;section-3&quot;&gt;三.配置文件的移植&lt;/h2&gt;
+
+&lt;p&gt;将red5-war-1.0-RC1\ROOT\WEB-INF\classes下的配置文件拷贝到工程对应的src目录下，工程中的web.xml用red5-war-1.0-RC1\ROOT\WEB-INF中对应的替代。&lt;/p&gt;
+
+&lt;h2 id=&quot;lib&quot;&gt;四.lib文件的移植&lt;/h2&gt;
+
+&lt;p&gt;red5-war-1.0-RC1\ROOT\WEB-INF\lib下的文件全部拷贝到项目对应的文件夹中，打开cmd,切换到red5-war-1.0-RC1\ROOT\WEB-INF\classes中，执行命令&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;jar -cvf red5final.jar org
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;生成了red5final.jar的库文件，同样拷贝到项目对应的lib文件夹中&lt;/p&gt;
+
+&lt;p&gt;此时运行程序应该不会有错，我用了好几个版本的red5中的源程序来替代red5final.jar，但是总是会出各种问题。只有用同一个包中的才行。如果之前在tomcat上验证通过，这里也就不应该有什么问题。&lt;/p&gt;
+
+&lt;h1 id=&quot;section-4&quot;&gt;3.通过推流和播放验证移植成功&lt;/h1&gt;
+
+&lt;p&gt;首先，修改绑定的IP地址，若是找不到red5.properties或是类似的文件，就直接在red5-core.xml中修改，默认的rtmp端口一般是1935,搜一下就找到了。&lt;/p&gt;
+
+&lt;p&gt;然后修改root-web.xml里面的&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;property name=&quot;contextPath&quot; value=&quot;/oflaDemo&quot; /&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;oflaDemo可以用其他字符，也是取一个名字，rtmp访问时会用到（紧跟在ip后面）：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;rtmp://ip地址/oflaDemo/自己取得流名称
+&lt;/code&gt;&lt;/pre&gt;
+
+</description>
+      </item>
+    
+      <item>
+        <title>Android手机视频直播推流-RTMP推流-解决方案一</title>
+        <link>http://www.liuschen.com/2016/10/25/ffmpeg-jna.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2016/10/25/ffmpeg-jna.html</guid>
+        <pubDate>Tue, 25 Oct 2016 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;基于对原生视频编解码，也就是FFMPEG的学习，对音视频编解码有了初步的认识。最近在GITHUB上发现了一个开源的&lt;a href=&quot;https://github.com/beautifulSoup/RtmpRecoder/tree/master&quot;&gt;直播推流项目&lt;/a&gt;,用的同样是FFMPEG库，可是和我经常调用的方法不太一样，所以记录下。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h1 id=&quot;jnijna&quot;&gt;1.JNI和JNA&lt;/h1&gt;
+
+&lt;p&gt;JNI是&lt;strong&gt;Java Native Interface&lt;/strong&gt;的缩写，而JNA则是&lt;strong&gt;jna:Java Native Access&lt;/strong&gt;的缩写&lt;/p&gt;
+
+&lt;p&gt;技术总是共通的，jni是Java和c/c++交互的技术，而jna则是在jni基础上，通过在一个java接口中描述目标native library的函数与结构，JNA将自动实现Java接口到native function的映射。从而消除了Java调用本地代码的隔阂，效率当然不如前者，并且只能单向调用，但是却不用编写本地代码，便利了开发。&lt;/p&gt;
+
+&lt;h1 id=&quot;rtmprecoder&quot;&gt;2.RtmpRecoder分析&lt;/h1&gt;
+
+&lt;p&gt;首先看其添加的依赖：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;dependencies {
+	compile fileTree(dir: &#39;libs&#39;, include: [&#39;*.jar&#39;])
+	testCompile &#39;junit:junit:4.12&#39;
+	compile &#39;com.android.support:appcompat-v7:23.1.1&#39;
+   	 	compile &#39;com.android.support:design:23.1.1&#39;
+	compile &#39;com.jakewharton:butterknife:7.0.1&#39;
+	compile group: &#39;org.bytedeco&#39;, name: &#39;javacv&#39;, version: &#39;1.1&#39;
+	compile group: &#39;org.bytedeco.javacpp-presets&#39;, name: &#39;opencv&#39;, version: &#39;3.0.0-1.1&#39;, classifier: &#39;android-arm&#39;
+	compile group: &#39;org.bytedeco.javacpp-presets&#39;, name: &#39;opencv&#39;, version: &#39;3.0.0-1.1&#39;, classifier: &#39;android-x86&#39;
+	compile group: &#39;org.bytedeco.javacpp-presets&#39;, name: &#39;ffmpeg&#39;, version: &#39;2.8.1-1.1&#39;, classifier: &#39;android-arm&#39;
+	compile group: &#39;org.bytedeco.javacpp-presets&#39;, name: &#39;ffmpeg&#39;, version: &#39;2.8.1-1.1&#39;, classifier: &#39;android-x86&#39; }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;尤其是最后面的几项，项目里面用到了FFMPEG，但是却没有任何外部c或.so库的引用，那么就是说这些库包含在了这些Android官方提供的这些引用里面。&lt;/p&gt;
+
+&lt;p&gt;通过之上的引用，在代码中用到的内容主要如下:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;	//创建对象，传入直播推流地址以及帧的宽高信息
+	FFmpegFrameRecorder recorder = new FFmpegFrameRecorder(ffmpeg_link, imageWidth, imageHeight, 1);
+	//
+    recorder.setVideoCodec(28);
+	//设置编码格式，rmtp传输的是flv
+    recorder.setFormat(&quot;flv&quot;);
+    recorder.setSampleRate(sampleAudioRateInHz);
+    // Set in the surface changed method,设置帧率
+    recorder.setFrameRate(frameRate);
+	
+	recorder.start();
+	
+	recorder.stop();
+    recorder.release();
+
+	//设置时间戳
+	long t = 1000 * (System.currentTimeMillis() - startTime);
+    if (t &amp;gt; recorder.getTimestamp()) {
+         recorder.setTimestamp(t);
+     }
+	
+	Frame yuvImage = new Frame(imageWidth, imageHeight, Frame.DEPTH_UBYTE, 2);
+	//将从onPreviewFrame回调中获取的帧数据data传入
+	((ByteBuffer) yuvImage.image[0].position(0)).put(data);
+	recorder.record(yuvImage);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;其中同时也有录音的功能&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;class AudioRecordRunnable implements Runnable {
+
+    @Override
+    public void run() {
+        android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
+
+        // Audio
+        int bufferSize;
+        ShortBuffer audioData;
+        int bufferReadResult;
+
+        bufferSize = AudioRecord.getMinBufferSize(sampleAudioRateInHz,
+                AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT);
+        audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, sampleAudioRateInHz,
+                AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT, bufferSize);
+
+        
+        audioData = ShortBuffer.allocate(bufferSize);
+
+        Log.d(LOG_TAG, &quot;audioRecord.startRecording()&quot;);
+        audioRecord.startRecording();
+
+        /* ffmpeg_audio encoding loop */
+        while (runAudioThread) {
+            if (RECORD_LENGTH &amp;gt; 0) {
+                audioData = samples[samplesIndex++ % samples.length];
+                audioData.position(0).limit(0);
+            }
+            //Log.v(LOG_TAG,&quot;recording? &quot; + recording);
+            bufferReadResult = audioRecord.read(audioData.array(), 0, audioData.capacity());
+            audioData.limit(bufferReadResult);
+            if (bufferReadResult &amp;gt; 0) {
+                Log.v(LOG_TAG, &quot;bufferReadResult: &quot; + bufferReadResult);
+                // If &quot;recording&quot; isn&#39;t true when start this thread, it never get&#39;s set according to this if statement...!!!
+                // Why?  Good question...
+                if (recording) {
+                    try {
+                        recorder.recordSamples(audioData);
+                        //Log.v(LOG_TAG,&quot;recording &quot; + 1024*i + &quot; to &quot; + 1024*i+1024);
+                    } catch (FFmpegFrameRecorder.Exception e) {
+                        Log.v(LOG_TAG, e.getMessage());
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        Log.v(LOG_TAG, &quot;AudioThread Finished, release audioRecord&quot;);
+
+        /* encoding finish, release recorder */
+        if (audioRecord != null) {
+            audioRecord.stop();
+            audioRecord.release();
+            audioRecord = null;
+            Log.v(LOG_TAG, &quot;audioRecord released&quot;);
+        }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;查看FFmpegFrameRecorder.java中的代码可以找到一些明显是ffmpeg中的函数，如av_register_all()，点击进入到了avformat.java，而avformat.java是avformat.h的映射，可见这里用的是JNA技术。&lt;/p&gt;
+
+</description>
+      </item>
+    
+      <item>
+        <title>基于Android的手机推流</title>
+        <link>http://www.liuschen.com/2016/10/17/ffmpeg.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2016/10/17/ffmpeg.html</guid>
+        <pubDate>Mon, 17 Oct 2016 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;这个推流器卡了很久，基于大神的代码，但是编译的时候总是出错，ffmpeg用的版本是3.1.4,有些函数提示不用了。有些很顺利就找到了替代的函数，有些则郁闷了很久，也正因为此，才逼自己去理解其中的含义。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&quot;javac&quot;&gt;1.将java中获取到的字符串转换成c语言中的字符数组&lt;/h2&gt;
+
+&lt;p&gt;strcpy(input_str,(*env)-&amp;gt;GetStringUTFChars(env,input-jstr, NULL));&lt;/p&gt;
+
+&lt;p&gt;strcpy(output_str,(*env)-&amp;gt;GetStringUTFChars(env,output-jstr, NULL));&lt;/p&gt;
+
+&lt;h2 id=&quot;section&quot;&gt;2.初始化组件&lt;/h2&gt;
+
+&lt;p&gt;av-register-all();&lt;/p&gt;
+
+&lt;h2 id=&quot;section-1&quot;&gt;3.如果有网络，初始化&lt;/h2&gt;
+
+&lt;p&gt;avformat-network-init();&lt;/p&gt;
+
+&lt;h2 id=&quot;ifmt-ctxavformatcontext&quot;&gt;4.打开输入函数ifmt-ctx为AVFormatContext对象，里面存储流以及参数信息&lt;/h2&gt;
+
+&lt;p&gt;avformat-open-input(&amp;amp;ifmt-ctx, input-str, 0, 0)&lt;/p&gt;
+
+&lt;h2 id=&quot;ifmt-ctx&quot;&gt;5.将流的信息写入ifmt-ctx&lt;/h2&gt;
+
+&lt;p&gt;avformat-find-stream-info(ifmt-ctx, 0)&lt;/p&gt;
+
+&lt;h2 id=&quot;avformatcontext&quot;&gt;6.获取输出流的AVFormatContext对象，计算出输出方式&lt;/h2&gt;
+
+&lt;p&gt;avformat-alloc-output-context2(&amp;amp;ofmt-ctx, NULL, “flv”,output-str);&lt;/p&gt;
+
+&lt;h2 id=&quot;section-2&quot;&gt;7.然后是流交换&lt;/h2&gt;
+
+&lt;p&gt;需要将输入流对应的AVFormatContext中的信息写入到输出流中，AVFormatContext中有一个流数组，存储的流如音频流，视频流等等。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;for (i = 0; i &amp;lt; ifmt_ctx-&amp;gt;nb_streams; i++) {
+    AVStream *in_stream = ifmt_ctx-&amp;gt;streams[i];
+    //通过id获取到对应解码器
+    pCodec = avcodec_find_decoder(ofmt-&amp;gt;video_codec);
+	//avformat_new_stream会新建流并把新的流存储在对应streams数组中
+    AVStream *out_stream = avformat_new_stream(ofmt_ctx, pCodec);
+    if (!out_stream) {
+        LOGE( &quot;Failed allocating  output stream\n&quot;);
+        ret = AVERROR_UNKNOWN;
+        goto end;
+     }
+	//avcodec_copy_context，
+     avcodec_parameters_copy(out_stream-&amp;gt;codecpar,in_stream-&amp;gt;codecpar);
+     
+     out_stream-&amp;gt;codecpar-&amp;gt;codec_tag = 0;
+  }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;avcodec_parameters_copy，这个是最坑爹的函数，原来大神的代码是avcodec_copy_context，我在avcodec.h中找到函数说的是&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;If you need to transfer the stream parameters from one codec context
+ 	to another, use an intermediate AVCodecParameters instance and the
+ 	avcodec_parameters_from_context() / avcodec_parameters_to_context()
+ 	functions.*/
+attribute_deprecated
+int avcodec_copy_context(AVCodecContext *dest, const AVCodecContext *src);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;结果完全被误导了，结果就是avformat_write_header一直返回-22，参数异常&lt;/p&gt;
+
+&lt;h2 id=&quot;section-3&quot;&gt;8.打开流&lt;/h2&gt;
+
+&lt;p&gt;avio-open2(&amp;amp;ofmt-ctx-&amp;gt;pb, output-str, AVIO-FLAG-WRITE,NULL,NULL);&lt;/p&gt;
+
+&lt;h2 id=&quot;section-4&quot;&gt;9.写入头文件&lt;/h2&gt;
+
+&lt;p&gt;avformat-write-header(ofmt-ctx, NULL);&lt;/p&gt;
+
+&lt;h2 id=&quot;section-5&quot;&gt;10.往外写数据&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;while (1) {
+      AVStream *in_stream, *out_stream;
+      //Get an AVPacket
+      ret = av_read_frame(ifmt_ctx, &amp;amp;pkt);
+      if (ret &amp;lt; 0){
+      LOGE( &quot;av_read_frame_break%d---%s\n&quot;,ret,av_err2str(ret));
+      break;
+      }
+
+      //FIX：No PTS (Example: Raw H.264)
+      //Simple Write PTS，如果没有pts值得话需要设置，pts是显示时间戳，dts是解码是解码时间戳
+      if(pkt.pts==AV_NOPTS_VALUE){
+          //Write PTS
+          LOGE( &quot;AV_NOPTS_VALUE\n&quot;);
+          AVRational time_base1=ifmt_ctx-&amp;gt;streams[videoindex]-&amp;gt;time_base;
+          //Duration between 2 frames (us)
+          int64_t calc_duration=(double)AV_TIME_BASE/av_q2d(ifmt_ctx-&amp;gt;streams[videoindex]-&amp;gt;r_frame_rate);
+          //Parameters
+          pkt.pts=(double)(frame_index*calc_duration)/(double)(av_q2d(time_base1)*AV_TIME_BASE);
+          pkt.dts=pkt.pts;
+          pkt.duration=(double)calc_duration/(double)(av_q2d(time_base1)*AV_TIME_BASE);
+      }
+      //Important:Delay，为了防止输出过快，加入的延时，是以视频帧为单位的
+      if(pkt.stream_index==videoindex){
+          AVRational time_base=ifmt_ctx-&amp;gt;streams[videoindex]-&amp;gt;time_base;
+          LOGE( &quot;time_base==%d\n&quot;,pkt.stream_index);
+          AVRational time_base_q={1,AV_TIME_BASE};
+          int64_t pts_time = av_rescale_q(pkt.dts, time_base, time_base_q);
+          int64_t now_time = av_gettime() - start_time;
+          LOGE( &quot;new_time%lld-----pts_time%lld\n&quot;,now_time,pts_time);
+          if (pts_time &amp;gt; now_time)
+              av_usleep(pts_time - now_time);
+      }
+
+      in_stream  = ifmt_ctx-&amp;gt;streams[pkt.stream_index];
+      out_stream = ofmt_ctx-&amp;gt;streams[pkt.stream_index];
+
+      LOGE( &quot;pkt.stream_index==%d\n&quot;,pkt.stream_index);
+
+      /* copy packet */
+      //Convert PTS/DTS
+      LOGE(&quot;--------pkt.pts:%lld----pkt.dts:%lld----pkt.duration:%lld\n&quot;,pkt.pts,pkt.dts,pkt.duration);
+      pkt.pts = av_rescale_q_rnd(pkt.pts, in_stream-&amp;gt;time_base, out_stream-&amp;gt;time_base, AV_ROUND_NEAR_INF|AV_ROUND_PASS_MINMAX);
+      pkt.dts = av_rescale_q_rnd(pkt.dts, in_stream-&amp;gt;time_base, out_stream-&amp;gt;time_base, AV_ROUND_NEAR_INF|AV_ROUND_PASS_MINMAX);
+      pkt.duration = av_rescale_q(pkt.duration, in_stream-&amp;gt;time_base, out_stream-&amp;gt;time_base);
+      pkt.pos = -1;
+
+      LOGE(&quot;pkt.pts:%lld----pkt.dts:%lld----pkt.duration:%lld\n&quot;,pkt.pts,pkt.dts,pkt.duration);
+      //Print to Screen
+      if(pkt.stream_index==videoindex){
+          LOGE(&quot;Send %8d video frames to output URL\n&quot;,pkt.stream_index);
+          frame_index++;
+        }
+
+	//写入数据，关键函数
+      ret = av_write_frame(ofmt_ctx, &amp;amp;pkt);
+      //ret = av_interleaved_write_frame(ofmt_ctx, &amp;amp;pkt);
+
+      if (ret &amp;lt; 0) {
+      LOGE( &quot;Error muxing packet%d---%s\n&quot;,ret,av_err2str(ret));
+          break;
+      }
+      av_packet_unref(&amp;amp;pkt);
+
+  }
+  //Write file trailer
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&quot;section-6&quot;&gt;11.写入文件尾，推流结束&lt;/h2&gt;
+
+&lt;p&gt;av-write-trailer(ofmt-ctx);&lt;/p&gt;
+
+&lt;h2 id=&quot;section-7&quot;&gt;12.最后关闭流，释放资源&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;avformat_close_input(&amp;amp;ifmt_ctx);
+  /* close output */
+  if (ofmt_ctx &amp;amp;&amp;amp; !(ofmt-&amp;gt;flags &amp;amp; AVFMT_NOFILE))
+      avio_close(ofmt_ctx-&amp;gt;pb);
+  avformat_free_context(ofmt_ctx);
+  if (ret &amp;lt; 0 &amp;amp;&amp;amp; ret != AVERROR_EOF) {
+      LOGE( &quot;Error occurred.\n&quot;);
+      return -1;
+  }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;psavformat-write-headerofmt-ctx-null-22avwriteframeofmtctx-pkt-22copyavformatcontextptsdts&quot;&gt;PS:遇到的问题主要有两个，一个是avformat-write-header(ofmt-ctx, NULL)返回-22，一个是av_write_frame(ofmt_ctx, &amp;amp;pkt)返回-22，前者是由于copy参数的函数没有找对，后者则是由于AVFormatContext中的关系没有理清，导致音频缺失，写入数据时也没有筛选,导致后面音频帧的pts,和dts数据错误，写入数据时报参数异常。&lt;/h3&gt;
+
+&lt;h3 id=&quot;ffmpeghttpblogcsdnnetleixiaohua1020articledetails39803457&quot;&gt;参考：&lt;a href=&quot;http://blog.csdn.net/leixiaohua1020/article/details/39803457&quot;&gt;最简单的基于FFmpeg的推流器&lt;/a&gt;&lt;/h3&gt;
+</description>
+      </item>
+    
+      <item>
+        <title>音视频编解码-ffmpeg解码</title>
+        <link>http://www.liuschen.com/2016/10/12/ffmpeg-decode.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2016/10/12/ffmpeg-decode.html</guid>
+        <pubDate>Wed, 12 Oct 2016 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;每次编解码必须先进行初始化组件av-register-all()，如果需要网络还需要avformat-network-init()；&lt;/p&gt;
+
+&lt;p&gt;avformat-alloc-context()返回一个指向&lt;strong&gt;AVFormatContext&lt;/strong&gt;的指针，&lt;strong&gt;AVFormatContext&lt;/strong&gt;是一个用于处理封装格式的结构体；&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;AVStream，AVCodecContext&lt;/strong&gt;视音频流对应的结构体，用于视音频编解码。&lt;/p&gt;
+
+&lt;p&gt;AVFormatContext里面存储有一个流的list&lt;avstream&gt;,而AVStream里面存储有一个AVCodecContext，不过在我用这个版本显示&lt;/avstream&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;/**
+ * @deprecated use the codecpar struct instead
+ */
+attribute_deprecated
+AVCodecContext *codec;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;编译的时候也警告说是过时了，要用codecpar替代，而codecpar是一个AVCodecParameters类型的指针&lt;/p&gt;
+
+&lt;p&gt;所有改完，生成.so文件不再报错后，部署到手机上，运行又报错：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;JNI DETECTED ERROR IN APPLICATION: invalid reference returned from java.lang.String luofeng.com.ffmpegdemo.FFmpegUtils.getFFmpegInfo1()
+09-28 10:27:14.363 18198-18198/luofeng.com.ffmpegdemo A/art: art/runtime/check_jni.cc:65]     from java.lang.String luofeng.com.ffmpegdemo.FFmpegUtils.getFFmpegInfo1()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这个是由于我开的cmd命令行目录占据着build文件夹，导致makeclean也无法重新build程序，也就是说新的改动没有生效。&lt;/p&gt;
+
+&lt;p&gt;然后运行后又报错，是日志报的错avformat_open_input返回值不对，找答案找不到，最后发现忘了添加读写内存卡的权限。添加之后正常解码出了视频文件为YUV视频帧序列。&lt;/p&gt;
+
+&lt;p&gt;在一些步骤返回错误码，若要知道错误码的错误类型可以用&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;	char buf2[500] = {0};
+     av_strerror(ret, buf2, 1024);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;将错误内容查询出来，再在log中输出即可。&lt;/p&gt;
+
+&lt;h3 id=&quot;android-httpblogcsdnnetleixiaohua1020articledetails47010637&quot;&gt;参考：&lt;a href=&quot;http://blog.csdn.net/leixiaohua1020/article/details/47010637&quot;&gt;Android 视频解码器&lt;/a&gt;&lt;/h3&gt;
+
+</description>
+      </item>
+    
+      <item>
         <title>荒原日记-时空狂想</title>
         <link>http://www.liuschen.com/2016/10/02/wildernessdiary-time.html</link>
         <guid isPermaLink="true">http://www.liuschen.com/2016/10/02/wildernessdiary-time.html</guid>
         <pubDate>Sun, 02 Oct 2016 00:00:00 +0800</pubDate>
-        <description>&lt;p&gt;我们存在于此的客观因素是时间和空间，人之于物，我想和物之于物没什么不同。只不过是人，进化出了高情态的智能。所以有能力去认知自己的现状，进而改变其所处的环境。&lt;/p&gt;
+        <description>&lt;p&gt;我们存在于此的客观因素是时间和空间，人之于物，我想和物之于物没什么不同。只不过是人，进化出了高等的智能。所以有能力去认知自己的现状，进而改变其所处的环境。&lt;/p&gt;
 
-&lt;p&gt;首先是唯心主义的观点，认为人才是世界的中心，世界是以人的意识为前提存在的，如果你认为荒诞，就不要再往下看了，先入为主往往会让人丧失判断力，“缸中之脑”其实就是一种唯心主义的现实体现，可怕的是你不觉得它是对的，却也无法证明它是错的。神学最初就是以唯心立论的，然而经过长达几个世纪科学的发展，它的观点不断的被现代科学否决，而它也像一个摇摆不定的娼妇，在一次次的改变着自己的主张，接收着现代科学的渗透。但是却一直未遭到废弃，究其原因，是因为现代科学解决不了人的信仰问题，自古以来，人类都对自己存在的意义充满了好奇。神学，宗教可以给你答案，然而科学给不了。所以现在仍有不少的科学家试图用科学的手段来证明一些宗教现象的背后的意义。&lt;/p&gt;
+&lt;p&gt;首先是唯心主义的观点，认为人才是世界的中心，世界是以人的意识为前提存在的，如果你认为荒诞，就不要再往下看了，先入为主往往会让人丧失判断力，“缸中之脑”其实就是一种唯心主义的现实体现，可怕的是你不觉得它是对的，却也无法证明它是错的。神学最初就是以唯心立论的，然而经过长达几个世纪科学的发展，它的观点不断的被现代科学否定，而它也像一个摇摆不定的娼妇，在一次次的改变着自己的主张，接收着现代科学的渗透。但是却一直未遭到废弃，究其原因，是因为现代科学解决不了人的信仰问题，自古以来，人类都对自己存在的意义充满了好奇。神学，宗教可以给你答案，然而科学给不了。所以现在仍有不少的科学家试图用科学的手段来证明一些宗教现象的背后的意义。&lt;/p&gt;
 
 &lt;p&gt;称量灵魂重量就是一个典型的例子，有人说灵魂的重量是21g，事实上如何，怕也没人知道，只是觉得不可信，人有高矮胖瘦，更何况灵魂，只是说21g，无所谓严谨，说是科学实验恐怕也只是噱头。灵魂向来是一个抽象的概念，指的是我之所以是我的那个本质。久而久之，却连离体之说都被传的煞有其事。但是，灵魂究竟为何？是可以独立的还是某些硬件或是后天形成的特征。我们可以假设几个例子：&lt;/p&gt;
 
@@ -23,6 +446,48 @@
 &lt;/ol&gt;
 
 &lt;p&gt;关于轮回，大部分都是宗教的观点和人美好的愿望，苦难者寄往来生，支配者渴望永生，然而不管是来生还是永生，还是我最初所想，都不是那么有趣，永生和死亡自古以来都是一个交缠的话题，我们害怕死亡，所以渴望永生，然而细细思量，无穷无尽的生命却更为恐怖。没有尽头，没有一个人能忍受的了，所以对于轮回的猜想才更为现实。事物有兴盛衰败的变化，这是自然界中最为合理的规则，所以人对永生的追求便寄望到了轮回一途。阴朝地府我想是不会有的，现今科学的发展也不容我这么考虑，然而轮回的存在也许是可能的，只不过并不是以我们期望的方式，如果意识是独特的存在，轮回可以说必然存在，如果意识不过是我们的错觉，我们并没有什么独特之处，那么我们死后，便可以轮回成任何人，我和你并没有什么区别，生来不过是一张白纸，我们的意识可能只不过是某些偶发因素导致的概率事件。当把发生概率的范围扩展至无穷（宇宙），那么即便是小概率事件也会变得相当大，而这，就是轮回。&lt;/p&gt;
+</description>
+      </item>
+    
+      <item>
+        <title>Androidstudio解决javah生成头文件时找不到类的问题</title>
+        <link>http://www.liuschen.com/2016/09/25/javah.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2016/09/25/javah.html</guid>
+        <pubDate>Sun, 25 Sep 2016 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;首先将命令行的工作目录切换到D:*&lt;strong&gt;*&lt;/strong&gt;\app\build\intermediates\classes\debug下，而不要切换到具体类的目录中，然后执行的命令是Javah (-classpath如果当前目录在别的目录可以跟这个，后面写上面所说路径) -jni 类名.文件名（只是文件名，不要加class扩展名）然后就会生成想要的头文件了。&lt;/p&gt;
+
+&lt;p&gt;在目录中执行ndk-build的前提是该目录名必须是jni,否则会有如下异常：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Android NDK: Could not find application project directory !
+Android NDK: Please define the NDK_PROJECT_PATH variable to point to it.
+F:\programer\android-ndk-r10e\build/core/build-local.mk:143: *** Android NDK: Aborting    .  Stop.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Application.mk是配置编译的一些全局属性，最好还是写一下，如：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;APP_PLATFORM = android-21
+APP_ABI := armeabi-v7a armeabi
+APP_STL := stlport_static
+APP_OPTIM := debug
+
+(1)APP_PLATFORM  使用的ndk库函数版本号。一般和SDK的版本相对应，各个版本在NDK目录下的platforms文件夹中
+
+(2)APP_ABI  编译成什么类型的cpu的so, 拥有三个属性armeabi  armeabi-v7a  x86可以全选 也可以只用一个，如果全选也可以使用all.
+
+(3)APP_STL       如何连接c++标准库 。
+      stlport_static    静态链接 
+      stlport_shared    动态链接 
+      system    系统默认
+
+(4)APP_OPTIM   编译版本，如果是DEBUG版本就会带上调试信息。可以使用gdb-server进行动态断点低调试。
+      debug   调试版本    so中带调试信息
+      release  发布版本   so不带调试信息
+&lt;/code&gt;&lt;/pre&gt;
+
 </description>
       </item>
     
@@ -1483,391 +1948,6 @@ public String id;
 
 &lt;p&gt;慢慢的，我也逐渐找到了自己的答案，也许每个人来到世上都是为了寻找到这一个答案，只是或许有些人不愿意分享，在喧闹抑或宁静，城市或许乡村，更或许只有当你在午夜，万物沉寂，而你独自一人时才会有机会偶然想起你此刻立于此地的意义。我们每个人都有一个答案，只是有些人一生可能都不会想起。幸运抑或不幸，只是人对自己过往的追问和总结罢了。&lt;/p&gt;
 
-</description>
-      </item>
-    
-      <item>
-        <title>Visual Studio开发Android程序</title>
-        <link>http://www.liuschen.com/2016/02/21/studio.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2016/02/21/studio.html</guid>
-        <pubDate>Sun, 21 Feb 2016 00:00:00 +0800</pubDate>
-        <description>&lt;blockquote&gt;
-  &lt;p&gt;早就听说微软在新版的visual studio上增强了对移动开发的便利，而且提供的Android模拟器比Google提供的性能上要好很多，所以周末就弄了一下，简单说一下遇到的问题&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h1 id=&quot;visual-studio-2015&quot;&gt;1.安装Visual Studio 2015&lt;/h1&gt;
-
-&lt;p&gt;安装Visual Studio 2015时，要联网下载很多东西，虽然安装包已经不小了，很显然，安装的要更多。装了近10个小时（只能说我够闲），完了后仍然提示我说android 的sdk和一个git相关的什么东西没装上，最重要的是sdk没装上肯定就不能开发Android了，下载是不现实的，所以就用了我本地存放的sdk,更改sdk路径的设置需要依次点击&lt;/p&gt;
-
-&lt;h3 id=&quot;cross-platform&quot;&gt;工具-选项-Cross Platform&lt;/h3&gt;
-
-&lt;p&gt;就能看到，然后勾选Android SDK前面的选择框就可以更改路径了。&lt;/p&gt;
-
-&lt;p&gt;调试Android程序，如果是真机调试一般选ARM，连接上手机开发者一般就能看到设备了，如果是window的虚拟机则是选x86。&lt;/p&gt;
-
-&lt;h1 id=&quot;window&quot;&gt;2.安装window的虚拟机&lt;/h1&gt;
-
-&lt;p&gt;安装window提供的Android虚拟机需要window对Hyper-V的支持，这个功能家庭版上没有，至少要专业版才行，然后再控制面板中打开该功能，电脑在此期间会重启来完成功能的添加。之后就能安装虚拟机了，如果没有添加该功能直接安装会出错，安装虚拟机要升级到最新版本，安装完后就能使用了。&lt;/p&gt;
-
-&lt;p&gt;window提供的Android虚拟机的基础Hyper-V感觉和workstation以及virtualbox差不多，但是毕竟是在window系统自家提供的功能，相必必有一些过人的地方，只是Android的模拟器虽然速度比Google自己的要快很多，但是总有些似曾相识的感觉，之前用sdk自带的虚拟机，在window上其实也是可以加速的，也就是单独针对x86架构有加速的独立window程序可以安装，和这个差不多，都是针对同一种架构的优化，从这个意义上来讲，其实这个虚拟机对我做开发意义并不是太大。&lt;/p&gt;
-
-&lt;h1 id=&quot;visual-studio-2015-1&quot;&gt;3.Visual Studio 2015编程&lt;/h1&gt;
-
-&lt;p&gt;我最期待的是Visual Studio 2015用c++来架构程序的效果，新建工程时,我发现没有Java构建代码的模板，好像在这里面C#是Java的等效语言，除此之外就是Visual c++，在里面的跨平台中还是找到了一个模板可以构建Java的Android程序，同时也可以建c++共享库，也有纯c++来开发Android的模板，遗憾的是，我看过之后发现这个模板是完全照抄的NDK中的示例源码，可见这并不是visualstudio的主要功能。其中也有Apache Cordova的模板，用网页前端语言构建app的框架，这个可以使代码可以轻松的跨平台，在节省开发成本上具有广泛意义，但传统的仍然认为这种方式在运行速度上仍不理想，所以现在还是以Java+html5混合编程为主。&lt;/p&gt;
-</description>
-      </item>
-    
-      <item>
-        <title>C++学习整理</title>
-        <link>http://www.liuschen.com/2016/02/19/c++.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2016/02/19/c++.html</guid>
-        <pubDate>Fri, 19 Feb 2016 00:00:00 +0800</pubDate>
-        <description>&lt;h2 id=&quot;section&quot;&gt;打印字符串&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code&gt;#include &amp;lt;iostream&amp;gt;
-extern int pow(int, int);
-int main()
-{
-	int val = 2;
-	int exp = 15;
-	cout &amp;lt;&amp;lt; &quot;The Powers of 2\n&quot;;
-	for ( int cnt=0; cnt &amp;lt;= exp; ++cnt )
-	cout &amp;lt;&amp;lt; cnt &amp;lt;&amp;lt; &quot;: &quot;
-	&amp;lt;&amp;lt; pow(val, cnt) &amp;lt;&amp;lt; endl;
-	return 0;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&quot;inline&quot;&gt;内联函数inline,最好放在头文件中&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code&gt;inline int min( int v1, int v2 ) { /* ... */ }
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&quot;extern-c&quot;&gt;链接指示符 extern “c”,告诉编译器函数编写语言类型&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code&gt;// 单一语句形式的链接指示符
-extern &quot;C&quot; void exit(int);
-// 复合语句形式的链接指示符
-extern &quot;C&quot; {
-int printf( const char* ... );
-int scanf( const char* ... );
-}
-// 复合语句形式的链接指示符
-extern &quot;C&quot; {
-	#include &amp;lt;cmath&amp;gt;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;链接指示符不能出现在函数体中，并且如果需要c调用c++程序也需要在前面生命链接指示符,链接指示符如果声明多次，可以只声明一次，自动作用于后面&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;// ---- myMath.h ----
-extern &quot;C&quot; double calc( double );
-// ---- myMath.C ----
-// 在 Math.h 中的calc() 的声明
-#include &quot;myMath.h&quot;
-// 定义了 extern &quot;C&quot; calc() 函数
-// calc() 可以从C 程序中被调用
-double calc( double dparm ) { // ...
-&lt;/code&gt;&lt;/pre&gt;
-</description>
-      </item>
-    
-      <item>
-        <title>Socket编程笔记</title>
-        <link>http://www.liuschen.com/2016/02/17/socket.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2016/02/17/socket.html</guid>
-        <pubDate>Wed, 17 Feb 2016 00:00:00 +0800</pubDate>
-        <description>&lt;blockquote&gt;
-  &lt;p&gt;android中的socket连接HttpURLConnection来实现的。而HttpClient是对HttpURLConnection做了一层封装，HttpClient6.0之后被废弃了,推荐用HttpURLConnection。而HttpURLConnection继承于HttpConnection，两者都是抽象类，想了解其中的实现原理，就要深入的剖析一下代码，但是其中一些关键的方法如connect()方法却是抽象的，所以需要找到它的实现类。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;首先，是找到connect()的实现，最可能的是在URL类中找线索，因为是在url中获取的&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;URL url = new URL(httpUrl);//此处有异常抛出
-HttpURLConnection urlConn = (HttpURLConnection) url.openConnection();
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;然而，URL中却显示streamHandler中取得的&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;public URLConnection openConnection() throws IOException {
-    return streamHandler.openConnection(this);
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;而streamHandler这个实例所属的对象实现的方法仍然是抽象的&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;protected abstract URLConnection openConnection(URL u) throws IOException;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;也就是说单独知道这个出处还不够，还需要知道streamHandler是在什么时候被赋值的，这时候可以注意到URL中有URLStreamHandlerFactory streamHandlerFactory的工厂声明，点击去发现还是抽象的(晕)，然后顺着streamHandlerFactory就找到了下面的方法，是对streamHandler赋值的关键&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt; void setupStreamHandler() {
-    // Check for a cached (previously looked up) handler for
-    // the requested protocol.
-    streamHandler = streamHandlers.get(protocol);
-    if (streamHandler != null) {
-        return;
-    }
-
-    // If there is a stream handler factory, then attempt to
-    // use it to create the handler.
-    if (streamHandlerFactory != null) {
-        streamHandler = streamHandlerFactory.createURLStreamHandler(protocol);
-        if (streamHandler != null) {
-            streamHandlers.put(protocol, streamHandler);
-            return;
-        }
-    }
-
-    // Check if there is a list of packages which can provide handlers.
-    // If so, then walk this list looking for an applicable one.
-    String packageList = System.getProperty(&quot;java.protocol.handler.pkgs&quot;);
-    ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-    if (packageList != null &amp;amp;&amp;amp; contextClassLoader != null) {
-        for (String packageName : packageList.split(&quot;\\|&quot;)) {
-            String className = packageName + &quot;.&quot; + protocol + &quot;.Handler&quot;;
-            try {
-                Class&amp;lt;?&amp;gt; c = contextClassLoader.loadClass(className);
-                streamHandler = (URLStreamHandler) c.newInstance();
-                if (streamHandler != null) {
-                    streamHandlers.put(protocol, streamHandler);
-                }
-                return;
-            } catch (IllegalAccessException ignored) {
-            } catch (InstantiationException ignored) {
-            } catch (ClassNotFoundException ignored) {
-            }
-        }
-    }
-
-    // Fall back to a built-in stream handler if the user didn&#39;t supply one
-    if (protocol.equals(&quot;file&quot;)) {
-        streamHandler = new FileHandler();
-    } else if (protocol.equals(&quot;ftp&quot;)) {
-        streamHandler = new FtpHandler();
-    } else if (protocol.equals(&quot;http&quot;)) {
-        try {
-            String name = &quot;com.android.okhttp.HttpHandler&quot;;
-            streamHandler = (URLStreamHandler) Class.forName(name).newInstance();
-        } catch (Exception e) {
-            throw new AssertionError(e);
-        }
-    } else if (protocol.equals(&quot;https&quot;)) {
-        try {
-            String name = &quot;com.android.okhttp.HttpsHandler&quot;;
-            streamHandler = (URLStreamHandler) Class.forName(name).newInstance();
-        } catch (Exception e) {
-            throw new AssertionError(e);
-        }
-    } else if (protocol.equals(&quot;jar&quot;)) {
-        streamHandler = new JarHandler();
-    }
-    if (streamHandler != null) {
-        streamHandlers.put(protocol, streamHandler);
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;看注释区分，总共分为4个部分&lt;/p&gt;
-
-&lt;h1 id=&quot;section&quot;&gt;第一部分&lt;/h1&gt;
-
-&lt;pre&gt;&lt;code&gt; streamHandler = streamHandlers.get(protocol);
-    if (streamHandler != null) {
-        return;
-    }
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;是取缓存的streamHandler实例，如果已经存在了，就不会往下执行了。&lt;/p&gt;
-
-&lt;h1 id=&quot;section-1&quot;&gt;第二部分&lt;/h1&gt;
-
-&lt;pre&gt;&lt;code&gt;if (streamHandlerFactory != null) {
-        streamHandler = streamHandlerFactory.createURLStreamHandler(protocol);
-        if (streamHandler != null) {
-            streamHandlers.put(protocol, streamHandler);
-            return;
-        }
-    }
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;明显用到了工厂，所以需要知道工厂的出处，是这里:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;/**
- * Sets the stream handler factory for this VM.
- *
- * @throws Error if a URLStreamHandlerFactory has already been installed
- *     for the current VM.
- */
-public static synchronized void setURLStreamHandlerFactory(URLStreamHandlerFactory factory) {
-    if (streamHandlerFactory != null) {
-        throw new Error(&quot;Factory already set&quot;);
-    }
-    streamHandlers.clear();
-    streamHandlerFactory = factory;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;得了，这个是公共的设置方法:Sets the stream handler factory for this VM顿时感觉好高大上，总之，不通。&lt;/p&gt;
-
-&lt;h1 id=&quot;section-2&quot;&gt;第三部分&lt;/h1&gt;
-
-&lt;p&gt;在系统属性指定的包中寻找相应的URLStreamHandler处理类，因为没怎么用过这种方法，值得注意，不过不是这里的重点&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;String packageList = System.getProperty(&quot;java.protocol.handler.pkgs&quot;);
-    ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
-    if (packageList != null &amp;amp;&amp;amp; contextClassLoader != null) {
-        for (String packageName : packageList.split(&quot;\\|&quot;)) {
-            String className = packageName + &quot;.&quot; + protocol + &quot;.Handler&quot;;
-            try {
-                Class&amp;lt;?&amp;gt; c = contextClassLoader.loadClass(className);
-                streamHandler = (URLStreamHandler) c.newInstance();
-                if (streamHandler != null) {
-                    streamHandlers.put(protocol, streamHandler);
-                }
-                return;
-            } catch (IllegalAccessException ignored) {
-            } catch (InstantiationException ignored) {
-            } catch (ClassNotFoundException ignored) {
-            }
-        }
-    }
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h1 id=&quot;section-3&quot;&gt;第四部分&lt;/h1&gt;
-
-&lt;p&gt;再不成只能做最后的挣扎了&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;if (protocol.equals(&quot;file&quot;)) {
-        streamHandler = new FileHandler();
-    } else if (protocol.equals(&quot;ftp&quot;)) {
-        streamHandler = new FtpHandler();
-    } else if (protocol.equals(&quot;http&quot;)) {
-        try {
-            String name = &quot;com.android.okhttp.HttpHandler&quot;;
-            streamHandler = (URLStreamHandler) Class.forName(name).newInstance();
-        } catch (Exception e) {
-            throw new AssertionError(e);
-        }
-    } else if (protocol.equals(&quot;https&quot;)) {
-        try {
-            String name = &quot;com.android.okhttp.HttpsHandler&quot;;
-            streamHandler = (URLStreamHandler) Class.forName(name).newInstance();
-        } catch (Exception e) {
-            throw new AssertionError(e);
-        }
-    } else if (protocol.equals(&quot;jar&quot;)) {
-        streamHandler = new JarHandler();
-    }
-    if (streamHandler != null) {
-        streamHandlers.put(protocol, streamHandler);
-    }
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;其中https依然是在特定包com.android.okhttp.HttpsHandler中找&lt;br /&gt;
-而其他的则是直接new一个对象，这些对象的导入&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;import libcore.net.url.FileHandler;
-import libcore.net.url.FtpHandler;
-import libcore.net.url.JarHandler;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;在androidstudio中显示的是灰色的，表示没有没有提供相关源码，至此，线索全断了，不过通过这些查找也并非没有收获。&lt;/p&gt;
-
-&lt;p&gt;一直以来找的URLStreamHandler streamHandler其实是一个协议流处理器，每一个&lt;br /&gt;
-对应一个URLHttpConnection，至于实现它们的源码，限于sdk中源码包没有所以没看到，不过却找到了出处，网上查了一下知道了其中实现也是通过Socket，大体的关系总是理清了。&lt;/p&gt;
-
-&lt;h1 id=&quot;section-4&quot;&gt;总结：&lt;/h1&gt;
-
-&lt;p&gt;1.URLHttpConnection和URLHttpsConnection都继承了URLConnection都是基于应用层对http或https协议的封装，里面通信还是用的socket&lt;/p&gt;
-
-&lt;p&gt;2.URLConnection里面调用的Socket是传输层对应用层提供的抽象接口,是下层黑箱的一个门面，其中包括的协议有传输层的TCP协议和UDP协议，以及网络层的IP协议。当然也可以直接用socket通信，可以在应用层通过socket来架构网络框架，但是需要考虑多线程，以及状态监控（其实用URLConnection也要自己写多线程）等因素，更省流量以及更可控，但是如果要用到http等应用层协议，还是用URLConnection方便些。&lt;/p&gt;
-
-&lt;p&gt;3.每个URLConnection都有一个相对应的URLStreamHandler实例用来处理协议，URL类中还有关于file，ftp,jar对应类型的URLStreamHandler应该也是一些协议的封装的处理器，也就是说每一种协议需要对应一种处理模型。&lt;/p&gt;
-
-&lt;h1 id=&quot;section-5&quot;&gt;最后，温习一下网络模型：&lt;/h1&gt;
-
-&lt;h2 id=&quot;section-6&quot;&gt;应用层-应用层，表示层，会话层&lt;/h2&gt;
-
-&lt;h2 id=&quot;section-7&quot;&gt;传输层-传输层&lt;/h2&gt;
-
-&lt;h2 id=&quot;section-8&quot;&gt;网际互联层-网络层&lt;/h2&gt;
-
-&lt;h2 id=&quot;section-9&quot;&gt;网络接入层-数据链路层，物理层&lt;/h2&gt;
-
-</description>
-      </item>
-    
-      <item>
-        <title>git常用命令行</title>
-        <link>http://www.liuschen.com/2016/02/16/apk.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2016/02/16/apk.html</guid>
-        <pubDate>Tue, 16 Feb 2016 00:00:00 +0800</pubDate>
-        <description>&lt;blockquote&gt;
-  &lt;p&gt;首先将git目录下的cmd配置到环境变量，打开cmd就可以使用git命令，git仓库就是目录下隐藏的.git文件夹&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;&lt;a href=&quot;http://www.bootcss.com/p/git-guide/&quot;&gt;git简易使用说明(外链)&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;创建版本库&lt;br /&gt;
-git init&lt;/p&gt;
-
-&lt;p&gt;查看分支&lt;br /&gt;
-git branch&lt;br /&gt;
-git branch -a&lt;/p&gt;
-
-&lt;p&gt;从远端拉取&lt;br /&gt;
-git clone 地址&lt;/p&gt;
-
-&lt;p&gt;显示状态&lt;br /&gt;
-git status&lt;/p&gt;
-
-&lt;p&gt;修改加入缓存&lt;br /&gt;
-git add filename&lt;/p&gt;
-
-&lt;p&gt;修改提交到HEAD(本地库最近版本)&lt;br /&gt;
-git commit -m “提交注释内容”&lt;/p&gt;
-
-&lt;p&gt;创建分支并切换  单独切换分支 删除本地分支&lt;br /&gt;
-git checkout -b name&lt;br /&gt;
-git checkout name&lt;/p&gt;
-
-&lt;p&gt;还没提交到远端的分支可以直接删除&lt;br /&gt;
-git branch -d name&lt;/p&gt;
-
-&lt;p&gt;更新不需要密码&lt;br /&gt;
-git pull&lt;br /&gt;
-提交到远端库&lt;br /&gt;
-git push&lt;/p&gt;
-
-&lt;p&gt;本地有一个远端的拷贝，和远端同步&lt;/p&gt;
-</description>
-      </item>
-    
-      <item>
-        <title>android反编译</title>
-        <link>http://www.liuschen.com/2016/02/14/apk.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2016/02/14/apk.html</guid>
-        <pubDate>Sun, 14 Feb 2016 00:00:00 +0800</pubDate>
-        <description>&lt;p&gt;android程序是apk格式，其实就是一个压缩包，可以直接解压，但是直接解压后可以直接得到资源文件，以及c的动态链接库，但是打开布局文件却是乱码，并且没有的到直接可读的java源码，所以需要用到反编译相关的软件，而android逆向助手就是一个整合了多个反编译工具的软件。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;http://7xpui7.com1.z0.glb.clouddn.com/blog-apk.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;其中，反编译apk和反编译dex直接提取的都是smali格式的文件&lt;/p&gt;
-
-&lt;h3 id=&quot;androidjava&quot;&gt;获得android程序源码中java格式的源码：&lt;/h3&gt;
-&lt;p&gt;通过dex转成jar格式   通过js-gui可以直接读取其中的内容，如果里面代码经过了混淆，则被混淆过的代码名称均用无意义的英文字母来命名，因为更改了名称，所以该部分代码不能用到反射。&lt;/p&gt;
-
-&lt;h3 id=&quot;androidxml&quot;&gt;获得android程序源码中的xml文件：&lt;/h3&gt;
-
-&lt;p&gt;反编译apk中就能获得xml文件用的APKTool工具&lt;br /&gt;
-没有说明出错了, apktool.jar版本没更，跟不上android的版本&lt;br /&gt;
-直接替换反编译却又不能出结果&lt;/p&gt;
-
-&lt;h3 id=&quot;section&quot;&gt;结果：&lt;/h3&gt;
-
-&lt;p&gt;直接用里面的apktool d 文件 来解析xml文件&lt;br /&gt;
-用完整工具可以解析src中的Java文件&lt;/p&gt;
 </description>
       </item>
     

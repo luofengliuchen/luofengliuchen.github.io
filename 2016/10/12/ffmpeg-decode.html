@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
 <!--[if lte IE 9]><meta http-equiv="refresh" content="0;url=/ie.html"><![endif]-->
 
-<title>Android绘图-LOGO-实现2 | 落风的博客</title>
+<title>音视频编解码-ffmpeg解码 | 落风的博客</title>
 <meta name="author" content="落风">
 
-  <meta name="keywords" content="android ,绘图,logo">
+  <meta name="keywords" content="ffmpeg,解码">
 
 
 
@@ -142,66 +142,55 @@
     <div id="post">
       <div id="pjax">
         <article id="post__content">
-  <h1 id="post__title" data-identifier="20160114">Android绘图-LOGO-实现2</h1>
-  <p>首先对半圆的绘制考虑到之前版本并不能精确的满足绘制的要求（内圆和外圆并不一定是同心圆，用Path.FillType.EVEN_ODD来实现的话可能会产生多余的部分），要是能够像ps中单纯对路径进行相加相减就好了。所幸在Path中找到了一个Op的枚举类型（和FillType距离不远），最终就是用Path的这个属性完美的解决了这个问题</p>
+  <h1 id="post__title" data-identifier="20161012">音视频编解码-ffmpeg解码</h1>
+  <blockquote>
+  <p>文章链接:<a href="http://www.liuschen.com">http://www.liuschen.com</a></p>
+</blockquote>
 
-<pre><code>@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-private void drawRing(Canvas canvas, Paint paint,float interX, float innerY,float outerX, float outerY,float startAngle,float sweepAngle,float inner_circle,float outter_circle) {
+<p>每次编解码必须先进行初始化组件av-register-all()，如果需要网络还需要avformat-network-init()；</p>
 
-    Path outterpath = new Path();
+<p>avformat-alloc-context()返回一个指向<strong>AVFormatContext</strong>的指针，<strong>AVFormatContext</strong>是一个用于处理封装格式的结构体；</p>
 
-    outterpath.moveTo(outerX, outerY);
-    outterpath.lineTo(outerX, outerY - outter_circle);
-    outterpath.arcTo(outerX - outter_circle, outerY - outter_circle, outerX + outter_circle, outerY + outter_circle, startAngle, sweepAngle, true);
-    outterpath.lineTo(outerX, outerY);
-    outterpath.close();
+<p><strong>AVStream，AVCodecContext</strong>视音频流对应的结构体，用于视音频编解码。</p>
 
-    Path innerpath = new Path();
+<p>AVFormatContext里面存储有一个流的list<avstream>,而AVStream里面存储有一个AVCodecContext，不过在我用这个版本显示</avstream></p>
 
-    innerpath.moveTo(interX, innerY);
-    innerpath.lineTo(interX, innerY - inner_circle);
-    innerpath.arcTo(interX - inner_circle, innerY - inner_circle, interX + inner_circle, innerY + inner_circle, startAngle, -360, true);
-    innerpath.lineTo(interX, innerY);
-    innerpath.close();
-
-    outterpath.op(innerpath,Path.Op.DIFFERENCE);
-    canvas.drawPath(outterpath,paint);
-}
+<pre><code>/**
+ * @deprecated use the codecpar struct instead
+ */
+attribute_deprecated
+AVCodecContext *codec;
 </code></pre>
 
-<p>最终整个动画由一个定时器控制速率，通过定时重绘View实现了整个动画，最后的退出动画是通过对画布操作完成的（对画布的操作必须在绘制之前）。</p>
+<p>编译的时候也警告说是过时了，要用codecpar替代，而codecpar是一个AVCodecParameters类型的指针</p>
 
-<pre><code>@Override
-protected void onDraw(Canvas canvas) {
-    super.onDraw(canvas);
+<p>所有改完，生成.so文件不再报错后，部署到手机上，运行又报错：</p>
 
-    canvas.translate(TRACK1_OUTTER_CIRCLE * 1.5f, TRACK1_OUTTER_CIRCLE * 1.5f);
-    scaleAnim(canvas);
-
-    Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    paint.setStyle(Paint.Style.FILL);
-    track1(canvas, paint);
-    track2(canvas, paint);
-    track3(canvas, paint);
-
-    if(!isTimerRunning){
-        mHandler.post(mRunnable);
-        isTimerRunning = true;
-    }else{
-        mHandler.postDelayed(mRunnable, mFrameTime);
-    }
-    if(mFrameNumber&gt;60){
-        resetAnim();
-    }
-}
+<pre><code>JNI DETECTED ERROR IN APPLICATION: invalid reference returned from java.lang.String luofeng.com.ffmpegdemo.FFmpegUtils.getFFmpegInfo1()
+09-28 10:27:14.363 18198-18198/luofeng.com.ffmpegdemo A/art: art/runtime/check_jni.cc:65]     from java.lang.String luofeng.com.ffmpegdemo.FFmpegUtils.getFFmpegInfo1()
 </code></pre>
+
+<p>这个是由于我开的cmd命令行目录占据着build文件夹，导致makeclean也无法重新build程序，也就是说新的改动没有生效。</p>
+
+<p>然后运行后又报错，是日志报的错avformat_open_input返回值不对，找答案找不到，最后发现忘了添加读写内存卡的权限。添加之后正常解码出了视频文件为YUV视频帧序列。</p>
+
+<p>在一些步骤返回错误码，若要知道错误码的错误类型可以用</p>
+
+<pre><code>	char buf2[500] = {0};
+     av_strerror(ret, buf2, 1024);
+</code></pre>
+
+<p>将错误内容查询出来，再在log中输出即可。</p>
+
+<h3 id="android-httpblogcsdnnetleixiaohua1020articledetails47010637">参考：<a href="http://blog.csdn.net/leixiaohua1020/article/details/47010637">Android 视频解码器</a></h3>
+
 
 </article> <!-- end #post__content -->
 
 <div id="post__share">
-  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/01/14/draw-a-logo.html&text=Android绘图-LOGO-实现2" target="_blank"></a>
+  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/10/12/ffmpeg-decode.html&text=音视频编解码-ffmpeg解码" target="_blank"></a>
   <a id="icon-cc" class="fontello" href="http://creativecommons.org/licenses/by-nc-sa/3.0" target="_blank"></a>
-  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/01/14/draw-a-logo.html&title=Android绘图-LOGO-实现2" target="_blank"></a>
+  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/10/12/ffmpeg-decode.html&title=音视频编解码-ffmpeg解码" target="_blank"></a>
 </div> <!-- end #post__share -->
 <div id="disqus_thread" name="luofeng">
   <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
