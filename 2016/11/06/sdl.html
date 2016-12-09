@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
 <!--[if lte IE 9]><meta http-equiv="refresh" content="0;url=/ie.html"><![endif]-->
 
-<title>Androidstudio下的代码混淆 | 落风的博客</title>
+<title>SDL&android | 落风的博客</title>
 <meta name="author" content="落风">
 
-  <meta name="keywords" content="混淆">
+  <meta name="keywords" content="SDL,Android">
 
 
 
@@ -160,87 +160,95 @@
     <div id="post">
       <div id="pjax">
         <article id="post__content">
-  <h1 id="post__title" data-identifier="20160805">Androidstudio下的代码混淆</h1>
-  <p>首先在项目的build.gradle中Android标签下添加</p>
+  <h1 id="post__title" data-identifier="20161106">SDL&android</h1>
+  <blockquote>
+  <p>文章链接:<a href="http://www.liuschen.com">http://www.liuschen.com</a></p>
 
-<pre><code>signingConfigs {
-    release {
-        keyAlias 'xxx'
-        keyPassword 'xxx'
-        storeFile file('xxx')
-        storePassword 'xxx'
-    }
-}
+  <p>下载SDL:<a href="http://www.libsdl.org/download-2.0.php">http://www.libsdl.org/download-2.0.php</a></p>
+</blockquote>
 
-buildTypes {
-    release {
-        signingConfig signingConfigs.release
-        minifyEnabled true
-        proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-    }
-}
+<h1 id="jnisdl">1.通过jni编译SDL</h1>
+
+<p>解压下载的SDL文件</p>
+
+<p>将目录下的include，src文件夹以及Android.mk文件分别移动到jni目录下，执行ndk-build</p>
+
+<p>我用的版本是2.0.5,编译会出现如下错误：</p>
+
+<pre><code>[armeabi] Compile thumb  : SDL2 &lt;= SDL_render_gles.c
+[armeabi] Compile thumb  : SDL2 &lt;= SDL_render_gles2.c
+D:/project/AndroidSDL/app/src/main/jni/src/render/opengles2/SDL_gles2funcs.h: In function 'GLES2_LoadFunctions':
+D:/project/AndroidSDL/app/src/main/jni/src/render/opengles2/SDL_render_gles2.c:294:45: warning: assignment from incompatible pointer type [enabled by default]
+ #define SDL_PROC(ret,func,params) data-&gt;func=func;
+                                             ^
+D:/project/AndroidSDL/app/src/main/jni/src/render/opengles2/SDL_gles2funcs.h:56:1: note: in expansion of macro 'SDL_PROC'
+ SDL_PROC(void, glShaderSource, (GLuint, GLsizei, const GLchar* const*, const GLint *))
+ ^
 </code></pre>
 
-<p>其中第二个是混淆的设置，第一个配置的是数字签名的路径以及密码等信息，</p>
+<p>具体原因没有分析，但是改用2.0.3后，编译通过(<a href="http://hg.libsdl.org/SDL">历史下载列表</a>)。</p>
 
-<pre><code>signingConfig signingConfigs.release
+<p>编译出so文件后,又将目录下的AndroidProject中的Activity移动到了项目下（路径名也要一致，因为在c中有映射，改那个太麻烦），运行工程，再次出错</p>
+
+<pre><code>JNI DETECTED ERROR IN APPLICATION: JNI GetStaticMethodID called with pending exception 'java.lang.NoSuchMethodError' thrown in int org.libsdl.app.SDLActivity.nativeInit(java.lang.Object):-2
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65]     in call to GetStaticMethodID
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65]     from int org.libsdl.app.SDLActivity.nativeInit(java.lang.Object)
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65] "SDLThread" prio=5 tid=19 Runnable
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65]   | group="main" sCount=0 dsCount=0 obj=0x12d884c0 self=0xab66f138
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65]   | sysTid=22530 nice=0 cgrp=default sched=0/0 handle=0xab66f768
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65]   | state=R schedstat=( 823907 204323 7 ) utm=0 stm=0 core=6 HZ=100
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65]   | stack=0xe4a25000-0xe4a27000 stackSize=1036KB
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65]   | held mutexes= "mutator lock"(shared held)
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65]   native: #00 pc 000049f4  /system/lib/libbacktrace_libc++.so (_ZN13UnwindCurrent6UnwindEjP8ucontext+23)
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65]   native: #01 pc 000030cd  /system/lib/libbacktrace_libc++.so (_ZN9Backtrace6UnwindEjP8ucontext+8)
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65]   native: #02 pc 002481c5  /system/lib/libart.so (_ZN3art15DumpNativeStackERNSt3__113basic_ostreamIcNS0_11char_traitsIcEEEEiPKcPNS_6mirror9ArtMethodE+68)
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65]   native: #03 pc 0022bf1d  /system/lib/libart.so (_ZNK3art6Thread4DumpERNSt3__113basic_ostreamIcNS1_11char_traitsIcEEEE+144)
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65]   native: #04 pc 000b0c53  /system/lib/libart.so (_ZN3artL8JniAbortEPKcS1_+582)
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65]   native: #05 pc 000b1389  /system/lib/libart.so (_ZN3art9JniAbortFEPKcS1_z+60)
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65]   native: #06 pc 000b44cb  /system/lib/libart.so (_ZN3art11ScopedCheckC2EP7_JNIEnviPKc+1286)
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65]   native: #07 pc 000b6793  /system/lib/libart.so (_ZN3art8CheckJNI17GetStaticMethodIDEP7_JNIEnvP7_jclassPKcS6_+26)
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65]   native: #08 pc 00042707  /data/app/ketr.com.androidsdl-1/lib/arm/libSDL2.so (SDL_Android_Init+106)
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65]   native: #09 pc 0000116f  /data/app/ketr.com.androidsdl-1/lib/arm/libSDL2main.so (Java_org_libsdl_app_SDLActivity_nativeInit+2)
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65]   native: #10 pc 0002d319  /data/data/ketr.com.androidsdl/cache/slice-slice_5-classes.dex (Java_org_libsdl_app_SDLActivity_nativeInit__Ljava_lang_Object_2+100)
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65]   at org.libsdl.app.SDLActivity.nativeInit(Native method)
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65]   at org.libsdl.app.SDLMain.run(SDLActivity.java:1028)
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65]   at java.lang.Thread.run(Thread.java:818)
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65] 
+11-08 13:52:18.701 22508-22530/? A/libc: Fatal signal 11 (SIGSEGV), code 1, fault addr 0x1d in tid 22530 (SDLThread)
 </code></pre>
 
-<p>个是依赖于这项配置的，不然会报错</p>
+<p>这个问题是由于jni对java的调用找不到方法导致的，c函数调用Java时，在core/android里面的实现出了问题，里面的函数还用了一些define别名，以及extern C_LINKAGE 来引用一些函数，最后发现调用流程是：</p>
 
-<p>然后，就是配置混淆的文件</p>
+<ol>
+  <li>SDLActivity里面调用init的本地方法；</li>
+  <li>init方法的实现是在main/Android文件夹里SDL_Android_main.c里；</li>
+  <li>init方法里面调用了core/android里面的方法初始化了，这个初始化的方法调用的是Android的Java代码；</li>
+  <li>接着又调用了SDL_main方法，这个方式是main方法的别名define定义的；</li>
+  <li>这个main方法就是自己写的主函数</li>
+</ol>
 
-<pre><code>-ignorewarnings
--optimizationpasses 5          # 指定代码的压缩级别
--dontusemixedcaseclassnames   # 是否使用大小写混合
--dontpreverify           # 混淆时是否做预校验
--verbose                # 混淆时是否记录日志
+<p>也就是说，SDL最终还是调用的Android里面的方法，就变成了这样：</p>
 
+<p>Android播放器实现（java）——&gt;调用SDL本地方法——&gt;调用java方法——&gt;调用本地引擎方法</p>
 
--optimizations !code/simplification/arithmetic,!field/*,!class/merging/*  # 混淆时所采用的算法
+<p>有点拐弯抹角，实现起来并不经济，SDL只是为了跨平台而实现的一层框架，并且里面对于Android中Java方法的相互调用，方法名写的比较死，耦合太大，随着版本的升级也要不断改动，如果不需要跨平台，就完全没用。</p>
 
--keep public class * extends android.app.Activity      # 保持哪些类不被混淆
--keep public class * extends android.app.Application   # 保持哪些类不被混淆
--keep public class * extends android.app.Service       # 保持哪些类不被混淆
--keep public class * extends android.content.BroadcastReceiver  # 保持哪些类不被混淆
--keep public class * extends android.content.ContentProvider    # 保持哪些类不被混淆
--keep public class * extends android.app.backup.BackupAgentHelper # 保持哪些类不被混淆
--keep public class * extends android.preference.Preference        # 保持哪些类不被混淆
--keep public class com.android.vending.licensing.ILicensingService    # 保持哪些类不被混淆
+<p>PS:通过javah生成头文件</p>
 
--keep class javax.security.** { *; }
-
-
--keepclasseswithmembernames class * {  # 保持 native 方法不被混淆
-    native &lt;methods&gt;;
-}
--keepclasseswithmembers class * {   # 保持自定义控件类不被混淆
-    public &lt;init&gt;(android.content.Context, android.util.AttributeSet);
-}
--keepclasseswithmembers class * {# 保持自定义控件类不被混淆
-    public &lt;init&gt;(android.content.Context, android.util.AttributeSet, int);
-}
--keepclassmembers class * extends android.app.Activity { # 保持自定义控件类不被混淆
-    public void *(android.view.View);
-}
--keepclassmembers enum * {     # 保持枚举 enum 类不被混淆
-    public static **[] values();
-    public static ** valueOf(java.lang.String);
-}
--keep class * implements android.os.Parcelable { # 保持 Parcelable 不被混淆
-    public static final android.os.Parcelable$Creator *;
-}
+<pre><code>app\build\intermediates\classes\debug&gt;javah -jni org.libsdl.app.SDLActivity
+错误: 无法访问android.app.Activity
+  找不到android.app.Activity的类文件
 </code></pre>
 
-<p>一般情况下，系统的控件不必要混淆，如activity，service等，其次由于默在Androidstudio中默认已经将libs包中的jar添加了，重复添加反而会报错，最后项目中用到反射的地方一定不能混淆。<br />
-添加完后却还是报错了，先添加了-dontwarn，然并没什么用，然后加了-ignorewarnings忽略警告，成功生成apk,只是一定要注意确保警告中的地方没被项目调用，否则实际运行时还会出错，后果更严重。</p>
+<p>将目录切换到源文件src目录下执行，能正常生成头文件</p>
+
 
 </article> <!-- end #post__content -->
 
 <div id="post__share">
-  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/08/05/proguard.html&text=Androidstudio下的代码混淆" target="_blank"></a>
+  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/11/06/sdl.html&text=SDL&android" target="_blank"></a>
   <a id="icon-cc" class="fontello" href="http://creativecommons.org/licenses/by-nc-sa/3.0" target="_blank"></a>
-  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/08/05/proguard.html&title=Androidstudio下的代码混淆" target="_blank"></a>
+  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/11/06/sdl.html&title=SDL&android" target="_blank"></a>
 </div> <!-- end #post__share -->
 <div id="disqus_thread" name="luofeng">
   <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>

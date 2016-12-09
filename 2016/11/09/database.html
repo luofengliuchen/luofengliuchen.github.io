@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
 <!--[if lte IE 9]><meta http-equiv="refresh" content="0;url=/ie.html"><![endif]-->
 
-<title>Androidstudio下的代码混淆 | 落风的博客</title>
+<title>Android数据库并发操作 | 落风的博客</title>
 <meta name="author" content="落风">
 
-  <meta name="keywords" content="混淆">
+  <meta name="keywords" content="Android，sqlite">
 
 
 
@@ -160,87 +160,88 @@
     <div id="post">
       <div id="pjax">
         <article id="post__content">
-  <h1 id="post__title" data-identifier="20160805">Androidstudio下的代码混淆</h1>
-  <p>首先在项目的build.gradle中Android标签下添加</p>
+  <h1 id="post__title" data-identifier="20161109">Android数据库并发操作</h1>
+  <blockquote>
+  <p>文章链接:<a href="http://www.liuschen.com">http://www.liuschen.com</a></p>
+</blockquote>
 
-<pre><code>signingConfigs {
-    release {
-        keyAlias 'xxx'
-        keyPassword 'xxx'
-        storeFile file('xxx')
-        storePassword 'xxx'
-    }
-}
+<h1 id="android-sqlite">1.Android SQLite函数调用</h1>
 
-buildTypes {
-    release {
-        signingConfig signingConfigs.release
-        minifyEnabled true
-        proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-    }
+<p>首先在SQLiteDatabase中有已经封装好的增删改查操作函数，操作简单数据自己在封装一个dao直接调用即可,操作复杂可以自定义SQL语句，但是里面都是通过SQLiteStatement来执行其对应操作。查询操作执行和其他不同，是通过SQLiteCursorDriver来找到curser的。</p>
+
+<pre><code>查询(读):外层包装-&gt;SQL语句-&gt;SQLiteCursorDriver
+增删改(写)：外层包装-&gt;SQL语句-&gt;SQLiteStatement
+</code></pre>
+
+<p>所以可以直接如网上所说，用来SQLiteStatement写，将</p>
+
+<pre><code>SQLiteDatabase database = new SQLiteDatabase();  
+if (database.isOpen())   
+{  
+    database.beginTransaction();  
+    try {  
+         //sql为insert into tableName (name) values ("test")  
+        database.execSQL(sql);  
+    }  
+        database.setTransactionSuccessful();  
+    } finally {  
+        database.endTransaction();  
+    }  
+    database.close();  
+} 
+</code></pre>
+
+<p>改为</p>
+
+<pre><code>SQLiteDatabase database = new SQLiteDatabase();  
+//sql为insert into tableName (name) values (?)  
+SQLiteStatement sqlListStatment = database.compileStatement(sql);  
+if (database.isOpen())   
+{  
+    database.beginTransaction();  
+    try {  
+        //index 为1开始索引，value为入库的值  
+        //bingXXX为插入XXX类型
+         sqLiteStatement.bindString(index, value);  
+         sqLiteStatement.executeInsert();  
+    }  
+        database.setTransactionSuccessful();  
+    } finally {  
+        database.endTransaction();  
+    }  
+    database.close();
 }
 </code></pre>
 
-<p>其中第二个是混淆的设置，第一个配置的是数字签名的路径以及密码等信息，</p>
+<p>这样性能应该会提升不少，因为SQLiteDatabase封装的时候做了一些检查操作，每一条省下的时间可能微不足道，但如果数据过万就不同了。</p>
 
-<pre><code>signingConfig signingConfigs.release
+<h1 id="section">2.事务操作</h1>
+
+<p>Android SQL语句默认一条语句是一个事务，事务是为了保证操作的安全性，但是事务实际执行却会耗费大量资源，如果反复执行一个插入操作10000次将会相当耗时，所以在反复执行增删改操所时，一定在外层加入事务，让整个任务作为一条事务来执行。</p>
+
+<pre><code>	db.beginTransaction();
+	try{
+		//批量写操作
+	}catch(Exception e){
+		e.printStackTrace();
+	}finally{
+		db.endTransaction();
+	}
 </code></pre>
 
-<p>个是依赖于这项配置的，不然会报错</p>
+<h1 id="sqlite-database-is-locked">3.SQLite database is locked</h1>
 
-<p>然后，就是配置混淆的文件</p>
+<p>这个是由于同时操作数据库抛出的异常，数据库同一时间不能被并发访问，这一点用单例模式可以解决，SQLiteOpenHelper在多个线程创建多个对象不能同时读和写，只能同时读，但是用单例模式，单个SQLiteOpenHelper对象在不同线程可以同时读写。</p>
 
-<pre><code>-ignorewarnings
--optimizationpasses 5          # 指定代码的压缩级别
--dontusemixedcaseclassnames   # 是否使用大小写混合
--dontpreverify           # 混淆时是否做预校验
--verbose                # 混淆时是否记录日志
+<p>关于SQLiteOpenHelper用单例在不同线程同时执行读写，写写操作，我做了一些测试，发现数据库的访问是顺序执行的，两个线程同时进行写操作，先执行的会先操作，另一个线程就阻塞了，等到先执行的操作完成，另一个线程才开始操作。</p>
 
-
--optimizations !code/simplification/arithmetic,!field/*,!class/merging/*  # 混淆时所采用的算法
-
--keep public class * extends android.app.Activity      # 保持哪些类不被混淆
--keep public class * extends android.app.Application   # 保持哪些类不被混淆
--keep public class * extends android.app.Service       # 保持哪些类不被混淆
--keep public class * extends android.content.BroadcastReceiver  # 保持哪些类不被混淆
--keep public class * extends android.content.ContentProvider    # 保持哪些类不被混淆
--keep public class * extends android.app.backup.BackupAgentHelper # 保持哪些类不被混淆
--keep public class * extends android.preference.Preference        # 保持哪些类不被混淆
--keep public class com.android.vending.licensing.ILicensingService    # 保持哪些类不被混淆
-
--keep class javax.security.** { *; }
-
-
--keepclasseswithmembernames class * {  # 保持 native 方法不被混淆
-    native &lt;methods&gt;;
-}
--keepclasseswithmembers class * {   # 保持自定义控件类不被混淆
-    public &lt;init&gt;(android.content.Context, android.util.AttributeSet);
-}
--keepclasseswithmembers class * {# 保持自定义控件类不被混淆
-    public &lt;init&gt;(android.content.Context, android.util.AttributeSet, int);
-}
--keepclassmembers class * extends android.app.Activity { # 保持自定义控件类不被混淆
-    public void *(android.view.View);
-}
--keepclassmembers enum * {     # 保持枚举 enum 类不被混淆
-    public static **[] values();
-    public static ** valueOf(java.lang.String);
-}
--keep class * implements android.os.Parcelable { # 保持 Parcelable 不被混淆
-    public static final android.os.Parcelable$Creator *;
-}
-</code></pre>
-
-<p>一般情况下，系统的控件不必要混淆，如activity，service等，其次由于默在Androidstudio中默认已经将libs包中的jar添加了，重复添加反而会报错，最后项目中用到反射的地方一定不能混淆。<br />
-添加完后却还是报错了，先添加了-dontwarn，然并没什么用，然后加了-ignorewarnings忽略警告，成功生成apk,只是一定要注意确保警告中的地方没被项目调用，否则实际运行时还会出错，后果更严重。</p>
 
 </article> <!-- end #post__content -->
 
 <div id="post__share">
-  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/08/05/proguard.html&text=Androidstudio下的代码混淆" target="_blank"></a>
+  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/11/09/database.html&text=Android数据库并发操作" target="_blank"></a>
   <a id="icon-cc" class="fontello" href="http://creativecommons.org/licenses/by-nc-sa/3.0" target="_blank"></a>
-  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/08/05/proguard.html&title=Androidstudio下的代码混淆" target="_blank"></a>
+  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/11/09/database.html&title=Android数据库并发操作" target="_blank"></a>
 </div> <!-- end #post__share -->
 <div id="disqus_thread" name="luofeng">
   <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>

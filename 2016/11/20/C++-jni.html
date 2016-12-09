@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
 <!--[if lte IE 9]><meta http-equiv="refresh" content="0;url=/ie.html"><![endif]-->
 
-<title>Androidstudio下的代码混淆 | 落风的博客</title>
+<title>jni编程中C++/C语言一些问题 | 落风的博客</title>
 <meta name="author" content="落风">
 
-  <meta name="keywords" content="混淆">
+  <meta name="keywords" content="c/c++,jni">
 
 
 
@@ -160,87 +160,114 @@
     <div id="post">
       <div id="pjax">
         <article id="post__content">
-  <h1 id="post__title" data-identifier="20160805">Androidstudio下的代码混淆</h1>
-  <p>首先在项目的build.gradle中Android标签下添加</p>
+  <h1 id="post__title" data-identifier="20161120">jni编程中C++/C语言一些问题</h1>
+  <blockquote>
+  <p>文章链接:<a href="http://www.liuschen.com">http://www.liuschen.com</a></p>
+</blockquote>
 
-<pre><code>signingConfigs {
-    release {
-        keyAlias 'xxx'
-        keyPassword 'xxx'
-        storeFile file('xxx')
-        storePassword 'xxx'
-    }
-}
+<h2 id="uint8t">1.uint8_t</h2>
+<p>首先，先来看一下jni.h关于j数据类型的定义：</p>
 
-buildTypes {
-    release {
-        signingConfig signingConfigs.release
-        minifyEnabled true
-        proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-    }
-}
+<pre><code>#ifdef HAVE_INTTYPES_H
+# include &lt;inttypes.h&gt;      /* C99 */
+typedef uint8_t         jboolean;       /* unsigned 8 bits */
+typedef int8_t          jbyte;          /* signed 8 bits */
+typedef uint16_t        jchar;          /* unsigned 16 bits */
+typedef int16_t         jshort;         /* signed 16 bits */
+typedef int32_t         jint;           /* signed 32 bits */
+typedef int64_t         jlong;          /* signed 64 bits */
+typedef float           jfloat;         /* 32-bit IEEE 754 */
+typedef double          jdouble;        /* 64-bit IEEE 754 */
+#else
+typedef unsigned char   jboolean;       /* unsigned 8 bits */
+typedef signed char     jbyte;          /* signed 8 bits */
+typedef unsigned short  jchar;          /* unsigned 16 bits */
+typedef short           jshort;         /* signed 16 bits */
+typedef int             jint;           /* signed 32 bits */
+typedef long long       jlong;          /* signed 64 bits */
+typedef float           jfloat;         /* 32-bit IEEE 754 */
+typedef double          jdouble;        /* 64-bit IEEE 754 */
+#endif
 </code></pre>
 
-<p>其中第二个是混淆的设置，第一个配置的是数字签名的路径以及密码等信息，</p>
+<p>而在inttypes.h中又有如下定义，当然不同环境可能定义略有不同</p>
 
-<pre><code>signingConfig signingConfigs.release
+<pre><code>#if defined(_CHAR_IS_SIGNED)  
+typedef char                    int8_t;  
+#else  
+#if defined(__STDC__)  
+typedef signed char             int8_t;  
+#endif  
+#endif  
+typedef short                   int16_t;  
+typedef int                     int32_t;  
+#ifdef  _LP64  
+#define _INT64_TYPE  
+typedef long                    int64_t;  
+#else   /* _ILP32 */  
+#if defined(_LONGLONG_TYPE)  
+#define _INT64_TYPE  
+typedef long long               int64_t;  
+#endif  
+#endif  
+  
+typedef unsigned char           uint8_t;  
+typedef unsigned short          uint16_t;  
+typedef unsigned int            uint32_t;  
+#ifdef  _LP64  
+typedef unsigned long           uint64_t;  
+#else   /* _ILP32 */  
+#if defined(_LONGLONG_TYPE)  
+typedef unsigned long long      uint64_t;
 </code></pre>
 
-<p>个是依赖于这项配置的，不然会报错</p>
+<p>如uint8_t是unsigned char的别名，能直观的体现所表示类型的字节数，以及符号属性，在不同的环境即是所表示的数据类型不同，但是只要在inttypes.h中将这种差异处理了，程序通过调用uint8_t并不会有什么影响，因为它只表示无符号一字节的数据，方便了程序不同平台的移植。在做音视频传输时，帧的数据就是通过uint8_t数组来存储的。</p>
 
-<p>然后，就是配置混淆的文件</p>
+<h2 id="env">2.env</h2>
+<p>注意：jni.h头文件中对于<em>**.c &amp; **</em>.cpp采用不同的定义<br />
+在C的定义中,env是一个两级指针,而在C++的定义中,env是个一级指针<br />
+C形式需要对env指针进行双重deferencing，而且须将env作为第一个参数传给jni函数,如进行字符串转化时：</p>
 
-<pre><code>-ignorewarnings
--optimizationpasses 5          # 指定代码的压缩级别
--dontusemixedcaseclassnames   # 是否使用大小写混合
--dontpreverify           # 混淆时是否做预校验
--verbose                # 混淆时是否记录日志
-
-
--optimizations !code/simplification/arithmetic,!field/*,!class/merging/*  # 混淆时所采用的算法
-
--keep public class * extends android.app.Activity      # 保持哪些类不被混淆
--keep public class * extends android.app.Application   # 保持哪些类不被混淆
--keep public class * extends android.app.Service       # 保持哪些类不被混淆
--keep public class * extends android.content.BroadcastReceiver  # 保持哪些类不被混淆
--keep public class * extends android.content.ContentProvider    # 保持哪些类不被混淆
--keep public class * extends android.app.backup.BackupAgentHelper # 保持哪些类不被混淆
--keep public class * extends android.preference.Preference        # 保持哪些类不被混淆
--keep public class com.android.vending.licensing.ILicensingService    # 保持哪些类不被混淆
-
--keep class javax.security.** { *; }
-
-
--keepclasseswithmembernames class * {  # 保持 native 方法不被混淆
-    native &lt;methods&gt;;
-}
--keepclasseswithmembers class * {   # 保持自定义控件类不被混淆
-    public &lt;init&gt;(android.content.Context, android.util.AttributeSet);
-}
--keepclasseswithmembers class * {# 保持自定义控件类不被混淆
-    public &lt;init&gt;(android.content.Context, android.util.AttributeSet, int);
-}
--keepclassmembers class * extends android.app.Activity { # 保持自定义控件类不被混淆
-    public void *(android.view.View);
-}
--keepclassmembers enum * {     # 保持枚举 enum 类不被混淆
-    public static **[] values();
-    public static ** valueOf(java.lang.String);
-}
--keep class * implements android.os.Parcelable { # 保持 Parcelable 不被混淆
-    public static final android.os.Parcelable$Creator *;
-}
+<pre><code>C++:env0-&gt;GetStringUTFChars(url, NULL)
+C:(*env)-&gt;GetStringUTFChars(env,url, NULL)
 </code></pre>
 
-<p>一般情况下，系统的控件不必要混淆，如activity，service等，其次由于默在Androidstudio中默认已经将libs包中的jar添加了，重复添加反而会报错，最后项目中用到反射的地方一定不能混淆。<br />
-添加完后却还是报错了，先添加了-dontwarn，然并没什么用，然后加了-ignorewarnings忽略警告，成功生成apk,只是一定要注意确保警告中的地方没被项目调用，否则实际运行时还会出错，后果更严重。</p>
+<h2 id="section">3.类型转换</h2>
+
+<p>C++ char const* 类型和字符串互相转化</p>
+
+<pre><code>#include&lt;iostream&gt;
+std::string src1(rootpath);
+std::string src2(streamName0);
+std::string dest = src1 + src2;
+char const* streamName = dest.c_str();
+</code></pre>
+
+<h2 id="cuintt">4.C++将uint_t数组输出到文件</h2>
+
+<p>头文件</p>
+
+<pre><code>#include &lt;iostream&gt;
+#include &lt;fstream&gt;
+using namespace std;//这个必须加
+</code></pre>
+
+<p>输出</p>
+
+<pre><code>ofstream outfile;
+outfile.open(store_path);
+for(i=0;i&lt;size;i++){
+	outfile&lt;&lt;fReceiveBuffer[i];
+}
+outfile.close();
+</code></pre>
 
 </article> <!-- end #post__content -->
 
 <div id="post__share">
-  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/08/05/proguard.html&text=Androidstudio下的代码混淆" target="_blank"></a>
+  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/11/20/C++-jni.html&text=jni编程中C++/C语言一些问题" target="_blank"></a>
   <a id="icon-cc" class="fontello" href="http://creativecommons.org/licenses/by-nc-sa/3.0" target="_blank"></a>
-  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/08/05/proguard.html&title=Androidstudio下的代码混淆" target="_blank"></a>
+  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/11/20/C++-jni.html&title=jni编程中C++/C语言一些问题" target="_blank"></a>
 </div> <!-- end #post__share -->
 <div id="disqus_thread" name="luofeng">
   <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>

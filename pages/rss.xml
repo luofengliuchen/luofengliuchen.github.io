@@ -6,6 +6,1252 @@
     <description>落风的博客</description>
     
       <item>
+        <title>c++学习笔记</title>
+        <link>http://www.liuschen.com/2016/12/01/c++-copy.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2016/12/01/c++-copy.html</guid>
+        <pubDate>Thu, 01 Dec 2016 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;在网上看到，正好正在学习c++，摘抄下比较在意的点,方便再看&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://man.lupaworld.com/content/develop/c&amp;amp;c++/c/c.htm#_Toc520634028&quot;&gt;来源：http://man.lupaworld.com/content/develop/c&amp;amp;c++/c/c.htm#_Toc520634028&lt;/a&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;section&quot;&gt;1.引用与指针的比较&lt;/h1&gt;
+
+&lt;p&gt;引用是C++中的概念，初学者容易把引用和指针混淆一起。一下程序中，n是m的一个引用（reference），m是被引用物（referent）。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;int m;
+int &amp;amp;n = m; n相当于m的别名（绰号），对n的任何操作就是对m的操作。例如有人名叫王小毛，他的绰号是“三毛”。说“三毛”怎么怎么的，其实就是对王小毛说三道四。所以n既不是m的拷贝，也不是指向m的指针，其实n就是m它自己。 引用的一些规则如下： （1）引用被创建的同时必须被初始化（指针则可以在任何时候被初始化）。 （2）不能有NULL引用，引用必须与合法的存储单元关联（指针则可以是NULL）。 （3）一旦引用被初始化，就不能改变引用的关系（指针则可以随时改变所指的对象）。
+
+以下示例程序中，k被初始化为i的引用。语句k = j并不能将k修改成为j的引用，只是把k的值改变成为6。由于k是i的引用，所以i的值也变成了6。
+
+ int i = 5;
+int j = 6;
+int &amp;amp;k = i;
+k = j;    // k和i的值都变成了6;   
+上面的程序看起来象在玩文字游戏，没有体现出引用的价值。引用的主要功能是传递函数的参数和返回值。C++语言中，函数的参数和返回值的传递方式有三种：值传递、指针传递和引用传递。
+以下是“值传递”的示例程序。由于Func1函数体内的x是外部变量n的一份拷贝，改变x的值不会影响n, 所以n的值仍然是0。
+void Func1(int x)
+{
+	x = x + 10;
+}
+…
+int n = 0;
+Func1(n);
+cout &amp;lt;&amp;lt; “n = ” &amp;lt;&amp;lt; n &amp;lt;&amp;lt; endl;    // n = 0
+   
+以下是“指针传递”的示例程序。由于Func2函数体内的x是指向外部变量n的指针，改变该指针的内容将导致n的值改变，所以n的值成为10。
+    void Func2(int *x)
+{
+	(* x) = (* x) + 10;
+}
+…
+int n = 0;
+Func2(&amp;amp;n);
+cout &amp;lt;&amp;lt; “n = ” &amp;lt;&amp;lt; n &amp;lt;&amp;lt; endl;        // n = 10
+ 
+以下是“引用传递”的示例程序。由于Func3函数体内的x是外部变量n的引用，x和n是同一个东西，改变x等于改变n，所以n的值成为10。
+void Func3(int &amp;amp;x)
+{
+	x = x + 10;
+}
+…
+int n = 0;
+Func3(n);
+cout &amp;lt;&amp;lt; “n = ” &amp;lt;&amp;lt; n &amp;lt;&amp;lt; endl;      // n = 10
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;对比上述三个示例程序，会发现“引用传递”的性质象“指针传递”，而书写方式象“值传递”。实际上“引用”可以做的任何事情“指针”也都能够做，为什么还要“引用”这东西？&lt;br /&gt;
+答案是“用适当的工具做恰如其分的工作”。&lt;br /&gt;
+指针能够毫无约束地操作内存中的如何东西，尽管指针功能强大，但是非常危险。就象一把刀，它可以用来砍树、裁纸、修指甲、理发等等，谁敢这样用？&lt;br /&gt;
+如果的确只需要借用一下某个对象的“别名”，那么就用“引用”，而不要用“指针”，以免发生意外。比如说，某人需要一份证明，本来在文件上盖上公章的印子就行了，如果把取公章的钥匙交给他，那么他就获得了不该有的权利。&lt;/p&gt;
+
+&lt;h1 id=&quot;section-1&quot;&gt;2.指针与数组的对比&lt;/h1&gt;
+
+&lt;p&gt;C++/C程序中，指针和数组在不少地方可以相互替换着用，让人产生一种错觉，以为两者是等价的。&lt;/p&gt;
+
+&lt;p&gt;数组要么在静态存储区被创建（如全局数组），要么在栈上被创建。数组名对应着（而不是指向）一块内存，其地址与容量在生命期内保持不变，只有数组的内容可以改变。&lt;/p&gt;
+
+&lt;p&gt;指针可以随时指向任意类型的内存块，它的特征是“可变”，所以我们常用指针来操作动态内存。指针远比数组灵活，但也更危险。&lt;br /&gt;
+下面以字符串为例比较指针与数组的特性。&lt;/p&gt;
+
+&lt;p&gt;以下示例中，字符数组a的容量是6个字符，其内容为hello\0。a的内容可以改变，如a[0]= ‘X’。指针p指向常量字符串“world”（位于静态存储区，内容为world\0），常量字符串的内容是不可以被修改的。从语法上看，编译器并不觉得语句p[0]= ‘X’有什么不妥，但是该语句企图修改常量字符串的内容而导致运行错误。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;char a[] = “hello”;
+a[0] = ‘X’;
+cout &amp;lt;&amp;lt; a &amp;lt;&amp;lt; endl;
+char *p = “world”;     // 注意p指向常量字符串
+p[0] = ‘X’;             // 编译器不能发现该错误
+cout &amp;lt;&amp;lt; p &amp;lt;&amp;lt; endl;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id=&quot;section-2&quot;&gt;3.计算内存容量&lt;/h1&gt;
+
+&lt;p&gt;用运算符sizeof可以计算出数组的容量（字节数）。示例7-3-3（a）中，sizeof(a)的值是12（注意别忘了’\0’）。指针p指向a，但是sizeof(p)的值却是4。这是因为sizeof(p)得到的是一个指针变量的字节数，相当于sizeof(char*)，而不是p所指的内存容量。C++/C语言没有办法知道指针所指的内存容量，除非在申请内存时记住它。&lt;br /&gt;
+注意当数组作为函数的参数进行传递时，该数组自动退化为同类型的指针。示例中，不论数组a的容量是多少，sizeof(a)始终等于sizeof(char *)。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;char a[] = &quot;hello world&quot;;
+char *p  = a;
+cout&amp;lt;&amp;lt; sizeof(a) &amp;lt;&amp;lt; endl;   // 12字节
+cout&amp;lt;&amp;lt; sizeof(p) &amp;lt;&amp;lt; endl;   // 4字节
+计算数组和指针的内存容量
+  
+void Func(char a[100])
+{
+    cout&amp;lt;&amp;lt; sizeof(a) &amp;lt;&amp;lt; endl;   // 4字节而不是100字节
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id=&quot;section-3&quot;&gt;4.指针参数是如何传递内存的？&lt;/h1&gt;
+
+&lt;p&gt;如果函数的参数是一个指针，不要指望用该指针去申请动态内存。示例7-4-1中，Test函数的语句GetMemory(str, 200)并没有使str获得期望的内存，str依旧是NULL，为什么？&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;void GetMemory(char *p, int num)
+{
+    p = (char *)malloc(sizeof(char) * num);
+}
+void Test(void)
+{
+    char *str = NULL;
+    GetMemory(str, 100);    // str 仍然为 NULL 
+    strcpy(str, &quot;hello&quot;);   // 运行错误
+}
+示例7-4-1 试图用指针参数申请动态内存
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;毛病出在函数GetMemory中。编译器总是要为函数的每个参数制作临时副本，指针参数p的副本是 _p，编译器使 _p = p。如果函数体内的程序修改了_p的内容，就导致参数p的内容作相应的修改。这就是指针可以用作输出参数的原因。在本例中，_p申请了新的内存，只是把_p所指的内存地址改变了，但是p丝毫未变。所以函数GetMemory并不能输出任何东西。事实上，每执行一次GetMemory就会泄露一块内存，因为没有用free释放内存。&lt;br /&gt;
+如果非得要用指针参数去申请内存，那么应该改用“指向指针的指针”，见示例7-4-2。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;void GetMemory2(char **p, int num)
+{
+    *p = (char *)malloc(sizeof(char) * num);
+}
+void Test2(void)
+{
+    char *str = NULL;
+    GetMemory2(&amp;amp;str, 100);  // 注意参数是 &amp;amp;str，而不是str
+    strcpy(str, &quot;hello&quot;);  
+    cout&amp;lt;&amp;lt; str &amp;lt;&amp;lt; endl;
+    free(str); 
+}
+示例7-4-2用指向指针的指针申请动态内存
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;由于“指向指针的指针”这个概念不容易理解，我们可以用函数返回值来传递动态内存。这种方法更加简单，见示例7-4-3。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;char *GetMemory3(int num)
+{
+    char *p = (char *)malloc(sizeof(char) * num);
+    return p;
+}
+void Test3(void)
+{
+    char *str = NULL;
+    str = GetMemory3(100); 
+    strcpy(str, &quot;hello&quot;);
+    cout&amp;lt;&amp;lt; str &amp;lt;&amp;lt; endl;
+    free(str); 
+}
+示例7-4-3 用函数返回值来传递动态内存
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;用函数返回值来传递动态内存这种方法虽然好用，但是常常有人把return语句用错了。这里强调不要用return语句返回指向“栈内存”的指针，因为该内存在函数结束时自动消亡，见示例7-4-4。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;char *GetString(void)
+{
+    char p[] = &quot;hello world&quot;;
+    return p;   // 编译器将提出警告
+}
+void Test4(void)
+{
+char *str = NULL;
+str = GetString();  // str 的内容是垃圾
+cout&amp;lt;&amp;lt; str &amp;lt;&amp;lt; endl;
+}
+示例7-4-4 return语句返回指向“栈内存”的指针
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;用调试器逐步跟踪Test4，发现执行str = GetString语句后str不再是NULL指针，但是str的内容不是“hello world”而是垃圾。&lt;br /&gt;
+如果把示例7-4-4改写成示例7-4-5，会怎么样？&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;char *GetString2(void)
+{
+    char *p = &quot;hello world&quot;;
+    return p;
+}
+void Test5(void)
+{
+    char *str = NULL;
+    str = GetString2();
+    cout&amp;lt;&amp;lt; str &amp;lt;&amp;lt; endl;
+}
+示例7-4-5 return语句返回常量字符串
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;函数Test5运行虽然不会出错，但是函数GetString2的设计概念却是错误的。因为GetString2内的“hello world”是常量字符串，位于静态存储区，它在程序生命期内恒定不变。无论什么时候调用GetString2，它返回的始终是同一个“只读”的内存块。&lt;/p&gt;
+
+&lt;h1 id=&quot;section-4&quot;&gt;5.参数的缺省值&lt;/h1&gt;
+
+&lt;p&gt;有一些参数的值在每次函数调用时都相同，书写这样的语句会使人厌烦。C++语言采用参数的缺省值使书写变得简洁（在编译时，缺省值由编译器自动插入）。&lt;/p&gt;
+
+&lt;h2 id=&quot;section-5&quot;&gt;参数缺省值的使用规则：&lt;/h2&gt;
+
+&lt;h3 id=&quot;section-6&quot;&gt;5.1.参数缺省值只能出现在函数的声明中，而不能出现在定义体中。&lt;/h3&gt;
+&lt;p&gt;例如：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;void Foo(int x=0, int y=0);    // 正确，缺省值出现在函数的声明中
+ 
+void Foo(int x=0, int y=0)        // 错误，缺省值出现在函数的定义体中
+{
+…
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;为什么会这样？我想是有两个原因：一是函数的实现（定义）本来就与参数是否有缺省值无关，所以没有必要让缺省值出现在函数的定义体中。二是参数的缺省值可能会改动，显然修改函数的声明比修改函数的定义要方便。&lt;/p&gt;
+
+&lt;h3 id=&quot;section-7&quot;&gt;5.2.如果函数有多个参数，参数只能从后向前挨个儿缺省，否则将导致函数调用语句怪模怪样。&lt;/h3&gt;
+&lt;p&gt;正确的示例如下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;void Foo(int x, int y=0, int z=0);
+错误的示例如下：
+void Foo(int x=0, int y, int z=0);   
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;要注意，使用参数的缺省值并没有赋予函数新的功能，仅仅是使书写变得简洁一些。它可能会提高函数的易用性，但是也可能会降低函数的可理解性。所以我们只能适当地使用参数的缺省值，要防止使用不当产生负面效果。示例8-3-2中，不合理地使用参数的缺省值将导致重载函数output产生二义性。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;#include &amp;lt;iostream.h&amp;gt;
+void output( int x);
+void output( int x, float y=0.0);
+ 
+void output( int x)
+{
+    cout &amp;lt;&amp;lt; &quot; output int &quot; &amp;lt;&amp;lt; x &amp;lt;&amp;lt; endl ;
+}
+ 
+void output( int x, float y)
+{
+    cout &amp;lt;&amp;lt; &quot; output int &quot; &amp;lt;&amp;lt; x &amp;lt;&amp;lt; &quot; and float &quot; &amp;lt;&amp;lt; y &amp;lt;&amp;lt; endl ;
+}
+ 
+void main(void)
+{
+    int x=1;
+    float y=0.5;
+//  output(x);          // error! ambiguous call
+    output(x,y);        // output int 1 and float 0.5
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;参数的缺省值将导致重载函数产生二义性&lt;/p&gt;
+</description>
+      </item>
+    
+      <item>
+        <title>c语言微知识点</title>
+        <link>http://www.liuschen.com/2016/11/27/C++-point.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2016/11/27/C++-point.html</guid>
+        <pubDate>Sun, 27 Nov 2016 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&quot;c-new&quot;&gt;1.c++ 中如何new一个对象&lt;/h2&gt;
+
+&lt;p&gt;demo* demo0 = new demo();&lt;/p&gt;
+
+&lt;h2 id=&quot;c-&quot;&gt;2.c语言结构体.和-&amp;gt;的区别&lt;/h2&gt;
+
+&lt;p&gt;结构体变量的引用和赋值，有两种形式，一种是用符号”.”，一种是用符号”-&amp;gt;”。结构体指针变量一般用”-&amp;gt;”，非结构体指针变量，也就是一般结构体变量，一般用”.”。&lt;/p&gt;
+
+&lt;h2 id=&quot;c&quot;&gt;3.C++回调函数&lt;/h2&gt;
+
+&lt;p&gt;1.重新定义一个函数指针类型&lt;/p&gt;
+
+&lt;p&gt;typedef void(*pcb)();&lt;/p&gt;
+
+&lt;p&gt;2.将该函数指针作为函数的形参&lt;/p&gt;
+
+&lt;p&gt;virtual void getSomeThing(pcb call);&lt;/p&gt;
+
+&lt;p&gt;3.传入回掉函数&lt;/p&gt;
+
+&lt;p&gt;4.在getSomeThing中执行回调函数call()&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;void Func(char *s)；// 函数原型
+void (*pFunc) (char *);//函数指针
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&quot;section&quot;&gt;4.&amp;amp;运算符&lt;/h2&gt;
+
+&lt;p&gt;1.求址运算符&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;int *p;
+int a = 9;
+p = &amp;amp;a;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;2.引用（相当于别名,用作引用的名字不能作为其他变量别名）&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;int i = 5;
+int j = 6;
+int &amp;amp;k = i;
+k = j;
+&lt;/code&gt;&lt;/pre&gt;
+
+</description>
+      </item>
+    
+      <item>
+        <title>jni编程中C++/C语言一些问题</title>
+        <link>http://www.liuschen.com/2016/11/20/C++-jni.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2016/11/20/C++-jni.html</guid>
+        <pubDate>Sun, 20 Nov 2016 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&quot;uint8t&quot;&gt;1.uint8_t&lt;/h2&gt;
+&lt;p&gt;首先，先来看一下jni.h关于j数据类型的定义：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;#ifdef HAVE_INTTYPES_H
+# include &amp;lt;inttypes.h&amp;gt;      /* C99 */
+typedef uint8_t         jboolean;       /* unsigned 8 bits */
+typedef int8_t          jbyte;          /* signed 8 bits */
+typedef uint16_t        jchar;          /* unsigned 16 bits */
+typedef int16_t         jshort;         /* signed 16 bits */
+typedef int32_t         jint;           /* signed 32 bits */
+typedef int64_t         jlong;          /* signed 64 bits */
+typedef float           jfloat;         /* 32-bit IEEE 754 */
+typedef double          jdouble;        /* 64-bit IEEE 754 */
+#else
+typedef unsigned char   jboolean;       /* unsigned 8 bits */
+typedef signed char     jbyte;          /* signed 8 bits */
+typedef unsigned short  jchar;          /* unsigned 16 bits */
+typedef short           jshort;         /* signed 16 bits */
+typedef int             jint;           /* signed 32 bits */
+typedef long long       jlong;          /* signed 64 bits */
+typedef float           jfloat;         /* 32-bit IEEE 754 */
+typedef double          jdouble;        /* 64-bit IEEE 754 */
+#endif
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;而在inttypes.h中又有如下定义，当然不同环境可能定义略有不同&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;#if defined(_CHAR_IS_SIGNED)  
+typedef char                    int8_t;  
+#else  
+#if defined(__STDC__)  
+typedef signed char             int8_t;  
+#endif  
+#endif  
+typedef short                   int16_t;  
+typedef int                     int32_t;  
+#ifdef  _LP64  
+#define _INT64_TYPE  
+typedef long                    int64_t;  
+#else   /* _ILP32 */  
+#if defined(_LONGLONG_TYPE)  
+#define _INT64_TYPE  
+typedef long long               int64_t;  
+#endif  
+#endif  
+  
+typedef unsigned char           uint8_t;  
+typedef unsigned short          uint16_t;  
+typedef unsigned int            uint32_t;  
+#ifdef  _LP64  
+typedef unsigned long           uint64_t;  
+#else   /* _ILP32 */  
+#if defined(_LONGLONG_TYPE)  
+typedef unsigned long long      uint64_t;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;如uint8_t是unsigned char的别名，能直观的体现所表示类型的字节数，以及符号属性，在不同的环境即是所表示的数据类型不同，但是只要在inttypes.h中将这种差异处理了，程序通过调用uint8_t并不会有什么影响，因为它只表示无符号一字节的数据，方便了程序不同平台的移植。在做音视频传输时，帧的数据就是通过uint8_t数组来存储的。&lt;/p&gt;
+
+&lt;h2 id=&quot;env&quot;&gt;2.env&lt;/h2&gt;
+&lt;p&gt;注意：jni.h头文件中对于&lt;em&gt;**.c &amp;amp; **&lt;/em&gt;.cpp采用不同的定义&lt;br /&gt;
+在C的定义中,env是一个两级指针,而在C++的定义中,env是个一级指针&lt;br /&gt;
+C形式需要对env指针进行双重deferencing，而且须将env作为第一个参数传给jni函数,如进行字符串转化时：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;C++:env0-&amp;gt;GetStringUTFChars(url, NULL)
+C:(*env)-&amp;gt;GetStringUTFChars(env,url, NULL)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&quot;section&quot;&gt;3.类型转换&lt;/h2&gt;
+
+&lt;p&gt;C++ char const* 类型和字符串互相转化&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;#include&amp;lt;iostream&amp;gt;
+std::string src1(rootpath);
+std::string src2(streamName0);
+std::string dest = src1 + src2;
+char const* streamName = dest.c_str();
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&quot;cuintt&quot;&gt;4.C++将uint_t数组输出到文件&lt;/h2&gt;
+
+&lt;p&gt;头文件&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;#include &amp;lt;iostream&amp;gt;
+#include &amp;lt;fstream&amp;gt;
+using namespace std;//这个必须加
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;输出&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ofstream outfile;
+outfile.open(store_path);
+for(i=0;i&amp;lt;size;i++){
+	outfile&amp;lt;&amp;lt;fReceiveBuffer[i];
+}
+outfile.close();
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+      </item>
+    
+      <item>
+        <title>RTMP延时问题</title>
+        <link>http://www.liuschen.com/2016/11/17/RTMP.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2016/11/17/RTMP.html</guid>
+        <pubDate>Thu, 17 Nov 2016 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;用的是方案一的流媒体传输，如果只传输视频，延时非常严重。分析原因无非两个，一个是推流客户端的问题，一个是播放器的问题。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;在window上收流时发现，延时主要发生在两个函数上&lt;/p&gt;
+
+&lt;h1 id=&quot;avformatopeninput&quot;&gt;1.avformat_open_input&lt;/h1&gt;
+
+&lt;h1 id=&quot;avformatfindstreaminfo&quot;&gt;2.avformat_find_stream_info&lt;/h1&gt;
+
+&lt;p&gt;这个是用来解析流信息的，可以在之前设置这个&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ifmt_ctx-&amp;gt;probesize = 100 * 1024;
+ifmt_ctx-&amp;gt;max_analyze_duration = 5 * AV_TIME_BASE;
+
+if ((ret = avformat_find_stream_info(ifmt_ctx, 0)) &amp;lt; 0) {
+	printf( &quot;Failed to retrieve input stream information&quot;);
+	goto end;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;可以大大提高解析速度&lt;/p&gt;
+
+&lt;p&gt;其实用ffplay播放时，通过&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;-fflags nobuffer -analyzeduration 1000000
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;参数已经解决了这个问题，但是播放延迟还在，那么就有可能是客户端的问题了，之前是通过&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;	recorder = new FFmpegFrameRecorder(url, width, height, 1);
+    recorder.setVideoBitrate(2000000);
+    recorder.setVideoCodec(avcodec.AV_CODEC_ID_H264);
+    recorder.setFormat(&quot;flv&quot;);
+    recorder.setFrameRate(10);
+    recorder.setVideoOption(&quot;tune&quot;,&quot;zerolatency&quot;);
+    recorder.setVideoOption(&quot;preset&quot;,&quot;ultrafast&quot;);
+    recorder.setGopSize(GOP_LENGTH_IN_FRAMES);
+    recorder.setVideoQuality(28);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;单纯设置了视频的参数，但是通过阅读FFmpegFrameRecorder源码，发现音视频参数都设置了初始值，所以可能是默认仍然传输了音频。所以添加了&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;    recorder.setAudioBitrate(0);
+    recorder.setAudioChannels(-1);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;果然本来延时10多秒，恢复到了正常范围，延迟大约1s左右。&lt;/p&gt;
+
+</description>
+      </item>
+    
+      <item>
+        <title>ffmpeg/ffplay命令记录（转载，整理）</title>
+        <link>http://www.liuschen.com/2016/11/16/ffplay.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2016/11/16/ffplay.html</guid>
+        <pubDate>Wed, 16 Nov 2016 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;打出来的视频信息，但是没有播放，但是会输出视频帧到当前目录&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ffmpeg -i &quot;rtmp://192.168.24.142/oflaDemo/st6 live=1&quot; -f image2 -vf fps=fps=1 out%d.png
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;播放RMTP直播流&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ffplay -i &quot;rtmp://192.168.24.142/oflaDemo/st6 live=1&quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;fplay播放yuv文件命令&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ffplay -f rawvideo -video_size 1920x1080 a.yuv
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;设置播放没有缓冲区&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ffplay -x 240 -y 320 109.flv -fflags nobuffer
+
+
+ffplay -i &quot;rtmp://192.168.24.142/oflaDemo/st5 live=1&quot; -fflags nobuffer -analyzeduration 1000000
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;列出本机可用设备&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ffmpeg -list_devices true -f dshow -i dummy 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;播放本机USB摄像头捕捉数据&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ffplay -f dshow -i video=&quot;USB Camera&quot; -f dshow -i audio=&quot;音频设备&quot;
+ffplay -f vfwcap -i 0
+//设置分辨率和帧率播放
+ffplay -s 424x240 -r 5 -f dshow -i video=&quot;USB Camera&quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;将USB摄像头捕捉的数据编码成H264保存到文件&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ffmpeg -f dshow -i video=&quot;USB Camera&quot; -vcodec libx264 camera.mkv
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;将USB摄像头数据通过RTMP协议发送出去&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ffmpeg -f dshow -i video=&quot;USB Camera&quot; -vcodec libx264 -preset:v ultrafast -tune:v zerolatency -f flv rtmp://localhost/oflaDemo/livestream
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;查看设备选项&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ffmpeg -list_options true -f dshow -i video=&quot;USB Camera&quot; 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;分离视频音频流&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ffmpeg -i input_file -vcodec copy -an output_file_video　　//分离视频流
+ffmpeg -i input_file -acodec copy -vn output_file_audio　　//分离音频流
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;视频解复用&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ffmpeg –i test.mp4 –vcodec copy –an –f m4v test.264
+ffmpeg –i test.avi –vcodec copy –an –f m4v test.264
+//这个m4v是表示mp4的格式，如果是flv就需要写成flv
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;视频转码&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ffmpeg –i test.mp4 –vcodec h264 –s 352*278 –an –f m4v test.264              //转码为码流原始文件
+ffmpeg –i test.mp4 –vcodec h264 –bf 0 –g 25 –s 352*278 –an –f m4v test.264  //转码为码流原始文件
+ffmpeg –i test.avi -vcodec mpeg4 –vtag xvid –qsame test_xvid.avi            //转码为封装文件
+//-bf B帧数目控制，-g 关键帧间隔控制，-s 分辨率控制
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;视频封装&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ffmpeg –i video_file –i audio_file –vcodec copy –acodec copy output_file
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;视频剪切&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ffmpeg –i test.avi –r 1 –f image2 image-%3d.jpeg        //提取图片
+ffmpeg -ss 0:1:30 -t 0:0:20 -i input.avi -vcodec copy -acodec copy output.avi    //剪切视频
+//-r 提取图像的频率，-ss 开始时间，-t 持续时间
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;视频录制&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ffmpeg –i rtsp://192.168.3.205:5555/test –vcodec copy out.avi
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;YUV序列播放&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ffplay -f rawvideo -video_size 1920x1080 input.yuv
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;YUV序列转AVI&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ffmpeg –s w*h –pix_fmt yuv420p –i input.yuv –vcodec mpeg4 output.avi
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;采集usb摄像头视频命令：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ffmpeg -t 20 -f vfwcap -i 0 -r 8 -f mp4 cap1111.mp4
+
+具体说明如下：我们采集10秒，采集设备为vfwcap类型设备，第0个vfwcap采集设备（如果系统有多个vfw的视频采集设备，可以通过-i num来选择），每秒8帧，输出方式为文件，格式为mp4。
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;最简单的抓屏：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ffmpeg -f gdigrab -i desktop out.mpg 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;从屏幕的（10,20）点处开始，抓取640x480的屏幕，设定帧率为5 ：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ffmpeg -f gdigrab -framerate 5 -offset_x 10 -offset_y 20 -video_size 640x480 -i desktop out.mpg 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ffmpeg从视频中生成gif图片：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ffmpeg -i capx.mp4 -t 10 -s 320x240 -pix_fmt rgb24 jidu1.gif
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ffmpeg将图片转换为视频&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;指定编码，帧率和码率，图片在当前目录下需要按照自然数排序命名
+ffmpeg -f image2 -i c:\temp\d.jpg -vcodec libx264 -r 10 -b 200k  test.mp4
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;将文件当做直播送至live&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ffmpeg -re -i localFile.mp4 -c copy -f flv rtmp://server/live/streamName
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;将直播媒体保存至本地文件&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ffmpeg -i rtmp://server/live/streamName -c copy dump.flv
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;将其中一个直播流，视频改用h264压缩，音频不变，送至另外一个直播服务流&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ffmpeg -i rtmp://server/live/originalStream -c:a copy -c:v libx264 -vpre slow -f flv rtmp://server/live/h264Stream
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;将其中一个直播流，视频改用h264压缩，音频改用faac压缩，送至另外一个直播服务流&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ffmpeg -i rtmp://server/live/originalStream -c:a libfaac -ar 44100 -ab 48k -c:v libx264 -vpre slow -vpre baseline -f flv rtmp://server/live/h264Stream
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;将其中一个直播流，视频不变，音频改用faac压缩，送至另外一个直播服务流&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ffmpeg -i rtmp://server/live/originalStream -acodec libfaac -ar 44100 -ab 48k -vcodec copy -f flv rtmp://server/live/h264_AAC_Stream
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;将一个高清流，复制为几个不同视频清晰度的流重新发布，其中音频不变&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ffmpeg -re -i rtmp://server/live/high_FMLE_stream -acodec copy -vcodec x264lib -s 640×360 -b 500k -vpre medium -vpre baseline rtmp://server/live/baseline_500k -acodec copy -vcodec x264lib -s 480×272 -b 300k -vpre medium -vpre baseline rtmp://server/live/baseline_300k -acodec copy -vcodec x264lib -s 320×200 -b 150k -vpre medium -vpre baseline rtmp://server/live/baseline_150k -acodec libfaac -vn -ab 48k rtmp://server/live/audio_only_AAC_48k
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;功能一样，只是采用-x264opts选项&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ffmpeg -re -i rtmp://server/live/high_FMLE_stream -c:a copy -c:v x264lib -s 640×360 -x264opts bitrate=500:profile=baseline:preset=slow rtmp://server/live/baseline_500k -c:a copy -c:v x264lib -s 480×272 -x264opts bitrate=300:profile=baseline:preset=slow rtmp://server/live/baseline_300k -c:a copy -c:v x264lib -s 320×200 -x264opts bitrate=150:profile=baseline:preset=slow rtmp://server/live/baseline_150k -c:a libfaac -vn -b:a 48k rtmp://server/live/audio_only_AAC_48k
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;将当前摄像头及音频通过DSSHOW采集，视频h264、音频faac压缩后发布&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ffmpeg -r 25 -f dshow -s 640×480 -i video=”video source name”:audio=”audio source name” -vcodec libx264 -b 600k -vpre slow -acodec libfaac -ab 128k -f flv rtmp://server/application/stream_name
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;将一个JPG图片经过h264压缩循环输出为mp4视频&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ffmpeg.exe -i INPUT.jpg -an -vcodec libx264 -coder 1 -flags +loop -cmp +chroma -subq 10 -qcomp 0.6 -qmin 10 -qmax 51 -qdiff 4 -flags2 +dct8x8 -trellis 2 -partitions +parti8x8+parti4x4 -crf 24 -threads 0 -r 25 -g 25 -y OUTPUT.mp4
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;将普通流视频改用h264压缩，音频不变，送至高清流服务(新版本FMS live=1)&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ffmpeg -i rtmp://server/live/originalStream -c:a copy -c:v libx264 -vpre slow -f flv “rtmp://server/live/h264Stream live=1〃
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+      </item>
+    
+      <item>
+        <title>Android数据库并发操作</title>
+        <link>http://www.liuschen.com/2016/11/09/database.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2016/11/09/database.html</guid>
+        <pubDate>Wed, 09 Nov 2016 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h1 id=&quot;android-sqlite&quot;&gt;1.Android SQLite函数调用&lt;/h1&gt;
+
+&lt;p&gt;首先在SQLiteDatabase中有已经封装好的增删改查操作函数，操作简单数据自己在封装一个dao直接调用即可,操作复杂可以自定义SQL语句，但是里面都是通过SQLiteStatement来执行其对应操作。查询操作执行和其他不同，是通过SQLiteCursorDriver来找到curser的。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;查询(读):外层包装-&amp;gt;SQL语句-&amp;gt;SQLiteCursorDriver
+增删改(写)：外层包装-&amp;gt;SQL语句-&amp;gt;SQLiteStatement
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;所以可以直接如网上所说，用来SQLiteStatement写，将&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;SQLiteDatabase database = new SQLiteDatabase();  
+if (database.isOpen())   
+{  
+    database.beginTransaction();  
+    try {  
+         //sql为insert into tableName (name) values (&quot;test&quot;)  
+        database.execSQL(sql);  
+    }  
+        database.setTransactionSuccessful();  
+    } finally {  
+        database.endTransaction();  
+    }  
+    database.close();  
+} 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;改为&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;SQLiteDatabase database = new SQLiteDatabase();  
+//sql为insert into tableName (name) values (?)  
+SQLiteStatement sqlListStatment = database.compileStatement(sql);  
+if (database.isOpen())   
+{  
+    database.beginTransaction();  
+    try {  
+        //index 为1开始索引，value为入库的值  
+        //bingXXX为插入XXX类型
+         sqLiteStatement.bindString(index, value);  
+         sqLiteStatement.executeInsert();  
+    }  
+        database.setTransactionSuccessful();  
+    } finally {  
+        database.endTransaction();  
+    }  
+    database.close();
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这样性能应该会提升不少，因为SQLiteDatabase封装的时候做了一些检查操作，每一条省下的时间可能微不足道，但如果数据过万就不同了。&lt;/p&gt;
+
+&lt;h1 id=&quot;section&quot;&gt;2.事务操作&lt;/h1&gt;
+
+&lt;p&gt;Android SQL语句默认一条语句是一个事务，事务是为了保证操作的安全性，但是事务实际执行却会耗费大量资源，如果反复执行一个插入操作10000次将会相当耗时，所以在反复执行增删改操所时，一定在外层加入事务，让整个任务作为一条事务来执行。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;	db.beginTransaction();
+	try{
+		//批量写操作
+	}catch(Exception e){
+		e.printStackTrace();
+	}finally{
+		db.endTransaction();
+	}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id=&quot;sqlite-database-is-locked&quot;&gt;3.SQLite database is locked&lt;/h1&gt;
+
+&lt;p&gt;这个是由于同时操作数据库抛出的异常，数据库同一时间不能被并发访问，这一点用单例模式可以解决，SQLiteOpenHelper在多个线程创建多个对象不能同时读和写，只能同时读，但是用单例模式，单个SQLiteOpenHelper对象在不同线程可以同时读写。&lt;/p&gt;
+
+&lt;p&gt;关于SQLiteOpenHelper用单例在不同线程同时执行读写，写写操作，我做了一些测试，发现数据库的访问是顺序执行的，两个线程同时进行写操作，先执行的会先操作，另一个线程就阻塞了，等到先执行的操作完成，另一个线程才开始操作。&lt;/p&gt;
+
+</description>
+      </item>
+    
+      <item>
+        <title>SDL&android</title>
+        <link>http://www.liuschen.com/2016/11/06/sdl.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2016/11/06/sdl.html</guid>
+        <pubDate>Sun, 06 Nov 2016 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
+
+  &lt;p&gt;下载SDL:&lt;a href=&quot;http://www.libsdl.org/download-2.0.php&quot;&gt;http://www.libsdl.org/download-2.0.php&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h1 id=&quot;jnisdl&quot;&gt;1.通过jni编译SDL&lt;/h1&gt;
+
+&lt;p&gt;解压下载的SDL文件&lt;/p&gt;
+
+&lt;p&gt;将目录下的include，src文件夹以及Android.mk文件分别移动到jni目录下，执行ndk-build&lt;/p&gt;
+
+&lt;p&gt;我用的版本是2.0.5,编译会出现如下错误：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[armeabi] Compile thumb  : SDL2 &amp;lt;= SDL_render_gles.c
+[armeabi] Compile thumb  : SDL2 &amp;lt;= SDL_render_gles2.c
+D:/project/AndroidSDL/app/src/main/jni/src/render/opengles2/SDL_gles2funcs.h: In function &#39;GLES2_LoadFunctions&#39;:
+D:/project/AndroidSDL/app/src/main/jni/src/render/opengles2/SDL_render_gles2.c:294:45: warning: assignment from incompatible pointer type [enabled by default]
+ #define SDL_PROC(ret,func,params) data-&amp;gt;func=func;
+                                             ^
+D:/project/AndroidSDL/app/src/main/jni/src/render/opengles2/SDL_gles2funcs.h:56:1: note: in expansion of macro &#39;SDL_PROC&#39;
+ SDL_PROC(void, glShaderSource, (GLuint, GLsizei, const GLchar* const*, const GLint *))
+ ^
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;具体原因没有分析，但是改用2.0.3后，编译通过(&lt;a href=&quot;http://hg.libsdl.org/SDL&quot;&gt;历史下载列表&lt;/a&gt;)。&lt;/p&gt;
+
+&lt;p&gt;编译出so文件后,又将目录下的AndroidProject中的Activity移动到了项目下（路径名也要一致，因为在c中有映射，改那个太麻烦），运行工程，再次出错&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;JNI DETECTED ERROR IN APPLICATION: JNI GetStaticMethodID called with pending exception &#39;java.lang.NoSuchMethodError&#39; thrown in int org.libsdl.app.SDLActivity.nativeInit(java.lang.Object):-2
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65]     in call to GetStaticMethodID
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65]     from int org.libsdl.app.SDLActivity.nativeInit(java.lang.Object)
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65] &quot;SDLThread&quot; prio=5 tid=19 Runnable
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65]   | group=&quot;main&quot; sCount=0 dsCount=0 obj=0x12d884c0 self=0xab66f138
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65]   | sysTid=22530 nice=0 cgrp=default sched=0/0 handle=0xab66f768
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65]   | state=R schedstat=( 823907 204323 7 ) utm=0 stm=0 core=6 HZ=100
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65]   | stack=0xe4a25000-0xe4a27000 stackSize=1036KB
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65]   | held mutexes= &quot;mutator lock&quot;(shared held)
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65]   native: #00 pc 000049f4  /system/lib/libbacktrace_libc++.so (_ZN13UnwindCurrent6UnwindEjP8ucontext+23)
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65]   native: #01 pc 000030cd  /system/lib/libbacktrace_libc++.so (_ZN9Backtrace6UnwindEjP8ucontext+8)
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65]   native: #02 pc 002481c5  /system/lib/libart.so (_ZN3art15DumpNativeStackERNSt3__113basic_ostreamIcNS0_11char_traitsIcEEEEiPKcPNS_6mirror9ArtMethodE+68)
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65]   native: #03 pc 0022bf1d  /system/lib/libart.so (_ZNK3art6Thread4DumpERNSt3__113basic_ostreamIcNS1_11char_traitsIcEEEE+144)
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65]   native: #04 pc 000b0c53  /system/lib/libart.so (_ZN3artL8JniAbortEPKcS1_+582)
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65]   native: #05 pc 000b1389  /system/lib/libart.so (_ZN3art9JniAbortFEPKcS1_z+60)
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65]   native: #06 pc 000b44cb  /system/lib/libart.so (_ZN3art11ScopedCheckC2EP7_JNIEnviPKc+1286)
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65]   native: #07 pc 000b6793  /system/lib/libart.so (_ZN3art8CheckJNI17GetStaticMethodIDEP7_JNIEnvP7_jclassPKcS6_+26)
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65]   native: #08 pc 00042707  /data/app/ketr.com.androidsdl-1/lib/arm/libSDL2.so (SDL_Android_Init+106)
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65]   native: #09 pc 0000116f  /data/app/ketr.com.androidsdl-1/lib/arm/libSDL2main.so (Java_org_libsdl_app_SDLActivity_nativeInit+2)
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65]   native: #10 pc 0002d319  /data/data/ketr.com.androidsdl/cache/slice-slice_5-classes.dex (Java_org_libsdl_app_SDLActivity_nativeInit__Ljava_lang_Object_2+100)
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65]   at org.libsdl.app.SDLActivity.nativeInit(Native method)
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65]   at org.libsdl.app.SDLMain.run(SDLActivity.java:1028)
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65]   at java.lang.Thread.run(Thread.java:818)
+11-08 13:52:18.681 22508-22530/? A/art: art/runtime/check_jni.cc:65] 
+11-08 13:52:18.701 22508-22530/? A/libc: Fatal signal 11 (SIGSEGV), code 1, fault addr 0x1d in tid 22530 (SDLThread)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这个问题是由于jni对java的调用找不到方法导致的，c函数调用Java时，在core/android里面的实现出了问题，里面的函数还用了一些define别名，以及extern C_LINKAGE 来引用一些函数，最后发现调用流程是：&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;SDLActivity里面调用init的本地方法；&lt;/li&gt;
+  &lt;li&gt;init方法的实现是在main/Android文件夹里SDL_Android_main.c里；&lt;/li&gt;
+  &lt;li&gt;init方法里面调用了core/android里面的方法初始化了，这个初始化的方法调用的是Android的Java代码；&lt;/li&gt;
+  &lt;li&gt;接着又调用了SDL_main方法，这个方式是main方法的别名define定义的；&lt;/li&gt;
+  &lt;li&gt;这个main方法就是自己写的主函数&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;也就是说，SDL最终还是调用的Android里面的方法，就变成了这样：&lt;/p&gt;
+
+&lt;p&gt;Android播放器实现（java）——&amp;gt;调用SDL本地方法——&amp;gt;调用java方法——&amp;gt;调用本地引擎方法&lt;/p&gt;
+
+&lt;p&gt;有点拐弯抹角，实现起来并不经济，SDL只是为了跨平台而实现的一层框架，并且里面对于Android中Java方法的相互调用，方法名写的比较死，耦合太大，随着版本的升级也要不断改动，如果不需要跨平台，就完全没用。&lt;/p&gt;
+
+&lt;p&gt;PS:通过javah生成头文件&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;app\build\intermediates\classes\debug&amp;gt;javah -jni org.libsdl.app.SDLActivity
+错误: 无法访问android.app.Activity
+  找不到android.app.Activity的类文件
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;将目录切换到源文件src目录下执行，能正常生成头文件&lt;/p&gt;
+
+</description>
+      </item>
+    
+      <item>
+        <title>live555初探-修改live555当前工作目录</title>
+        <link>http://www.liuschen.com/2016/10/30/live555-dir.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2016/10/30/live555-dir.html</guid>
+        <pubDate>Sun, 30 Oct 2016 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;我的live555是在virtualstudio上编译的，但是修改工作目录却是为了移植Android平台的便利。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h1 id=&quot;section&quot;&gt;1.输出&lt;/h1&gt;
+&lt;p&gt;virtualStudio不太熟悉，所以调试live555也没用里面的工具，老办法，在代码里面输出内容来跟踪代码执行。&lt;/p&gt;
+
+&lt;p&gt;live555是通过UsageEnvironment来执行输出到屏幕的，live555MediaServer里面就可以看到&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;*env &amp;lt;&amp;lt; &quot;Play streams from this server using the URL\n\t&quot;
+   &amp;lt;&amp;lt; urlPrefix &amp;lt;&amp;lt; &quot;&amp;lt;filename&amp;gt;\nwhere &amp;lt;filename&amp;gt; is a file present in the current directory.\n&quot;;
+  	*env &amp;lt;&amp;lt; &quot;Each file&#39;s type is inferred from its name suffix:\n&quot;;
+  	*env &amp;lt;&amp;lt; &quot;\t\&quot;.264\&quot; =&amp;gt; a H.264 Video Elementary Stream file\n&quot;;
+  	*env &amp;lt;&amp;lt; &quot;\t\&quot;.265\&quot; =&amp;gt; a H.265 Video Elementary Stream file\n&quot;;
+  	*env &amp;lt;&amp;lt; &quot;\t\&quot;.aac\&quot; =&amp;gt; an AAC Audio (ADTS format) file\n&quot;;
+ 	 *env &amp;lt;&amp;lt; &quot;\t\&quot;.ac3\&quot; =&amp;gt; an AC-3 Audio file\n&quot;;
+ 	 *env &amp;lt;&amp;lt; &quot;\t\&quot;.amr\&quot; =&amp;gt; an AMR Audio file\n&quot;;
+  	*env &amp;lt;&amp;lt; &quot;\t\&quot;.dv\&quot; =&amp;gt; a DV Video file\n&quot;;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;而在直接找不到env时，可以用envir()来输出，envir()是Medium基类的成员函数，许多类都继承于它，返回的也是UsageEnvironment的对象&lt;/p&gt;
+
+&lt;h1 id=&quot;section-1&quot;&gt;2.查找-修改&lt;/h1&gt;
+
+&lt;p&gt;如果要修改工作目录，也就是存放音视频的目录，首先需要找出打开文件的操作fopen，全局搜索fopen,总共有三处调用&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;OuputFile.cpp&lt;/li&gt;
+  &lt;li&gt;InputFile,cpp&lt;/li&gt;
+  &lt;li&gt;DynamicRTSPServer.cpp&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;在每次打开文件前都做好输出标记，发现如果通过rtsp请求服务器文件，是只经过DynamicRTSPServer.cpp的,那么就在打开文件操作前添加如下代码：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;char const* rootpath = &quot;自定义的根目录&quot;;
+
+envir() &amp;lt;&amp;lt; &quot;beforefilepath&quot; &amp;lt;&amp;lt; streamName0&amp;lt;&amp;lt;&quot;\n&quot;;
+
+std::string src1(rootpath);
+//streamName0：函数参数由streamName改为streamName0
+std::string src2(streamName0);
+std::string dest = src1 + src2;
+char const* streamName;
+//因为该函数不只被调用一次，不加判断的话，根可能被重复添加
+if (strstr(streamName0,rootpath)) {
+	streamName = streamName0;
+}
+else {
+	streamName = dest.c_str();
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;还要添加头文件iostream&lt;/p&gt;
+
+&lt;h1 id=&quot;section-2&quot;&gt;3.进一步修改&lt;/h1&gt;
+
+&lt;p&gt;在RTSPServer.hh中添加声明&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;char const* root_path;
+void setRootPath(char const* rootpath);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;RTSPServer.cpp中添加实现&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;void RTSPServer::setRootPath(char const* rootpath) {
+	root_path = rootpath;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;然后，将子项目mediaServer设为启动项目，重新编译。&lt;/p&gt;
+
+&lt;p&gt;将以上代码中&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;char const* rootpath = &quot;自定义的根目录&quot;;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;改为&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;char const* rootpath = RTSPServer::root_path;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;此时可以在live555MediaServer.cpp中直接设置工作目录了：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;rtspServer-&amp;gt;setRootPath(&quot;D:/music/&quot;);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;将修改移动到Android的ndk下编译，可能会出现找不到iostream的错误，需要在Application.mk下添加，加入静态库支持：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;APP_STL := stlport_static
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;通过Live555MedaiServer新建流媒体服务对象时,其中代码如下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;portNumBits rtspServerPortNum = 554;
+   	rtspServer = DynamicRTSPServer::createNew(*env, rtspServerPortNum, authDB);
+if (rtspServer == NULL) {
+ rtspServerPortNum = 8554;
+ rtspServer = DynamicRTSPServer::createNew(*env, rtspServerPortNum, authDB);
+   	}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;第一次会设置554为访问端口，不成功会改设8554，在Android端曾出现访问不成功，最后发现端口被设成了8554，访问这个端口是需要在地址中具体指明的。&lt;/p&gt;
+</description>
+      </item>
+    
+      <item>
+        <title>live555 window下编译运行以及Android平台的移植</title>
+        <link>http://www.liuschen.com/2016/10/29/live555-android.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2016/10/29/live555-android.html</guid>
+        <pubDate>Sat, 29 Oct 2016 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;live555是一个开源的多媒体直播框架,代码是用c++写的,主要用到的直播协议是RTSP，在以下地址中可以直接下载到源码&lt;a href=&quot;http://www.live555.com/liveMedia/public/&quot;&gt;http://www.live555.com/liveMedia/public/&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h1 id=&quot;window&quot;&gt;1.window平台的编译&lt;/h1&gt;
+
+&lt;h2 id=&quot;httpblogcsdnnethjl240articledetails48159243httpblogcsdnnethjl240articledetails48159243&quot;&gt;参考地址：&lt;a href=&quot;http://blog.csdn.net/hjl240/article/details/48159243&quot;&gt;http://blog.csdn.net/hjl240/article/details/48159243&lt;/a&gt;&lt;/h2&gt;
+
+&lt;p&gt;在编译的过程中遇到了两个问题，一个是以上博客中提到的，以下单独摘出：&lt;/p&gt;
+
+&lt;h3 id=&quot;section&quot;&gt;错误 1&lt;/h3&gt;
+
+ 	error C4996: ‘_snprintf’:This function or variable may be unsafe. Consider using _snprintf_s instead. Todisable deprecation, use _CRT_SECURE_NO_WARNINGS.&lt;br /&gt;
+
+&lt;p&gt;错误是说 使用这个_snprintf函数不安全。&lt;/p&gt;
+
+&lt;p&gt;解决这个错误的方法是更改预处理定义：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;项目-&amp;gt;属性-&amp;gt;配置属性-&amp;gt;C/C++ -&amp;gt;预处理器 -&amp;gt; 预处理器定义
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;增加： _CRT_SECURE_NO_DEPRECATE&lt;/p&gt;
+
+&lt;h3 id=&quot;section-1&quot;&gt;错误 2&lt;/h3&gt;
+
+&lt;p&gt;说是一些方法过时了，编译不通过，我用的是一个相对简单的方法:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;项目-&amp;gt;属性-&amp;gt;配置属性-&amp;gt;C/C++ -&amp;gt;常规-&amp;gt;SDL检查 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;改为‘否’就好了&lt;/p&gt;
+
+&lt;h1 id=&quot;android&quot;&gt;2.Android平台的移植&lt;/h1&gt;
+
+&lt;p&gt;熟悉在Androidstudio下jni开发就知道首先在main目录下建一个jni目录，将live555源码中的BaseUsageEnvironment,groupsock,liveMedia,mediaServer和UsageEnvironment文件夹分别拷贝到里面，然后再文件夹下建立一个Android.mk文件&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;LOCAL_PATH := $(call my-dir)
+
+include $(CLEAR_VARS)
+
+LOCAL_MODULE := liblive555
+
+LOCAL_ARM_MODE := arm
+
+LOCAL_PRELINK_MODULE := false
+
+LOCAL_CPPFLAGS := \
+	-DNULL=0 -DSOCKLEN_T=socklen_t -DNO_SSTREAM -DBSD=1 -DNO_SSTREAM -fexceptions -DANDROID -DXLOCALE_NOT_USED
+
+LOCAL_C_INCLUDES := \
+$(LOCAL_PATH) \
+$(LOCAL_PATH)/BasicUsageEnvironment/include \
+$(LOCAL_PATH)/BasicUsageEnvironment \
+$(LOCAL_PATH)/UsageEnvironment/include \
+$(LOCAL_PATH)/UsageEnvironment \
+$(LOCAL_PATH)/groupsock/include \
+$(LOCAL_PATH)/groupsock \
+$(LOCAL_PATH)/liveMedia/include \
+$(LOCAL_PATH)/liveMedia \
+
+LOCAL_MODULE_TAGS := optional
+
+LOCAL_SRC_FILES := \
+BasicUsageEnvironment/BasicHashTable.cpp  \
+BasicUsageEnvironment/BasicTaskScheduler.cpp  \
+BasicUsageEnvironment/BasicTaskScheduler0.cpp  \
+BasicUsageEnvironment/BasicUsageEnvironment.cpp  \
+BasicUsageEnvironment/BasicUsageEnvironment0.cpp  \
+BasicUsageEnvironment/DelayQueue.cpp  \
+groupsock/GroupEId.cpp  \
+groupsock/Groupsock.cpp  \
+groupsock/GroupsockHelper.cpp  \
+groupsock/inet.c  \
+groupsock/IOHandlers.cpp  \
+groupsock/NetAddress.cpp  \
+groupsock/NetInterface.cpp  \
+liveMedia/AC3AudioFileServerMediaSubsession.cpp  \
+liveMedia/AC3AudioRTPSink.cpp  \
+liveMedia/AC3AudioRTPSource.cpp  \
+liveMedia/AC3AudioStreamFramer.cpp  \
+liveMedia/ADTSAudioFileServerMediaSubsession.cpp  \
+liveMedia/ADTSAudioFileSource.cpp  \
+liveMedia/AMRAudioFileServerMediaSubsession.cpp  \
+liveMedia/AMRAudioFileSink.cpp  \
+liveMedia/AMRAudioFileSource.cpp  \
+liveMedia/AMRAudioRTPSink.cpp  \
+liveMedia/AMRAudioRTPSource.cpp  \
+liveMedia/AMRAudioSource.cpp  \
+liveMedia/AudioInputDevice.cpp  \
+liveMedia/AudioRTPSink.cpp  \
+liveMedia/AVIFileSink.cpp  \
+liveMedia/Base64.cpp  \
+liveMedia/BasicUDPSink.cpp  \
+liveMedia/BasicUDPSource.cpp  \
+liveMedia/BitVector.cpp  \
+liveMedia/ByteStreamFileSource.cpp  \
+liveMedia/ByteStreamMemoryBufferSource.cpp  \
+liveMedia/ByteStreamMultiFileSource.cpp  \
+liveMedia/DeviceSource.cpp  \
+liveMedia/DigestAuthentication.cpp  \
+liveMedia/DVVideoFileServerMediaSubsession.cpp  \
+liveMedia/DVVideoRTPSink.cpp  \
+liveMedia/DVVideoRTPSource.cpp  \
+liveMedia/DVVideoStreamFramer.cpp  \
+liveMedia/EBMLNumber.cpp  \
+liveMedia/FileServerMediaSubsession.cpp  \
+liveMedia/FileSink.cpp  \
+liveMedia/FramedFileSource.cpp  \
+liveMedia/FramedFilter.cpp  \
+liveMedia/FramedSource.cpp  \
+liveMedia/GenericMediaServer.cpp  \
+liveMedia/GSMAudioRTPSink.cpp  \
+liveMedia/H261VideoRTPSource.cpp  \
+liveMedia/H263plusVideoFileServerMediaSubsession.cpp  \
+liveMedia/H263plusVideoRTPSink.cpp  \
+liveMedia/H263plusVideoRTPSource.cpp  \
+liveMedia/H263plusVideoStreamFramer.cpp  \
+liveMedia/H263plusVideoStreamParser.cpp  \
+liveMedia/H264or5VideoFileSink.cpp  \
+liveMedia/H264or5VideoRTPSink.cpp  \
+liveMedia/H264or5VideoStreamDiscreteFramer.cpp  \
+liveMedia/H264or5VideoStreamFramer.cpp  \
+liveMedia/H264VideoFileServerMediaSubsession.cpp  \
+liveMedia/H264VideoFileSink.cpp  \
+liveMedia/H264VideoRTPSink.cpp  \
+liveMedia/H264VideoRTPSource.cpp  \
+liveMedia/H264VideoStreamDiscreteFramer.cpp  \
+liveMedia/H264VideoStreamFramer.cpp  \
+liveMedia/H265VideoFileServerMediaSubsession.cpp  \
+liveMedia/H265VideoFileSink.cpp  \
+liveMedia/H265VideoRTPSink.cpp  \
+liveMedia/H265VideoRTPSource.cpp  \
+liveMedia/H265VideoStreamDiscreteFramer.cpp  \
+liveMedia/H265VideoStreamFramer.cpp  \
+liveMedia/InputFile.cpp  \
+liveMedia/JPEGVideoRTPSink.cpp  \
+liveMedia/JPEGVideoRTPSource.cpp  \
+liveMedia/JPEGVideoSource.cpp  \
+liveMedia/Locale.cpp  \
+liveMedia/MatroskaDemuxedTrack.cpp  \
+liveMedia/MatroskaFile.cpp  \
+liveMedia/MatroskaFileParser.cpp  \
+liveMedia/MatroskaFileServerDemux.cpp  \
+liveMedia/MatroskaFileServerMediaSubsession.cpp  \
+liveMedia/Media.cpp  \
+liveMedia/MediaSession.cpp  \
+liveMedia/MediaSink.cpp  \
+liveMedia/MediaSource.cpp  \
+liveMedia/MP3ADU.cpp  \
+liveMedia/MP3ADUdescriptor.cpp  \
+liveMedia/MP3ADUinterleaving.cpp  \
+liveMedia/MP3ADURTPSink.cpp  \
+liveMedia/MP3ADURTPSource.cpp  \
+liveMedia/MP3ADUTranscoder.cpp  \
+liveMedia/MP3AudioFileServerMediaSubsession.cpp  \
+liveMedia/MP3AudioMatroskaFileServerMediaSubsession.cpp  \
+liveMedia/MP3FileSource.cpp  \
+liveMedia/MP3Internals.cpp  \
+liveMedia/MP3InternalsHuffman.cpp  \
+liveMedia/MP3InternalsHuffmanTable.cpp  \
+liveMedia/MP3StreamState.cpp  \
+liveMedia/MP3Transcoder.cpp  \
+liveMedia/MPEG1or2AudioRTPSink.cpp  \
+liveMedia/MPEG1or2AudioRTPSource.cpp  \
+liveMedia/MPEG1or2AudioStreamFramer.cpp  \
+liveMedia/MPEG1or2Demux.cpp  \
+liveMedia/MPEG1or2DemuxedElementaryStream.cpp  \
+liveMedia/MPEG1or2DemuxedServerMediaSubsession.cpp  \
+liveMedia/MPEG1or2FileServerDemux.cpp  \
+liveMedia/MPEG1or2VideoFileServerMediaSubsession.cpp  \
+liveMedia/MPEG1or2VideoRTPSink.cpp  \
+liveMedia/MPEG1or2VideoRTPSource.cpp  \
+liveMedia/MPEG1or2VideoStreamDiscreteFramer.cpp  \
+liveMedia/MPEG1or2VideoStreamFramer.cpp  \
+liveMedia/MPEG2IndexFromTransportStream.cpp  \
+liveMedia/MPEG2TransportFileServerMediaSubsession.cpp  \
+liveMedia/MPEG2TransportStreamAccumulator.cpp  \
+liveMedia/MPEG2TransportStreamFramer.cpp  \
+liveMedia/MPEG2TransportStreamFromESSource.cpp  \
+liveMedia/MPEG2TransportStreamFromPESSource.cpp  \
+liveMedia/MPEG2TransportStreamIndexFile.cpp  \
+liveMedia/MPEG2TransportStreamMultiplexor.cpp  \
+liveMedia/MPEG2TransportStreamTrickModeFilter.cpp  \
+liveMedia/MPEG2TransportUDPServerMediaSubsession.cpp  \
+liveMedia/MPEG4ESVideoRTPSink.cpp  \
+liveMedia/MPEG4ESVideoRTPSource.cpp  \
+liveMedia/MPEG4GenericRTPSink.cpp  \
+liveMedia/MPEG4GenericRTPSource.cpp  \
+liveMedia/MPEG4LATMAudioRTPSink.cpp  \
+liveMedia/MPEG4LATMAudioRTPSource.cpp  \
+liveMedia/MPEG4VideoFileServerMediaSubsession.cpp  \
+liveMedia/MPEG4VideoStreamDiscreteFramer.cpp  \
+liveMedia/MPEG4VideoStreamFramer.cpp  \
+liveMedia/MPEGVideoStreamFramer.cpp  \
+liveMedia/MPEGVideoStreamParser.cpp  \
+liveMedia/MultiFramedRTPSink.cpp  \
+liveMedia/MultiFramedRTPSource.cpp  \
+liveMedia/OggDemuxedTrack.cpp  \
+liveMedia/OggFile.cpp  \
+liveMedia/OggFileParser.cpp  \
+liveMedia/OggFileServerDemux.cpp  \
+liveMedia/OggFileServerMediaSubsession.cpp  \
+liveMedia/OggFileSink.cpp  \
+liveMedia/OnDemandServerMediaSubsession.cpp  \
+liveMedia/ourMD5.cpp  \
+liveMedia/OutputFile.cpp  \
+liveMedia/PassiveServerMediaSubsession.cpp  \
+liveMedia/ProxyServerMediaSession.cpp  \
+liveMedia/QCELPAudioRTPSource.cpp  \
+liveMedia/QuickTimeFileSink.cpp  \
+liveMedia/QuickTimeGenericRTPSource.cpp  \
+liveMedia/RTCP.cpp  \
+liveMedia/rtcp_from_spec.c  \
+liveMedia/RTPInterface.cpp  \
+liveMedia/RTPSink.cpp  \
+liveMedia/RTPSource.cpp  \
+liveMedia/RTSPClient.cpp  \
+liveMedia/RTSPCommon.cpp  \
+liveMedia/RTSPRegisterSender.cpp  \
+liveMedia/RTSPServer.cpp  \
+liveMedia/RTSPServerRegister.cpp  \
+liveMedia/RTSPServerSupportingHTTPStreaming.cpp  \
+liveMedia/ServerMediaSession.cpp  \
+liveMedia/SimpleRTPSink.cpp  \
+liveMedia/SimpleRTPSource.cpp  \
+liveMedia/SIPClient.cpp  \
+liveMedia/StreamParser.cpp  \
+liveMedia/StreamReplicator.cpp  \
+liveMedia/T140TextRTPSink.cpp  \
+liveMedia/TCPStreamSink.cpp  \
+liveMedia/TextRTPSink.cpp  \
+liveMedia/TheoraVideoRTPSink.cpp  \
+liveMedia/TheoraVideoRTPSource.cpp  \
+liveMedia/uLawAudioFilter.cpp  \
+liveMedia/VideoRTPSink.cpp  \
+liveMedia/VorbisAudioRTPSink.cpp  \
+liveMedia/VorbisAudioRTPSource.cpp  \
+liveMedia/VP8VideoRTPSink.cpp  \
+liveMedia/VP8VideoRTPSource.cpp  \
+liveMedia/VP9VideoRTPSink.cpp  \
+liveMedia/VP9VideoRTPSource.cpp  \
+liveMedia/WAVAudioFileServerMediaSubsession.cpp  \
+liveMedia/WAVAudioFileSource.cpp  \
+mediaServer/DynamicRTSPServer.cpp  \
+mediaServer/live555MediaServer.cpp  \
+UsageEnvironment/HashTable.cpp  \
+UsageEnvironment/strDup.cpp  \
+UsageEnvironment/UsageEnvironment.cpp  \
+
+
+
+include $(BUILD_SHARED_LIBRARY)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;其中LOCAL_SRC_FILES的下面的一堆值可能会有问题，根据版本的不同类名也会有增删变化，所以如果不行，可以用下面代码自己生成，然后将生成的文件内容替换LOCAL_SRC_FILES的值:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;public class CreateLive555Index {
+
+public static void main(String[] args) {
+	File file =  new File(&quot;D:/project/AndroidSDL/app/src/main/jni&quot;);
+	File outFile = new File(&quot;D:/project/AndroidSDL/app/src/main/jni/output.txt&quot;);
+	try {
+		PrintStream ps = new PrintStream(outFile);
+		createDirIndex(file,ps,&quot;&quot;);
+		ps.flush();
+		ps.close();
+	} catch (FileNotFoundException e) {
+		e.printStackTrace();
+	}
+	
+}
+
+private static void createDirIndex(File file,PrintStream ps,String outputPath){
+	File[] files = file.listFiles();
+	for(File f : files){
+		if(f.isDirectory()){
+			System.out.println(outputPath+f.getName()+&quot;/---------------------------&quot;);
+			createDirIndex(f,ps,outputPath+f.getName()+&quot;/&quot;);
+		}else{
+			if(f.getName().endsWith(&quot;.cpp&quot;) || f.getName().endsWith(&quot;.c&quot;)){
+				System.out.println(outputPath);
+				ps.append(outputPath + f.getName() + &quot;  \\\r\n&quot;);
+			}
+		}
+	}
+}
+
+
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;然后只需要在jni目录下执行ndk-build即可编译&lt;/p&gt;
+</description>
+      </item>
+    
+      <item>
         <title>red5流媒体服务器的搭建以及Tomcat上的集成</title>
         <link>http://www.liuschen.com/2016/10/27/red5.html</link>
         <guid isPermaLink="true">http://www.liuschen.com/2016/10/27/red5.html</guid>
@@ -105,10 +1351,21 @@
 	compile group: &#39;org.bytedeco.javacpp-presets&#39;, name: &#39;opencv&#39;, version: &#39;3.0.0-1.1&#39;, classifier: &#39;android-arm&#39;
 	compile group: &#39;org.bytedeco.javacpp-presets&#39;, name: &#39;opencv&#39;, version: &#39;3.0.0-1.1&#39;, classifier: &#39;android-x86&#39;
 	compile group: &#39;org.bytedeco.javacpp-presets&#39;, name: &#39;ffmpeg&#39;, version: &#39;2.8.1-1.1&#39;, classifier: &#39;android-arm&#39;
-	compile group: &#39;org.bytedeco.javacpp-presets&#39;, name: &#39;ffmpeg&#39;, version: &#39;2.8.1-1.1&#39;, classifier: &#39;android-x86&#39; }
+	compile group: &#39;org.bytedeco.javacpp-presets&#39;, name: &#39;ffmpeg&#39;, version: &#39;2.8.1-1.1&#39;, classifier: &#39;android-x86&#39;
+}
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;尤其是最后面的几项，项目里面用到了FFMPEG，但是却没有任何外部c或.so库的引用，那么就是说这些库包含在了这些Android官方提供的这些引用里面。&lt;/p&gt;
+
+&lt;p&gt;同时，需要在gradle中的Android下加入&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;packagingOptions {
+    exclude &#39;META-INF/maven/org.bytedeco.javacpp-presets/opencv/pom.properties&#39;
+    exclude &#39;META-INF/maven/org.bytedeco.javacpp-presets/opencv/pom.xml&#39;
+    exclude &#39;META-INF/maven/org.bytedeco.javacpp-presets/ffmpeg/pom.properties&#39;
+    exclude &#39;META-INF/maven/org.bytedeco.javacpp-presets/ffmpeg/pom.xml&#39;
+}
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;通过之上的引用，在代码中用到的内容主要如下:&lt;/p&gt;
 
@@ -1286,668 +2543,6 @@ public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exc
 	ctx.fireUserEventTriggered(evt);
 }
 &lt;/code&gt;&lt;/pre&gt;
-</description>
-      </item>
-    
-      <item>
-        <title>android svg动画</title>
-        <link>http://www.liuschen.com/2016/08/12/AndroidSVG.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2016/08/12/AndroidSVG.html</guid>
-        <pubDate>Fri, 12 Aug 2016 00:00:00 +0800</pubDate>
-        <description>&lt;p&gt;用过矢量绘图的人都应该知道svg是一种矢量图的格式，内容如下：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&amp;gt;
-&amp;lt;!-- Generator: Adobe Illustrator 19.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  --&amp;gt;
-&amp;lt;svg version=&quot;1.1&quot; id=&quot;图层_1&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot; xmlns:xlink=&quot;http://www.w3.org/1999/xlink&quot; x=&quot;0px&quot; y=&quot;0px&quot;
-	 viewBox=&quot;0 0 595.3 841.9&quot; style=&quot;enable-background:new 0 0 595.3 841.9;&quot; xml:space=&quot;preserve&quot;&amp;gt;
-&amp;lt;style type=&quot;text/css&quot;&amp;gt;
-	.st0{fill:none;stroke:#000000;stroke-miterlimit:10;}
-	.st1{fill:url(#XMLID_18_);stroke:#131320;stroke-miterlimit:10;}
-	.st2{fill:#E21B15;stroke:#131320;stroke-miterlimit:10;}
-	.st3{fill:none;stroke:#131320;stroke-miterlimit:10;}
-&amp;lt;/style&amp;gt;
-&amp;lt;line id=&quot;XMLID_1_&quot; class=&quot;st0&quot; x1=&quot;133.3&quot; y1=&quot;145.4&quot; x2=&quot;54.7&quot; y2=&quot;344.4&quot;/&amp;gt;
-&amp;lt;line id=&quot;XMLID_2_&quot; class=&quot;st0&quot; x1=&quot;183.3&quot; y1=&quot;393.4&quot; x2=&quot;297.6&quot; y2=&quot;448.5&quot;/&amp;gt;
-&amp;lt;line id=&quot;XMLID_3_&quot; class=&quot;st0&quot; x1=&quot;268&quot; y1=&quot;203.6&quot; x2=&quot;159.8&quot; y2=&quot;274&quot;/&amp;gt;
-&amp;lt;line id=&quot;XMLID_4_&quot; class=&quot;st0&quot; x1=&quot;94&quot; y1=&quot;444.4&quot; x2=&quot;202.7&quot; y2=&quot;626.1&quot;/&amp;gt;
-&amp;lt;line id=&quot;XMLID_5_&quot; class=&quot;st0&quot; x1=&quot;426.2&quot; y1=&quot;256.7&quot; x2=&quot;240.5&quot; y2=&quot;330.1&quot;/&amp;gt;
-&amp;lt;line id=&quot;XMLID_6_&quot; class=&quot;st0&quot; x1=&quot;285.3&quot; y1=&quot;368.9&quot; x2=&quot;437.4&quot; y2=&quot;420.9&quot;/&amp;gt;
-&amp;lt;line id=&quot;XMLID_7_&quot; class=&quot;st0&quot; x1=&quot;437.4&quot; y1=&quot;256.7&quot; x2=&quot;589.4&quot; y2=&quot;308.7&quot;/&amp;gt;
-&amp;lt;line id=&quot;XMLID_8_&quot; class=&quot;st0&quot; x1=&quot;589.4&quot; y1=&quot;308.7&quot; x2=&quot;461.9&quot; y2=&quot;421&quot;/&amp;gt;
-&amp;lt;linearGradient id=&quot;XMLID_18_&quot; gradientUnits=&quot;userSpaceOnUse&quot; x1=&quot;262.8693&quot; y1=&quot;119.1227&quot; x2=&quot;533.773&quot; y2=&quot;121.9446&quot;&amp;gt;
-	&amp;lt;stop  offset=&quot;0&quot; style=&quot;stop-color:#FFFFFF&quot;/&amp;gt;
-	&amp;lt;stop  offset=&quot;1&quot; style=&quot;stop-color:#000000&quot;/&amp;gt;
-&amp;lt;/linearGradient&amp;gt;
-&amp;lt;rect id=&quot;XMLID_9_&quot; x=&quot;254.7&quot; y=&quot;76.1&quot; class=&quot;st1&quot; width=&quot;270.9&quot; height=&quot;88.8&quot;/&amp;gt;
-&amp;lt;path id=&quot;XMLID_10_&quot; class=&quot;st2&quot; d=&quot;M420,525L291.5,775c-5.1-1-115.8-23.3-133.7-93.9c-19.5-77.1,87.3-151.4,154.1-178.6
-	c55.7-22.7,154.6-41.6,183.7,0c29,41.5-14.9,138.2-115.3,233.7c-3.1,0.3-6.1,0.7-9.2,1&quot;/&amp;gt;
-&amp;lt;path id=&quot;XMLID_11_&quot; class=&quot;st2&quot; d=&quot;M-165.7,640.3&quot;/&amp;gt;
-&amp;lt;path id=&quot;XMLID_12_&quot; class=&quot;st3&quot; d=&quot;M365,333.4c21.5,0.8,43.1-0.7,64.2-4.6&quot;/&amp;gt;
-&amp;lt;path id=&quot;XMLID_13_&quot; class=&quot;st3&quot; d=&quot;M428.6,292.9c-3.3,5.5-5.7,11.5-8.4,17.2c-9.1,19.4-22.3,37-38.4,51.1&quot;/&amp;gt;
-&amp;lt;path id=&quot;XMLID_14_&quot; class=&quot;st3&quot; d=&quot;M398.7,334c4.2-1.5,8,2.8,10.4,6.6c6.3,10.2,12.7,20.3,19,30.5&quot;/&amp;gt;
-&amp;lt;line id=&quot;XMLID_15_&quot; class=&quot;st3&quot; x1=&quot;36.4&quot; y1=&quot;371.1&quot; x2=&quot;-92.2&quot; y2=&quot;621.1&quot;/&amp;gt;
-&amp;lt;line id=&quot;XMLID_16_&quot; class=&quot;st3&quot; x1=&quot;-92.2&quot; y1=&quot;631.2&quot; x2=&quot;306.8&quot; y2=&quot;198.5&quot;/&amp;gt;
-&amp;lt;/svg&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;有点像js和xml,如果要在android上绘制，就需要先对它进行解析操作，再进行绘制。&lt;/p&gt;
-</description>
-      </item>
-    
-      <item>
-        <title>AndroidStudio版本更新记录</title>
-        <link>http://www.liuschen.com/2016/08/11/Androidstudioupdatelike.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2016/08/11/Androidstudioupdatelike.html</guid>
-        <pubDate>Thu, 11 Aug 2016 00:00:00 +0800</pubDate>
-        <description>&lt;p&gt;对于开发者而言，最重要的无疑是开发工具的使用，做Android开发之前用的是eclipse，现在用的则是Google的Androidstudio，我不常更新工具，太麻烦也常常会出现很多问题，但是也会因此错过很多新的东西，比如Google的版本，每次更新总会带来很多新奇的特性，懒惰即是错过，虽然之前有同事因为更新出现了诸多问题，耗费了时间，最终也没能成功。但是，仔细想想这些都不是什么问题，尤其是现在我相对比较闲的情况下。&lt;/p&gt;
-
-&lt;p&gt;首先是下载，在官网上下在&lt;br /&gt;
-android-studio-bundle-143.2915827-windows.exe&lt;br /&gt;
-当然如无法下载也可以在网上搜索下载。&lt;br /&gt;
-我安装的2.1.2貌似是最新的版本。但是安装完后运行之前的程序，果不其然，报了一堆错.&lt;/p&gt;
-
-&lt;p&gt;首先是gradle版本不匹配，当前是2.1.2而我之前项目是1.3&lt;br /&gt;
-然后就提示我是否更新，更新项目gradle到新版本有好处云云。然后我就同意了，然后就报错了&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;Error:Gradle version 2.10 is required. Current version is 2.4. If using the gradle wrapper, try editing the distributionUrl in D:\softku\wangpan\AndroidAppBook\gradle\wrapper\gradle-wrapper.properties to gradle-2.10-all.zip
-&amp;lt;a href=&quot;fixGradleVersionInWrapper&quot;&amp;gt;Fix Gradle wrapper and re-import project&amp;lt;/a&amp;gt;&amp;lt;br&amp;gt;&amp;lt;a href=&quot;openGradleSettings&quot;&amp;gt;Gradle settings&amp;lt;/a&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;这个是gradle版本问题，需要翻墙下载，当然也可以单独下载&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;http://services.gradle.org/distributions&quot;&gt;http://services.gradle.org/distributions&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;而在项目的gradle\wrapper下面的gradle-wrapper.properties文件&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;#Thu Aug 11 08:37:08 CST 2016
-distributionBase=GRADLE_USER_HOME
-distributionPath=wrapper/dists
-zipStoreBase=GRADLE_USER_HOME
-zipStorePath=wrapper/dists
-distributionUrl=https\://services.gradle.org/distributions/gradle-2.10-all.zip
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;可以修改项目依赖的gradle版本下载地址&lt;/p&gt;
-
-&lt;p&gt;最后也就是做这些的目的，运行一些之前由于需要版本过高运行不了的项目，运行后依然报错，由于用的sdk是老的，缺少高版本的sdk，于是我将新安装的sdk下add-ons,platforms，system-images,build-tools和platform-tools下对应的版本sdk文件copy到了旧的Sdk(因为下的版本较多，很大)中，再次运行程序，成功。AndroidStudio更新成功。&lt;/p&gt;
-
-&lt;p&gt;有时候导入版本较早工程时会报&lt;br /&gt;
-Gradle DSL method not found: ‘runProguard()’&lt;/p&gt;
-
-&lt;p&gt;原因是这个&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;buildTypes {
-    release {
-
-        runProguard false // 已经被废弃并且停止使用了
-
-        ......
-    }
-}
-new:
-
-buildTypes {
-    release {
-
-        minifyEnabled false // 替代的方式
-
-        ......
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;改一下就好了。&lt;/p&gt;
-</description>
-      </item>
-    
-      <item>
-        <title>Androidstudio下的代码混淆</title>
-        <link>http://www.liuschen.com/2016/08/05/proguard.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2016/08/05/proguard.html</guid>
-        <pubDate>Fri, 05 Aug 2016 00:00:00 +0800</pubDate>
-        <description>&lt;p&gt;首先在项目的build.gradle中Android标签下添加&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;signingConfigs {
-    release {
-        keyAlias &#39;xxx&#39;
-        keyPassword &#39;xxx&#39;
-        storeFile file(&#39;xxx&#39;)
-        storePassword &#39;xxx&#39;
-    }
-}
-
-buildTypes {
-    release {
-        signingConfig signingConfigs.release
-        minifyEnabled true
-        proguardFiles getDefaultProguardFile(&#39;proguard-android.txt&#39;), &#39;proguard-rules.pro&#39;
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;其中第二个是混淆的设置，第一个配置的是数字签名的路径以及密码等信息，&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;signingConfig signingConfigs.release
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;个是依赖于这项配置的，不然会报错&lt;/p&gt;
-
-&lt;p&gt;然后，就是配置混淆的文件&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;-ignorewarnings
--optimizationpasses 5          # 指定代码的压缩级别
--dontusemixedcaseclassnames   # 是否使用大小写混合
--dontpreverify           # 混淆时是否做预校验
--verbose                # 混淆时是否记录日志
-
-
--optimizations !code/simplification/arithmetic,!field/*,!class/merging/*  # 混淆时所采用的算法
-
--keep public class * extends android.app.Activity      # 保持哪些类不被混淆
--keep public class * extends android.app.Application   # 保持哪些类不被混淆
--keep public class * extends android.app.Service       # 保持哪些类不被混淆
--keep public class * extends android.content.BroadcastReceiver  # 保持哪些类不被混淆
--keep public class * extends android.content.ContentProvider    # 保持哪些类不被混淆
--keep public class * extends android.app.backup.BackupAgentHelper # 保持哪些类不被混淆
--keep public class * extends android.preference.Preference        # 保持哪些类不被混淆
--keep public class com.android.vending.licensing.ILicensingService    # 保持哪些类不被混淆
-
--keep class javax.security.** { *; }
-
-
--keepclasseswithmembernames class * {  # 保持 native 方法不被混淆
-    native &amp;lt;methods&amp;gt;;
-}
--keepclasseswithmembers class * {   # 保持自定义控件类不被混淆
-    public &amp;lt;init&amp;gt;(android.content.Context, android.util.AttributeSet);
-}
--keepclasseswithmembers class * {# 保持自定义控件类不被混淆
-    public &amp;lt;init&amp;gt;(android.content.Context, android.util.AttributeSet, int);
-}
--keepclassmembers class * extends android.app.Activity { # 保持自定义控件类不被混淆
-    public void *(android.view.View);
-}
--keepclassmembers enum * {     # 保持枚举 enum 类不被混淆
-    public static **[] values();
-    public static ** valueOf(java.lang.String);
-}
--keep class * implements android.os.Parcelable { # 保持 Parcelable 不被混淆
-    public static final android.os.Parcelable$Creator *;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;一般情况下，系统的控件不必要混淆，如activity，service等，其次由于默在Androidstudio中默认已经将libs包中的jar添加了，重复添加反而会报错，最后项目中用到反射的地方一定不能混淆。&lt;br /&gt;
-添加完后却还是报错了，先添加了-dontwarn，然并没什么用，然后加了-ignorewarnings忽略警告，成功生成apk,只是一定要注意确保警告中的地方没被项目调用，否则实际运行时还会出错，后果更严重。&lt;/p&gt;
-</description>
-      </item>
-    
-      <item>
-        <title>nine patch图片的用法绘制以及作用</title>
-        <link>http://www.liuschen.com/2016/08/02/nine.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2016/08/02/nine.html</guid>
-        <pubDate>Tue, 02 Aug 2016 00:00:00 +0800</pubDate>
-        <description>&lt;p&gt;问题:&lt;/p&gt;
-
-&lt;p&gt;今天从网上down下了一个eclipse下的项目，导入到androidStudio中后，结果出现了如下异常：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;D:\myAllProject\androidstudio_ajlast\321Browser\uCBrowser_1113\src\main\res\layout\above_slidingmenu.xml
-Error:(111, 30) No resource found that matches the given name (at &#39;src&#39; with value &#39;@drawable/menubar_tabcenter_d&#39;).
-
-Error:(20, 38) No resource found that matches the given name (at &#39;src&#39; with value &#39;@drawable/url_progress_fullscreen&#39;).
-D:\myAllProject\androidstudio_ajlast\321Browser\uCBrowser_1113\src\main\res\drawable\search_btn_bg.xml
-Error:(5, 87) No resource found that matches the given name (at &#39;drawable&#39; with value &#39;@drawable/search_engines_switcher_item_bg_p&#39;).
-Error:(6, 87) No resource found that matches the given name (at &#39;drawable&#39; with value &#39;@drawable/search_engines_switcher_item_bg_p&#39;).
-Error:Execution failed for task &#39;:uCBrowser_1113:processDebugResources&#39;.
-com.android.ide.common.process.ProcessException: org.gradle.process.internal.ExecException: Process &#39;command &#39;F:\programer\android_sdk\build-tools\23.0.2\aapt.exe&#39;&#39; finished with non-zero exit value 1
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;纠结了很久发现都是.9图片的问题，于是按照网上说的在android的gradle中android标签下加入下面代码，避免了对 .9图片的检查&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;aaptOptions.cruncherEnabled = false
-aaptOptions.useNewCruncher = false
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;然而会继续报错，原因是图片上的像素定位点没有添加,最后还是一个一个改的。&lt;/p&gt;
-
-&lt;p&gt;问题核心：&lt;/p&gt;
-
-&lt;p&gt;.9图片可以根据ps绘制，同时，android里面也有专门的绘制工具。&lt;br /&gt;
-.9图片区别于普通图片主要是通过两点：&lt;br /&gt;
-1.特殊的扩展名，供专门的应用识别&lt;br /&gt;
-2.图片上下左右4个特殊的黑色像素条，宽一个像素，也可以仅仅是一个点，其中上边和左边像素条标记的分别是图片在横向和纵向的可拉伸区域，至于右边和下边的像素条，网上说是表示“前景能显示的范围”，用了这么久，没见过可以区别的效果，所以也不大理解是什么意思。&lt;/p&gt;
-
-</description>
-      </item>
-    
-      <item>
-        <title>Android解压缩zip文件</title>
-        <link>http://www.liuschen.com/2016/07/22/zip.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2016/07/22/zip.html</guid>
-        <pubDate>Fri, 22 Jul 2016 00:00:00 +0800</pubDate>
-        <description>&lt;blockquote&gt;
-  &lt;p&gt;期望:使项目apk包中的大文件批量数据可以单独作为一个apk来管理，所以需要将Android assets文件夹下的zip打包文件解压到SDCard上。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;解压缩的操作由于比较耗时，所以新开一个线程执行以下函数&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;/**将assets对应文件解压到对应的sdcard目录中*/
-public void unPress2Sdcard(String fileName){
-    try {
-        /**目标路径*/
-        String destDir = rootPath + File.separator + fileName;
-        /**将压缩文件拷贝到内存卡中*/
-        mAssetCopyer.copyBigDataToSD(destDir, fileName);
-        /**解压文件到目标路径*/
-        unzip(destDir, offlinePath);
-        /**删除在内存卡上临时存在的压缩文件*/
-        FileUtils.deleteFile(destDir);
-    } catch (Exception e) {
-        e.printStackTrace();
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;对应的先将assets下的zip文件拷贝到SDCard中，这个是直接在网上找的方法拿来用&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;public void copyBigDataToSD(String strOutFileName,String file) throws IOException{
-    InputStream myInput;
-    OutputStream myOutput = new FileOutputStream(strOutFileName);
-    myInput = mContext.getAssets().open(file);
-    byte[] buffer = new byte[1024];
-    int length = myInput.read(buffer);
-    while(length &amp;gt; 0){
-        myOutput.write(buffer, 0, length);
-        length = myInput.read(buffer);
-    }
-    myOutput.flush();
-    myInput.close();
-    myOutput.close();
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;然后解压缩操作&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;@SuppressWarnings(&quot;unchecked&quot;)  
-public static void unzip(String zipFilePath, String unzipFilePath) throws Exception{
-    /**验证是否为空*/
-    if (isEmpty(zipFilePath) || isEmpty(unzipFilePath)){
-
-    }
-    File zipFile = new File(zipFilePath);
-    /**创建解压缩文件保存的路径*/
-    File unzipFileDir = new File(unzipFilePath);
-    if (!unzipFileDir.exists()){
-        unzipFileDir.mkdirs();
-    }
-    //开始解压
-    ZipEntry entry = null;
-    String entryFilePath = null;
-    int count = 0, bufferSize = 1024;
-    byte[] buffer = new byte[bufferSize];  
-    BufferedInputStream bis = null;
-    BufferedOutputStream bos = null;  
-    ZipFile zip = new ZipFile(zipFile);
-    Enumeration&amp;lt;ZipEntry&amp;gt; entries = (Enumeration&amp;lt;ZipEntry&amp;gt;)zip.entries();  
-    //循环对压缩包里的每一个文件进行解压
-    while(entries.hasMoreElements()){
-        entry = entries.nextElement();
-        log(&quot;log ing5:&quot;+entry.getName());
-        /**这里提示如果当前元素是文件夹时，在目录中创建对应文件夹
-         * ，如果是文件，得出路径交给下一步处理*/
-        entryFilePath = unzipFilePath + File.separator + entry.getName();
-        File file = new File(entryFilePath);
-        log(&quot;~~是否是文件夹:&quot;+file.isDirectory());
-        if(entryFilePath.endsWith(&quot;/&quot;)){
-            if(!file.exists()){
-                file.mkdir();
-            }
-            continue;
-        }
-        /***这里即是上一步所说的下一步，负责文件的写入，不服来咬(≖ ‿ ≖)✧*/
-        bos = new BufferedOutputStream(new FileOutputStream(entryFilePath+&quot;/&quot;));
-        bis = new BufferedInputStream(zip.getInputStream(entry));
-        while ((count = bis.read(buffer, 0, bufferSize)) != -1){
-            bos.write(buffer, 0, count);
-        }
-        bos.flush();
-        bos.close();
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;用的也是直接网上down下来的，但是在解压缩操作中遇到的是这一句bos = new BufferedOutputStream(new FileOutputStream(entryFilePath));传入的entryFilePath运行的时候却老提示不是文件夹，于是把中间循环解压元素的代码以及一些冗余的逻辑删除了，改成了现在这样，进入循环先判断是否是文件夹(我这里是靠尾部的字符判断的)，如果是，在目标路径中创建，开始下一循环，不是，就把文件解压到对应路径。&lt;/p&gt;
-
-&lt;p&gt;最后一步删除SDcard下的压缩文件&lt;br /&gt;
-FileUtils.deleteFile(destDir);&lt;/p&gt;
-
-&lt;p&gt;注意:源压缩包必须是zip格式的并且是快速压缩，超高压缩算法不同，解析不了，我是在window上用快压打包的。&lt;/p&gt;
-</description>
-      </item>
-    
-      <item>
-        <title>程序员编程语录</title>
-        <link>http://www.liuschen.com/2016/06/07/person.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2016/06/07/person.html</guid>
-        <pubDate>Tue, 07 Jun 2016 00:00:00 +0800</pubDate>
-        <description>&lt;ol&gt;
-  &lt;li&gt;
-    &lt;p&gt;一个好的程序员是那种过单行线马路都要往两边看的人。(Doug Linder)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;程序有问题时不要担心。如果所有东西都没问题，你就失业了。(软件工程的Mosher定律)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;程序员的麻烦在于，你无法弄清他在捣腾什么，当你最终弄明白时，也许已经晚了。(超级计算机之父Seymour Cray)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;我想大部分人都知道通常一个程序员会具有的美德。当然了，有三种：懒惰，暴躁，傲慢。(Perl语言发明者Larry Wall)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;编程时要保持这种心态：就好象将来要维护你这些代码的人是一位残暴的精神病患者，而且他知道你住在哪。(Martin Golding)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;一个人写的烂软件将会给另一个人带来一份全职工作。(Jessica Gaston)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;如果建筑工人像程序员写软件那样盖房子，那第一只飞来的啄木鸟就能毁掉人类文明。(Gerald Weinberg)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;这世界最有可能毁灭的方式——大多数专家都同意——是次意外。这就是为什么会有我们，我们是计算机专家，我们创造意外。(Nathaniel Borenstein)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;我们这个行业有个特别奇怪的现象：不仅我们不从失败里吸取教训，同时也不从成功中学习经验。 (Keith  Braithwaite)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;一种新技术一旦开始流行，你要么坐上压路机，要么成为铺路石。(Stewart Brand)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;如果没能一次成功，那就叫它1.0版吧。(unknown)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;所有的程序员都是编剧，所有的计算机都是烂演员。(Anonymous Hack Actor)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;工作进度上越早落后，你就会有越充足的时间赶上。(Anonymous Scheduler)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;当有这样的一种编程语言出现：它能让程序员用简单的英语编程，你将会发现，程序员都开始不会说英语。(Anonymous Linguist)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;为什么我们没有时间把事情做对，却总有时间把事情做过头？(Anonymous)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;傻瓜都能写出计算机能理解的程序。优秀的程序员写出的是人类能读懂的代码。&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;任何你写的代码，超过6个月不去看它，当你再看时，都像是别人写的。(Eagleson’s law)&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;编程/软件开发语录&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;
-    &lt;p&gt;按代码行数来评估软件开发的进度，就如同按重量来评估飞机建造的进度。(Bill Gates)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;软件就像做爱。一次犯错，你需要用余下一生来维护支持。(Michael Sinz)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;在水上行走和按需求文档开发软件都很容易——前提是它们都是冻结状态。(Edward V Berard)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;最初90%的代码用去了最初90%的开发时间…余下10%的代码用去了另外90%的开发时间。(Tom Cargill)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;注释代码很像清洁你的厕所——你不想干，但如果你做了，这绝对会给你和你的客人带来更愉悦的体验。(Ryan Campbell)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;如今的编程是一场程序员和上帝的竞赛，程序员要开发出更大更好、傻瓜都会用到软件。而上帝在努力创造出更大更傻的傻瓜。目前为止，上帝是赢的。(Rick Cook)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;软件设计最困难的部分…是阻挡新功能的引入。(Donald Norman)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;为了理解递归，我们首先要理解的是递归。(Anonymous)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;世上只有两类编程语言：那些拥有被人诟病的和那些没人用的。(Bjarne Stroustrup)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;The best thing about a boolean is even if you are wrong, you are only off by a bit. (Anonymous)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;如果Java能实现真的垃圾回收，那大部分的程序都会在执行时删除自己。(Robert Swell)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;理论上，理论和实践是没有差异的。但实践中，是有的。(Jan L. A. van de Snepscheut)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;预备，开火，瞄准：这是最快的软件开发方法。预备，瞄准，瞄准，瞄准，瞄准：这是最慢的软件开发方法。(Anonymous)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;编程是10%的科学，20%天份，和70%的让这天份符合科学。(Anonymous)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;评估一个事情要比去理解你评估了什么容易。(Anonymous)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;测评不会撒谎，但测评的人会。(Anonymous)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;培养员工，即使他们有跳槽的风险。什么都不做而留他们在公司，这样风险更大。(Anonymous)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;计算机科学的目标是做出一个东西，并且保证它至少能坚持到我们将它开发完成。(Anonymous)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Java之于JavaScript如同Car之于Carpet。 (Chris Heilmann)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;起初就把事情做对是完全没必要的。但最后要把事情做对是绝对必要的。(Andrew Hunt and David Thomas)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;数组的起始索引应该从0开始还是从1开始？我的0.5的折中提议被他们未经认真考虑到拒绝了——我认为是这样的。(Stan Kelly-Bootle)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;程序必须是为了给人看而写，给机器去执行只是附带任务。 (Abelson / Sussman)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;编程可以很有趣，你可以用它做密码学研究，但两者绝对不能合二为一。(Kreitzberg and Shneiderman)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;拷贝-粘贴是一种设计错误。(David Parnas)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;计算机善于遵循指令，但不善于理解你的思维。(Donald Knuth)&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;软件纠错语录&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;
-    &lt;p&gt;删除的代码是没有bug的代码。(Jeff Sickel)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;如果纠错是消除软件bug的过程，那编程一定是把它们放进去的过程。(Edsger Dijkstra)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;代码纠错要比新编写代码困难一倍。因为，如果你写出了最聪明的代码，按此推算，你将没有更大的智慧来debug它。&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;想在自己的代码里找出一个错误是十分困难的。而当你认为你的代码没有错误时，那就更难了。(Steve McConnel)&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;软件bug语录&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;
-    &lt;p&gt;这不是个bug——这一个未注明的功能特征。(Anonymous)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;没有需求或设计，编程就是一种将bug添加到一个空文本文件里的艺术。(Louis Srygley)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;烂代码并不烂，只是被误解了。(Anonymous Code Behaviorist)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;有两种方法能写出没有错误的程序；但只有第三种好用。(Alan J. Perlis)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;小心上面代码中的bug；我只知道这些代码是正确的，但没有试过。(Donald Knuth)&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;软件产品/成品语录&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;
-    &lt;p&gt;软件能够复用前，它必须要可用。(Ralph Johnson)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;软件通常在beta测试完成不久后发布。Beta在拉丁语中是“还不能用”的意思。(Anonymous)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;最好的性能改进是将软件从不能用的状态变成可用。(J. Osterhout)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;最廉价、最快速、最可信赖的组件是那些还未出现的组件。(Gordon Bell)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;I think Microsoft named .Net so it wouldn’t show up in a Unix directory listing. (Oktal)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;软件和教堂非常相似——建成之后我们就在祈祷。(Sam Redwine)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;除非最后一个用户死掉，软件是不会有完工的时候的。(Anonymous)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;如今的大部分软件都非常像埃及金字塔，由成千上万的石块一个摞一个构成，没有结构上的集成，是由暴力强制和成千上万的奴隶完成。(Alan Kay)&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;摘自网上&lt;/p&gt;
-&lt;/blockquote&gt;
-</description>
-      </item>
-    
-      <item>
-        <title>Android数据库和Bean的交互</title>
-        <link>http://www.liuschen.com/2016/04/29/sqlite.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2016/04/29/sqlite.html</guid>
-        <pubDate>Fri, 29 Apr 2016 00:00:00 +0800</pubDate>
-        <description>&lt;p&gt;Android中数据库使用的轻量级的Sqlite数据库，创建数据库的过程，因为系统都封装好了，所以比较简单。只要继承SQLiteOpenHelper即可。然后再写一些增删改查的函数就可以了。&lt;/p&gt;
-
-&lt;p&gt;Android系统对数据的操作，就我的理解，主要是&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;网络请求-内存(数据模型)-本地存储
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;而 JSON数据-本地Bean对象-数据库 则是其中一种通用的路子。&lt;br /&gt;
-json到Bean对象以及Bean和数据库的交互转化，虽然可以针对每一种数据模型来实现，但是那样做未免太麻烦，同时也会浪费太多不必要的精力。&lt;br /&gt;
-fastjson（阿里工程师开发的）和GSON(谷歌带的)就是很好的实现了json和Bean转化的框架，里面都是用的反射来实现的，其实也只能用反射，只不过牛逼的框架一般做的都很全，在性能上也处理的比较的当，我等也能佩服。&lt;/p&gt;
-
-&lt;p&gt;当然我现在要说的是数据库和Bean的交互，因为时间比较匆忙，也没精力找别人写好的框架用，所以自己就简单的写了个。&lt;/p&gt;
-
-&lt;p&gt;用到了反射，但是因为数据库中的字段名称和我自己的命名习惯不符(数据库字段名是已经定好的),所以便退而求其次，用了注解。首先，定义了一个注解:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;@Target(ElementType.FIELD)
-@Retention(RetentionPolicy.RUNTIME)
-@Documented
-public @interface DBDataType {
-    /**为数据库中的信息，type=0时表示该为主键，-1为默认值，1,2,3,4为预留值，普通值请从5起，
-     * 并且表示了该列值在数据库中的添加顺序*/
-    int type() default -1;
-
-    /**数据库中的元素名*/
-    String elementName() default &quot;&quot;;
-    /**数据库中的元素类型*/
-    String elementType() default &quot;text&quot;;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;接着在建立的Bean对象中，对每一个field添加注解:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;@DBDataType(type = 0, elementName = &quot;ID&quot;)
-public String id;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;其中type是字段在数据库建表时的排列顺序，从5开始，0时表示该字段定义为主键，1，2，3，4为预留值，elementName表示该值在表中的字段名，其实还有一个elementType表示字段的属性，默认是文本类型，其他可以指定&lt;/p&gt;
-
-&lt;p&gt;然后就是关键代码，对sql语句进行拼接&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;try {
-
-		/**通过反射获取局部变量*/
-		Field[] fields = clazz.getDeclaredFields();
-		/**存储列的序号*/
-		int[] cloumns = new int[fields.length];
-		HashMap&amp;lt;Integer,DBDataType&amp;gt; hashMap = new HashMap&amp;lt;Integer,DBDataType&amp;gt;();
-		/**建立序号到每个field对应的注解DBDataType映射关系*/
-		for (int i=0;i&amp;lt;fields.length;i++){
-			DBDataType dbDataTypes = fields[i].getAnnotation(DBDataType.class);
-			int cloumnNumber = dbDataTypes.type();
-			cloumns[i] = cloumnNumber;
-			hashMap.put(cloumnNumber,dbDataTypes);
-		}
-		/**
-		 * 对序号进行排序
-		 * */
-		Arrays.sort(cloumns);
-
-		/**开始拼接sql语句*/
-		String sqlfont = &quot;create table if not exists &quot; + tableName + &quot; (&quot;;
-		String sqlContent = &quot;&quot;;
-		String sqlOver = &quot;)&quot;;
-
-		for(int i=0;i&amp;lt;cloumns.length;i++){
-
-			String elementType = hashMap.get(cloumns[i]).elementType();
-			String elementName = hashMap.get(cloumns[i]).elementName();
-
-			if(cloumns[i]==0){
-				//该值为主键
-				sqlContent += elementName + &quot; &quot; + elementType + &quot; primary key&quot; +&quot;,&quot;;
-			}else{
-				sqlContent += elementName + &quot; &quot; + elementType +((i==cloumns.length-1)?&quot;&quot;:&quot;,&quot;);
-			}
-
-		}
-		String sql = sqlfont + sqlContent + sqlOver;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;这里传入的clazz为一个Bean对象，就是通过对field进行注解标记的Bean，这些代码是封装到数据库操作类中的，所以之后创建表，只需要传入一个Bean对象即可。对数据库的插入，查询也是，只需用注解和反射去写好一个通用的方法即可。&lt;/p&gt;
-</description>
-      </item>
-    
-      <item>
-        <title>荒原日记-习惯</title>
-        <link>http://www.liuschen.com/2016/04/25/wildernessdiary-habby.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2016/04/25/wildernessdiary-habby.html</guid>
-        <pubDate>Mon, 25 Apr 2016 00:00:00 +0800</pubDate>
-        <description>&lt;p&gt;站在现在的角度看过去的自己，不得不说，我，是一个奇怪的小孩。&lt;/p&gt;
-
-&lt;p&gt;“这是一个美丽的世界，关闭。”也许你会好奇我说的这句话的意义，但是正如我所说，我曾经是一个很奇怪的孩子，而这句话就是我常常在心中念叨的一句咒语。它的功用在于它能帮我清除心中的杂念，当然，如果杂念太多那我就还需要点时间好好捋捋。你可能会说，你看，这孩子把自己当机器了，还要关机开机呢。当不当机器不好说，不过强迫症肯定是有的，这个习惯不知道是从什么时候开始的，我也不清楚是从什么时候结束的。我总是强迫自己尽善尽美的处理遇到的任何事情，所以在此期间没丢过东西也没遗忘过什么。像提前设定的程序，日子平平淡淡，却也无味至极，甚至对我来说，知道别人不会这样做，而对这种习惯和未来联系到的日子充满恐惧。&lt;/p&gt;
-
-&lt;p&gt;后来证明，这种担心多余了，甚至现在的我竟然搞不清，我舍弃掉的这个习惯是否一并带走了我更重要的东西，在那个充满幻想的年纪。&lt;/p&gt;
-</description>
-      </item>
-    
-      <item>
-        <title>荒原日记-开篇</title>
-        <link>http://www.liuschen.com/2016/04/16/wildernessdiary-start.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2016/04/16/wildernessdiary-start.html</guid>
-        <pubDate>Sat, 16 Apr 2016 00:00:00 +0800</pubDate>
-        <description>&lt;p&gt;我从哪里来，又往哪里去？在我7，8岁的时候，常常在考虑这个问题，因为小，不理解前路漫长，总是觉得人生不过弹指岁月，所以总是充满了对死亡的恐惧。&lt;/p&gt;
-
-&lt;p&gt;都说时间能抚平一切，当我将藏在心中的想法封印，企图在时间之海中将它沉溺，但时间流逝缓缓，却又残酷的否决了我。&lt;/p&gt;
-
-&lt;p&gt;慢慢的，我也逐渐找到了自己的答案，也许每个人来到世上都是为了寻找到这一个答案，只是或许有些人不愿意分享，在喧闹抑或宁静，城市或许乡村，更或许只有当你在午夜，万物沉寂，而你独自一人时才会有机会偶然想起你此刻立于此地的意义。我们每个人都有一个答案，只是有些人一生可能都不会想起。幸运抑或不幸，只是人对自己过往的追问和总结罢了。&lt;/p&gt;
-
 </description>
       </item>
     

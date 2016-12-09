@@ -9,6 +9,24 @@
 
 
 
+  /2016/12/01/c++-copy.html
+
+  /2016/11/27/C++-point.html
+
+  /2016/11/20/C++-jni.html
+
+  /2016/11/17/RTMP.html
+
+  /2016/11/16/ffplay.html
+
+  /2016/11/09/database.html
+
+  /2016/11/06/sdl.html
+
+  /2016/10/30/live555-dir.html
+
+  /2016/10/29/live555-android.html
+
   /2016/10/27/red5.html
 
   /2016/10/25/ffmpeg-jna.html

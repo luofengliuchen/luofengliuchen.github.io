@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
 <!--[if lte IE 9]><meta http-equiv="refresh" content="0;url=/ie.html"><![endif]-->
 
-<title>Androidstudio下的代码混淆 | 落风的博客</title>
+<title>live555初探-修改live555当前工作目录 | 落风的博客</title>
 <meta name="author" content="落风">
 
-  <meta name="keywords" content="混淆">
+  <meta name="keywords" content="live555,Android">
 
 
 
@@ -160,87 +160,120 @@
     <div id="post">
       <div id="pjax">
         <article id="post__content">
-  <h1 id="post__title" data-identifier="20160805">Androidstudio下的代码混淆</h1>
-  <p>首先在项目的build.gradle中Android标签下添加</p>
+  <h1 id="post__title" data-identifier="20161030">live555初探-修改live555当前工作目录</h1>
+  <blockquote>
+  <p>文章链接:<a href="http://www.liuschen.com">http://www.liuschen.com</a></p>
+</blockquote>
 
-<pre><code>signingConfigs {
-    release {
-        keyAlias 'xxx'
-        keyPassword 'xxx'
-        storeFile file('xxx')
-        storePassword 'xxx'
-    }
+<blockquote>
+  <p>我的live555是在virtualstudio上编译的，但是修改工作目录却是为了移植Android平台的便利。</p>
+</blockquote>
+
+<h1 id="section">1.输出</h1>
+<p>virtualStudio不太熟悉，所以调试live555也没用里面的工具，老办法，在代码里面输出内容来跟踪代码执行。</p>
+
+<p>live555是通过UsageEnvironment来执行输出到屏幕的，live555MediaServer里面就可以看到</p>
+
+<pre><code>*env &lt;&lt; "Play streams from this server using the URL\n\t"
+   &lt;&lt; urlPrefix &lt;&lt; "&lt;filename&gt;\nwhere &lt;filename&gt; is a file present in the current directory.\n";
+  	*env &lt;&lt; "Each file's type is inferred from its name suffix:\n";
+  	*env &lt;&lt; "\t\".264\" =&gt; a H.264 Video Elementary Stream file\n";
+  	*env &lt;&lt; "\t\".265\" =&gt; a H.265 Video Elementary Stream file\n";
+  	*env &lt;&lt; "\t\".aac\" =&gt; an AAC Audio (ADTS format) file\n";
+ 	 *env &lt;&lt; "\t\".ac3\" =&gt; an AC-3 Audio file\n";
+ 	 *env &lt;&lt; "\t\".amr\" =&gt; an AMR Audio file\n";
+  	*env &lt;&lt; "\t\".dv\" =&gt; a DV Video file\n";
+</code></pre>
+
+<p>而在直接找不到env时，可以用envir()来输出，envir()是Medium基类的成员函数，许多类都继承于它，返回的也是UsageEnvironment的对象</p>
+
+<h1 id="section-1">2.查找-修改</h1>
+
+<p>如果要修改工作目录，也就是存放音视频的目录，首先需要找出打开文件的操作fopen，全局搜索fopen,总共有三处调用</p>
+
+<ul>
+  <li>OuputFile.cpp</li>
+  <li>InputFile,cpp</li>
+  <li>DynamicRTSPServer.cpp</li>
+</ul>
+
+<p>在每次打开文件前都做好输出标记，发现如果通过rtsp请求服务器文件，是只经过DynamicRTSPServer.cpp的,那么就在打开文件操作前添加如下代码：</p>
+
+<pre><code>char const* rootpath = "自定义的根目录";
+
+envir() &lt;&lt; "beforefilepath" &lt;&lt; streamName0&lt;&lt;"\n";
+
+std::string src1(rootpath);
+//streamName0：函数参数由streamName改为streamName0
+std::string src2(streamName0);
+std::string dest = src1 + src2;
+char const* streamName;
+//因为该函数不只被调用一次，不加判断的话，根可能被重复添加
+if (strstr(streamName0,rootpath)) {
+	streamName = streamName0;
 }
-
-buildTypes {
-    release {
-        signingConfig signingConfigs.release
-        minifyEnabled true
-        proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-    }
+else {
+	streamName = dest.c_str();
 }
 </code></pre>
 
-<p>其中第二个是混淆的设置，第一个配置的是数字签名的路径以及密码等信息，</p>
+<p>还要添加头文件iostream</p>
 
-<pre><code>signingConfig signingConfigs.release
+<h1 id="section-2">3.进一步修改</h1>
+
+<p>在RTSPServer.hh中添加声明</p>
+
+<pre><code>char const* root_path;
+void setRootPath(char const* rootpath);
 </code></pre>
 
-<p>个是依赖于这项配置的，不然会报错</p>
+<p>RTSPServer.cpp中添加实现</p>
 
-<p>然后，就是配置混淆的文件</p>
-
-<pre><code>-ignorewarnings
--optimizationpasses 5          # 指定代码的压缩级别
--dontusemixedcaseclassnames   # 是否使用大小写混合
--dontpreverify           # 混淆时是否做预校验
--verbose                # 混淆时是否记录日志
-
-
--optimizations !code/simplification/arithmetic,!field/*,!class/merging/*  # 混淆时所采用的算法
-
--keep public class * extends android.app.Activity      # 保持哪些类不被混淆
--keep public class * extends android.app.Application   # 保持哪些类不被混淆
--keep public class * extends android.app.Service       # 保持哪些类不被混淆
--keep public class * extends android.content.BroadcastReceiver  # 保持哪些类不被混淆
--keep public class * extends android.content.ContentProvider    # 保持哪些类不被混淆
--keep public class * extends android.app.backup.BackupAgentHelper # 保持哪些类不被混淆
--keep public class * extends android.preference.Preference        # 保持哪些类不被混淆
--keep public class com.android.vending.licensing.ILicensingService    # 保持哪些类不被混淆
-
--keep class javax.security.** { *; }
-
-
--keepclasseswithmembernames class * {  # 保持 native 方法不被混淆
-    native &lt;methods&gt;;
-}
--keepclasseswithmembers class * {   # 保持自定义控件类不被混淆
-    public &lt;init&gt;(android.content.Context, android.util.AttributeSet);
-}
--keepclasseswithmembers class * {# 保持自定义控件类不被混淆
-    public &lt;init&gt;(android.content.Context, android.util.AttributeSet, int);
-}
--keepclassmembers class * extends android.app.Activity { # 保持自定义控件类不被混淆
-    public void *(android.view.View);
-}
--keepclassmembers enum * {     # 保持枚举 enum 类不被混淆
-    public static **[] values();
-    public static ** valueOf(java.lang.String);
-}
--keep class * implements android.os.Parcelable { # 保持 Parcelable 不被混淆
-    public static final android.os.Parcelable$Creator *;
+<pre><code>void RTSPServer::setRootPath(char const* rootpath) {
+	root_path = rootpath;
 }
 </code></pre>
 
-<p>一般情况下，系统的控件不必要混淆，如activity，service等，其次由于默在Androidstudio中默认已经将libs包中的jar添加了，重复添加反而会报错，最后项目中用到反射的地方一定不能混淆。<br />
-添加完后却还是报错了，先添加了-dontwarn，然并没什么用，然后加了-ignorewarnings忽略警告，成功生成apk,只是一定要注意确保警告中的地方没被项目调用，否则实际运行时还会出错，后果更严重。</p>
+<p>然后，将子项目mediaServer设为启动项目，重新编译。</p>
+
+<p>将以上代码中</p>
+
+<pre><code>char const* rootpath = "自定义的根目录";
+</code></pre>
+
+<p>改为</p>
+
+<pre><code>char const* rootpath = RTSPServer::root_path;
+</code></pre>
+
+<p>此时可以在live555MediaServer.cpp中直接设置工作目录了：</p>
+
+<pre><code>rtspServer-&gt;setRootPath("D:/music/");
+</code></pre>
+
+<p>将修改移动到Android的ndk下编译，可能会出现找不到iostream的错误，需要在Application.mk下添加，加入静态库支持：</p>
+
+<pre><code>APP_STL := stlport_static
+</code></pre>
+
+<p>通过Live555MedaiServer新建流媒体服务对象时,其中代码如下：</p>
+
+<pre><code>portNumBits rtspServerPortNum = 554;
+   	rtspServer = DynamicRTSPServer::createNew(*env, rtspServerPortNum, authDB);
+if (rtspServer == NULL) {
+ rtspServerPortNum = 8554;
+ rtspServer = DynamicRTSPServer::createNew(*env, rtspServerPortNum, authDB);
+   	}
+</code></pre>
+
+<p>第一次会设置554为访问端口，不成功会改设8554，在Android端曾出现访问不成功，最后发现端口被设成了8554，访问这个端口是需要在地址中具体指明的。</p>
 
 </article> <!-- end #post__content -->
 
 <div id="post__share">
-  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/08/05/proguard.html&text=Androidstudio下的代码混淆" target="_blank"></a>
+  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/10/30/live555-dir.html&text=live555初探-修改live555当前工作目录" target="_blank"></a>
   <a id="icon-cc" class="fontello" href="http://creativecommons.org/licenses/by-nc-sa/3.0" target="_blank"></a>
-  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/08/05/proguard.html&title=Androidstudio下的代码混淆" target="_blank"></a>
+  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/10/30/live555-dir.html&title=live555初探-修改live555当前工作目录" target="_blank"></a>
 </div> <!-- end #post__share -->
 <div id="disqus_thread" name="luofeng">
   <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>

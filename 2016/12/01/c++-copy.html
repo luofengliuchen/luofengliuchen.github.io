@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
 <!--[if lte IE 9]><meta http-equiv="refresh" content="0;url=/ie.html"><![endif]-->
 
-<title>Androidstudio下的代码混淆 | 落风的博客</title>
+<title>c++学习笔记 | 落风的博客</title>
 <meta name="author" content="落风">
 
-  <meta name="keywords" content="混淆">
+  <meta name="keywords" content="c++">
 
 
 
@@ -160,87 +160,251 @@
     <div id="post">
       <div id="pjax">
         <article id="post__content">
-  <h1 id="post__title" data-identifier="20160805">Androidstudio下的代码混淆</h1>
-  <p>首先在项目的build.gradle中Android标签下添加</p>
+  <h1 id="post__title" data-identifier="20161201">c++学习笔记</h1>
+  <blockquote>
+  <p>在网上看到，正好正在学习c++，摘抄下比较在意的点,方便再看</p>
+</blockquote>
 
-<pre><code>signingConfigs {
-    release {
-        keyAlias 'xxx'
-        keyPassword 'xxx'
-        storeFile file('xxx')
-        storePassword 'xxx'
-    }
+<blockquote>
+  <p>文章链接:<a href="http://www.liuschen.com">http://www.liuschen.com</a></p>
+</blockquote>
+
+<p><a href="http://man.lupaworld.com/content/develop/c&amp;c++/c/c.htm#_Toc520634028">来源：http://man.lupaworld.com/content/develop/c&amp;c++/c/c.htm#_Toc520634028</a></p>
+
+<h1 id="section">1.引用与指针的比较</h1>
+
+<p>引用是C++中的概念，初学者容易把引用和指针混淆一起。一下程序中，n是m的一个引用（reference），m是被引用物（referent）。</p>
+
+<pre><code>int m;
+int &amp;n = m; n相当于m的别名（绰号），对n的任何操作就是对m的操作。例如有人名叫王小毛，他的绰号是“三毛”。说“三毛”怎么怎么的，其实就是对王小毛说三道四。所以n既不是m的拷贝，也不是指向m的指针，其实n就是m它自己。 引用的一些规则如下： （1）引用被创建的同时必须被初始化（指针则可以在任何时候被初始化）。 （2）不能有NULL引用，引用必须与合法的存储单元关联（指针则可以是NULL）。 （3）一旦引用被初始化，就不能改变引用的关系（指针则可以随时改变所指的对象）。
+
+以下示例程序中，k被初始化为i的引用。语句k = j并不能将k修改成为j的引用，只是把k的值改变成为6。由于k是i的引用，所以i的值也变成了6。
+
+ int i = 5;
+int j = 6;
+int &amp;k = i;
+k = j;    // k和i的值都变成了6;   
+上面的程序看起来象在玩文字游戏，没有体现出引用的价值。引用的主要功能是传递函数的参数和返回值。C++语言中，函数的参数和返回值的传递方式有三种：值传递、指针传递和引用传递。
+以下是“值传递”的示例程序。由于Func1函数体内的x是外部变量n的一份拷贝，改变x的值不会影响n, 所以n的值仍然是0。
+void Func1(int x)
+{
+	x = x + 10;
 }
+…
+int n = 0;
+Func1(n);
+cout &lt;&lt; “n = ” &lt;&lt; n &lt;&lt; endl;    // n = 0
+   
+以下是“指针传递”的示例程序。由于Func2函数体内的x是指向外部变量n的指针，改变该指针的内容将导致n的值改变，所以n的值成为10。
+    void Func2(int *x)
+{
+	(* x) = (* x) + 10;
+}
+…
+int n = 0;
+Func2(&amp;n);
+cout &lt;&lt; “n = ” &lt;&lt; n &lt;&lt; endl;        // n = 10
+ 
+以下是“引用传递”的示例程序。由于Func3函数体内的x是外部变量n的引用，x和n是同一个东西，改变x等于改变n，所以n的值成为10。
+void Func3(int &amp;x)
+{
+	x = x + 10;
+}
+…
+int n = 0;
+Func3(n);
+cout &lt;&lt; “n = ” &lt;&lt; n &lt;&lt; endl;      // n = 10
+</code></pre>
 
-buildTypes {
-    release {
-        signingConfig signingConfigs.release
-        minifyEnabled true
-        proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-    }
+<p>对比上述三个示例程序，会发现“引用传递”的性质象“指针传递”，而书写方式象“值传递”。实际上“引用”可以做的任何事情“指针”也都能够做，为什么还要“引用”这东西？<br />
+答案是“用适当的工具做恰如其分的工作”。<br />
+指针能够毫无约束地操作内存中的如何东西，尽管指针功能强大，但是非常危险。就象一把刀，它可以用来砍树、裁纸、修指甲、理发等等，谁敢这样用？<br />
+如果的确只需要借用一下某个对象的“别名”，那么就用“引用”，而不要用“指针”，以免发生意外。比如说，某人需要一份证明，本来在文件上盖上公章的印子就行了，如果把取公章的钥匙交给他，那么他就获得了不该有的权利。</p>
+
+<h1 id="section-1">2.指针与数组的对比</h1>
+
+<p>C++/C程序中，指针和数组在不少地方可以相互替换着用，让人产生一种错觉，以为两者是等价的。</p>
+
+<p>数组要么在静态存储区被创建（如全局数组），要么在栈上被创建。数组名对应着（而不是指向）一块内存，其地址与容量在生命期内保持不变，只有数组的内容可以改变。</p>
+
+<p>指针可以随时指向任意类型的内存块，它的特征是“可变”，所以我们常用指针来操作动态内存。指针远比数组灵活，但也更危险。<br />
+下面以字符串为例比较指针与数组的特性。</p>
+
+<p>以下示例中，字符数组a的容量是6个字符，其内容为hello\0。a的内容可以改变，如a[0]= ‘X’。指针p指向常量字符串“world”（位于静态存储区，内容为world\0），常量字符串的内容是不可以被修改的。从语法上看，编译器并不觉得语句p[0]= ‘X’有什么不妥，但是该语句企图修改常量字符串的内容而导致运行错误。</p>
+
+<pre><code>char a[] = “hello”;
+a[0] = ‘X’;
+cout &lt;&lt; a &lt;&lt; endl;
+char *p = “world”;     // 注意p指向常量字符串
+p[0] = ‘X’;             // 编译器不能发现该错误
+cout &lt;&lt; p &lt;&lt; endl;
+</code></pre>
+
+<h1 id="section-2">3.计算内存容量</h1>
+
+<p>用运算符sizeof可以计算出数组的容量（字节数）。示例7-3-3（a）中，sizeof(a)的值是12（注意别忘了’\0’）。指针p指向a，但是sizeof(p)的值却是4。这是因为sizeof(p)得到的是一个指针变量的字节数，相当于sizeof(char*)，而不是p所指的内存容量。C++/C语言没有办法知道指针所指的内存容量，除非在申请内存时记住它。<br />
+注意当数组作为函数的参数进行传递时，该数组自动退化为同类型的指针。示例中，不论数组a的容量是多少，sizeof(a)始终等于sizeof(char *)。</p>
+
+<pre><code>char a[] = "hello world";
+char *p  = a;
+cout&lt;&lt; sizeof(a) &lt;&lt; endl;   // 12字节
+cout&lt;&lt; sizeof(p) &lt;&lt; endl;   // 4字节
+计算数组和指针的内存容量
+  
+void Func(char a[100])
+{
+    cout&lt;&lt; sizeof(a) &lt;&lt; endl;   // 4字节而不是100字节
 }
 </code></pre>
 
-<p>其中第二个是混淆的设置，第一个配置的是数字签名的路径以及密码等信息，</p>
+<h1 id="section-3">4.指针参数是如何传递内存的？</h1>
 
-<pre><code>signingConfig signingConfigs.release
+<p>如果函数的参数是一个指针，不要指望用该指针去申请动态内存。示例7-4-1中，Test函数的语句GetMemory(str, 200)并没有使str获得期望的内存，str依旧是NULL，为什么？</p>
+
+<pre><code>void GetMemory(char *p, int num)
+{
+    p = (char *)malloc(sizeof(char) * num);
+}
+void Test(void)
+{
+    char *str = NULL;
+    GetMemory(str, 100);    // str 仍然为 NULL 
+    strcpy(str, "hello");   // 运行错误
+}
+示例7-4-1 试图用指针参数申请动态内存
 </code></pre>
 
-<p>个是依赖于这项配置的，不然会报错</p>
+<p>毛病出在函数GetMemory中。编译器总是要为函数的每个参数制作临时副本，指针参数p的副本是 _p，编译器使 _p = p。如果函数体内的程序修改了_p的内容，就导致参数p的内容作相应的修改。这就是指针可以用作输出参数的原因。在本例中，_p申请了新的内存，只是把_p所指的内存地址改变了，但是p丝毫未变。所以函数GetMemory并不能输出任何东西。事实上，每执行一次GetMemory就会泄露一块内存，因为没有用free释放内存。<br />
+如果非得要用指针参数去申请内存，那么应该改用“指向指针的指针”，见示例7-4-2。</p>
 
-<p>然后，就是配置混淆的文件</p>
-
-<pre><code>-ignorewarnings
--optimizationpasses 5          # 指定代码的压缩级别
--dontusemixedcaseclassnames   # 是否使用大小写混合
--dontpreverify           # 混淆时是否做预校验
--verbose                # 混淆时是否记录日志
-
-
--optimizations !code/simplification/arithmetic,!field/*,!class/merging/*  # 混淆时所采用的算法
-
--keep public class * extends android.app.Activity      # 保持哪些类不被混淆
--keep public class * extends android.app.Application   # 保持哪些类不被混淆
--keep public class * extends android.app.Service       # 保持哪些类不被混淆
--keep public class * extends android.content.BroadcastReceiver  # 保持哪些类不被混淆
--keep public class * extends android.content.ContentProvider    # 保持哪些类不被混淆
--keep public class * extends android.app.backup.BackupAgentHelper # 保持哪些类不被混淆
--keep public class * extends android.preference.Preference        # 保持哪些类不被混淆
--keep public class com.android.vending.licensing.ILicensingService    # 保持哪些类不被混淆
-
--keep class javax.security.** { *; }
-
-
--keepclasseswithmembernames class * {  # 保持 native 方法不被混淆
-    native &lt;methods&gt;;
+<pre><code>void GetMemory2(char **p, int num)
+{
+    *p = (char *)malloc(sizeof(char) * num);
 }
--keepclasseswithmembers class * {   # 保持自定义控件类不被混淆
-    public &lt;init&gt;(android.content.Context, android.util.AttributeSet);
+void Test2(void)
+{
+    char *str = NULL;
+    GetMemory2(&amp;str, 100);  // 注意参数是 &amp;str，而不是str
+    strcpy(str, "hello");  
+    cout&lt;&lt; str &lt;&lt; endl;
+    free(str); 
 }
--keepclasseswithmembers class * {# 保持自定义控件类不被混淆
-    public &lt;init&gt;(android.content.Context, android.util.AttributeSet, int);
+示例7-4-2用指向指针的指针申请动态内存
+</code></pre>
+
+<p>由于“指向指针的指针”这个概念不容易理解，我们可以用函数返回值来传递动态内存。这种方法更加简单，见示例7-4-3。</p>
+
+<pre><code>char *GetMemory3(int num)
+{
+    char *p = (char *)malloc(sizeof(char) * num);
+    return p;
 }
--keepclassmembers class * extends android.app.Activity { # 保持自定义控件类不被混淆
-    public void *(android.view.View);
+void Test3(void)
+{
+    char *str = NULL;
+    str = GetMemory3(100); 
+    strcpy(str, "hello");
+    cout&lt;&lt; str &lt;&lt; endl;
+    free(str); 
 }
--keepclassmembers enum * {     # 保持枚举 enum 类不被混淆
-    public static **[] values();
-    public static ** valueOf(java.lang.String);
+示例7-4-3 用函数返回值来传递动态内存
+</code></pre>
+
+<p>用函数返回值来传递动态内存这种方法虽然好用，但是常常有人把return语句用错了。这里强调不要用return语句返回指向“栈内存”的指针，因为该内存在函数结束时自动消亡，见示例7-4-4。</p>
+
+<pre><code>char *GetString(void)
+{
+    char p[] = "hello world";
+    return p;   // 编译器将提出警告
 }
--keep class * implements android.os.Parcelable { # 保持 Parcelable 不被混淆
-    public static final android.os.Parcelable$Creator *;
+void Test4(void)
+{
+char *str = NULL;
+str = GetString();  // str 的内容是垃圾
+cout&lt;&lt; str &lt;&lt; endl;
+}
+示例7-4-4 return语句返回指向“栈内存”的指针
+</code></pre>
+
+<p>用调试器逐步跟踪Test4，发现执行str = GetString语句后str不再是NULL指针，但是str的内容不是“hello world”而是垃圾。<br />
+如果把示例7-4-4改写成示例7-4-5，会怎么样？</p>
+
+<pre><code>char *GetString2(void)
+{
+    char *p = "hello world";
+    return p;
+}
+void Test5(void)
+{
+    char *str = NULL;
+    str = GetString2();
+    cout&lt;&lt; str &lt;&lt; endl;
+}
+示例7-4-5 return语句返回常量字符串
+</code></pre>
+
+<p>函数Test5运行虽然不会出错，但是函数GetString2的设计概念却是错误的。因为GetString2内的“hello world”是常量字符串，位于静态存储区，它在程序生命期内恒定不变。无论什么时候调用GetString2，它返回的始终是同一个“只读”的内存块。</p>
+
+<h1 id="section-4">5.参数的缺省值</h1>
+
+<p>有一些参数的值在每次函数调用时都相同，书写这样的语句会使人厌烦。C++语言采用参数的缺省值使书写变得简洁（在编译时，缺省值由编译器自动插入）。</p>
+
+<h2 id="section-5">参数缺省值的使用规则：</h2>
+
+<h3 id="section-6">5.1.参数缺省值只能出现在函数的声明中，而不能出现在定义体中。</h3>
+<p>例如：</p>
+
+<pre><code>void Foo(int x=0, int y=0);    // 正确，缺省值出现在函数的声明中
+ 
+void Foo(int x=0, int y=0)        // 错误，缺省值出现在函数的定义体中
+{
+…
 }
 </code></pre>
 
-<p>一般情况下，系统的控件不必要混淆，如activity，service等，其次由于默在Androidstudio中默认已经将libs包中的jar添加了，重复添加反而会报错，最后项目中用到反射的地方一定不能混淆。<br />
-添加完后却还是报错了，先添加了-dontwarn，然并没什么用，然后加了-ignorewarnings忽略警告，成功生成apk,只是一定要注意确保警告中的地方没被项目调用，否则实际运行时还会出错，后果更严重。</p>
+<p>为什么会这样？我想是有两个原因：一是函数的实现（定义）本来就与参数是否有缺省值无关，所以没有必要让缺省值出现在函数的定义体中。二是参数的缺省值可能会改动，显然修改函数的声明比修改函数的定义要方便。</p>
+
+<h3 id="section-7">5.2.如果函数有多个参数，参数只能从后向前挨个儿缺省，否则将导致函数调用语句怪模怪样。</h3>
+<p>正确的示例如下：</p>
+
+<pre><code>void Foo(int x, int y=0, int z=0);
+错误的示例如下：
+void Foo(int x=0, int y, int z=0);   
+</code></pre>
+
+<p>要注意，使用参数的缺省值并没有赋予函数新的功能，仅仅是使书写变得简洁一些。它可能会提高函数的易用性，但是也可能会降低函数的可理解性。所以我们只能适当地使用参数的缺省值，要防止使用不当产生负面效果。示例8-3-2中，不合理地使用参数的缺省值将导致重载函数output产生二义性。</p>
+
+<pre><code>#include &lt;iostream.h&gt;
+void output( int x);
+void output( int x, float y=0.0);
+ 
+void output( int x)
+{
+    cout &lt;&lt; " output int " &lt;&lt; x &lt;&lt; endl ;
+}
+ 
+void output( int x, float y)
+{
+    cout &lt;&lt; " output int " &lt;&lt; x &lt;&lt; " and float " &lt;&lt; y &lt;&lt; endl ;
+}
+ 
+void main(void)
+{
+    int x=1;
+    float y=0.5;
+//  output(x);          // error! ambiguous call
+    output(x,y);        // output int 1 and float 0.5
+}
+</code></pre>
+
+<p>参数的缺省值将导致重载函数产生二义性</p>
 
 </article> <!-- end #post__content -->
 
 <div id="post__share">
-  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/08/05/proguard.html&text=Androidstudio下的代码混淆" target="_blank"></a>
+  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/12/01/c++-copy.html&text=c++学习笔记" target="_blank"></a>
   <a id="icon-cc" class="fontello" href="http://creativecommons.org/licenses/by-nc-sa/3.0" target="_blank"></a>
-  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/08/05/proguard.html&title=Androidstudio下的代码混淆" target="_blank"></a>
+  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/12/01/c++-copy.html&title=c++学习笔记" target="_blank"></a>
 </div> <!-- end #post__share -->
 <div id="disqus_thread" name="luofeng">
   <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
