@@ -52,6 +52,36 @@
 
     <nav id="pl__container">
     
+      <a class="技术 pl__all" href="/2017/03/31/smali.html"><span class="pl__circle"></span><span class="pl__title">Android反编译smali文件的修改</span><span class="pl__date">Mar 2017</span></a>
+    
+      <a class="技术 pl__all" href="/2017/03/28/Bootstrap.html"><span class="pl__circle"></span><span class="pl__title">Bootstrap</span><span class="pl__date">Mar 2017</span></a>
+    
+      <a class="技术 pl__all" href="/2017/03/21/smali2.html"><span class="pl__circle"></span><span class="pl__title">android反编译还原项目指南</span><span class="pl__date">Mar 2017</span></a>
+    
+      <a class="技术 pl__all" href="/2017/03/20/something.html"><span class="pl__circle"></span><span class="pl__title">一些web相关东西(摘自网络)</span><span class="pl__date">Mar 2017</span></a>
+    
+      <a class="技术 pl__all" href="/2017/03/16/linux.html"><span class="pl__circle"></span><span class="pl__title">linux网络调试</span><span class="pl__date">Mar 2017</span></a>
+    
+      <a class="技术 pl__all" href="/2017/03/13/caffe.html"><span class="pl__circle"></span><span class="pl__title">protobuf</span><span class="pl__date">Mar 2017</span></a>
+    
+      <a class="技术 pl__all" href="/2017/03/09/docker.html"><span class="pl__circle"></span><span class="pl__title">docker</span><span class="pl__date">Mar 2017</span></a>
+    
+      <a class="技术 pl__all" href="/2017/03/06/broadcast.html"><span class="pl__circle"></span><span class="pl__title">网络探测技术初探</span><span class="pl__date">Mar 2017</span></a>
+    
+      <a class="技术 pl__all" href="/2017/02/26/GBK.html"><span class="pl__circle"></span><span class="pl__title">GBK编码问题</span><span class="pl__date">Feb 2017</span></a>
+    
+      <a class="技术 pl__all" href="/2017/01/16/fastdfs.html"><span class="pl__circle"></span><span class="pl__title">FastDFS配置文档</span><span class="pl__date">Jan 2017</span></a>
+    
+      <a class="技术 pl__all" href="/2017/01/16/error.html"><span class="pl__circle"></span><span class="pl__title">eclipse配合maven导入项目遇到的问题</span><span class="pl__date">Jan 2017</span></a>
+    
+      <a class="技术 pl__all" href="/2016/12/28/Intellij.html"><span class="pl__circle"></span><span class="pl__title">intellij尝试</span><span class="pl__date">Dec 2016</span></a>
+    
+      <a class="技术 pl__all" href="/2016/12/26/maven.html"><span class="pl__circle"></span><span class="pl__title">MAVEN配置</span><span class="pl__date">Dec 2016</span></a>
+    
+      <a class="技术 pl__all" href="/2016/12/19/flash.html"><span class="pl__circle"></span><span class="pl__title">flash RTMP 推流</span><span class="pl__date">Dec 2016</span></a>
+    
+      <a class="技术 pl__all" href="/2016/12/12/jbmp.html"><span class="pl__circle"></span><span class="pl__title">JBMP安装</span><span class="pl__date">Dec 2016</span></a>
+    
       <a class="技术 pl__all" href="/2016/12/01/c++-copy.html"><span class="pl__circle"></span><span class="pl__title">c++学习笔记</span><span class="pl__date">Dec 2016</span></a>
     
       <a class="技术 pl__all" href="/2016/11/27/C++-point.html"><span class="pl__circle"></span><span class="pl__title">c语言微知识点</span><span class="pl__date">Nov 2016</span></a>
@@ -279,6 +309,32 @@ ffmpeg -ss 0:1:30 -t 0:0:20 -i input.avi -vcodec copy -acodec copy output.avi   
 <p>从屏幕的（10,20）点处开始，抓取640x480的屏幕，设定帧率为5 ：</p>
 
 <pre><code>ffmpeg -f gdigrab -framerate 5 -offset_x 10 -offset_y 20 -video_size 640x480 -i desktop out.mpg 
+</code></pre>
+
+<p>录屏推流播放</p>
+
+<pre><code>//录屏RTMP推流
+ffmpeg -f gdigrab  -i desktop  -vcodec libx264 -f flv rtmp://192.168.1.14/oflaDemo/str5
+
+//直播RTMP推流
+ffmpeg -f dshow -i video="USB Camera" -f dshow -i audio="麦克风 (Conexant SmartAudio HD)" -r 5 -vcodec libx264 -preset:v ultrafast -tune:v zerolatency -acodec libmp3lame -f flv rtmp://192.168.1.14/oflaDemo/str5
+
+//延迟较小的播放
+ffplay -i "rtmp://192.168.1.14/oflaDemo/str5 live=1" -fflags nobuffer -analyzeduration 1000000
+</code></pre>
+
+<p>gdigrab是基于GDI的抓屏设备，可以用于抓取屏幕的特定区域。</p>
+
+<p>gdigrab通过设定不同的输入URL，支持两种方式的屏幕抓取：</p>
+
+<p>（1）“desktop”：抓取整张桌面。或者抓取桌面中的一个特定的区域。</p>
+
+<p>（2）“title={窗口名称}”：抓取屏幕中特定的一个窗口。</p>
+
+<p>设置编码方式</p>
+
+<pre><code>音频：-acodec libmp3lame
+视频：-vcodec libx264
 </code></pre>
 
 <p>ffmpeg从视频中生成gif图片：</p>

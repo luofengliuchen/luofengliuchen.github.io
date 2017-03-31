@@ -9,6 +9,36 @@
 
 
 
+  /2017/03/31/smali.html
+
+  /2017/03/28/Bootstrap.html
+
+  /2017/03/21/smali2.html
+
+  /2017/03/20/something.html
+
+  /2017/03/16/linux.html
+
+  /2017/03/13/caffe.html
+
+  /2017/03/09/docker.html
+
+  /2017/03/06/broadcast.html
+
+  /2017/02/26/GBK.html
+
+  /2017/01/16/fastdfs.html
+
+  /2017/01/16/error.html
+
+  /2016/12/28/Intellij.html
+
+  /2016/12/26/maven.html
+
+  /2016/12/19/flash.html
+
+  /2016/12/12/jbmp.html
+
   /2016/12/01/c++-copy.html
 
   /2016/11/27/C++-point.html
