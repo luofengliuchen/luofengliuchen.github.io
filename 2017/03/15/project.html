@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
 <!--[if lte IE 9]><meta http-equiv="refresh" content="0;url=/ie.html"><![endif]-->
 
-<title>ffmpeg/ffplay命令记录（转载，整理） | 落风的博客</title>
+<title>如何将已存在的APK项目作为资源引用 | 落风的博客</title>
 <meta name="author" content="落风">
 
-  <meta name="keywords" content="ffmpeg,ffplay">
+  <meta name="keywords" content="android,apk">
 
 
 
@@ -202,220 +202,160 @@
     <div id="post">
       <div id="pjax">
         <article id="post__content">
-  <h1 id="post__title" data-identifier="20161116">ffmpeg/ffplay命令记录（转载，整理）</h1>
+  <h1 id="post__title" data-identifier="20170315">如何将已存在的APK项目作为资源引用</h1>
   <blockquote>
   <p>文章链接:<a href="http://www.liuschen.com">http://www.liuschen.com</a></p>
 </blockquote>
 
-<p>打出来的视频信息，但是没有播放，但是会输出视频帧到当前目录</p>
+<p>android开发中，调用外部引用的方法分为三种：</p>
 
-<pre><code>ffmpeg -i "rtmp://192.168.24.142/oflaDemo/st6 live=1" -f image2 -vf fps=fps=1 out%d.png
+<ul>
+  <li>引入jar包文件</li>
+  <li>把项目整体作为依赖</li>
+  <li>通过maven或是gradle直接配置依赖</li>
+</ul>
+
+<p>基本上，项目如果要开发更简洁，引入外部的依赖是不可避免的，这些引入的方法都很简单，不多加详述，现在我主要探究的是如何通过已有的apk拓展源，来制作可用的依赖。</p>
+
+<p>关于这点有两点设想</p>
+
+<ol>
+  <li>反编译apk，修改清单文件，重新打包，将apk作为插件供新程序调用。</li>
+  <li>反编译apk,将反编译出的class文件打成jar包，供新程序调用，引入资源文件，修改映射关系</li>
+</ol>
+
+<h2 id="section">反编译，重打包</h2>
+
+<blockquote>
+  <p>将apk反编译后会解出一个smali文件夹和res文件夹以及一个解码过的清单文件，如果单纯的解压apk,得到的则是dex文件和resources.arsc文件以及没有解码的res和清单文件，将反编译后的文件夹重新打包，会生成一个build文件夹，里面的内容和解压apk得到的文件类似。也就是说，其实反编译得到的代码是一个完整的开发工程，只是不是Java而已。</p>
+</blockquote>
+
+<p><strong>反编译  apktool d -f -.apk</strong>，会生成一个apk的同名文件夹</p>
+
+<p><strong>重打包  apktool b -f 反编译得到的文件夹</strong>,然后会在该文件夹下的dist目录中得到未签名的apk</p>
+
+<p>这时，包是没有签名的，没有签名的apk是不能安装到手机上的，所以，先简单说一下签名</p>
+
+<pre><code>每个程序在安装前都需要签名，即是是调试的apk也不例外，发布到市场上的apk一般会单独生成一个keystore,而一般调试用的是系统里面的一个debug.keystore
+
+keytool(jdk的bin目录下)是用来生成keystore的，eclipse和studio里面有图形化的生成方式其实也是调用的这个命令
+keytool -genkeypair -alias - debug.keystore -keyalg RSA -validity  100
+-keystore debug.keystore
+命令说明如下：
+ -genkeypair  ：指定生成数字证书
+-alias ：指定生成数字证书的别名
+-keyalg：指定生成数字证书的算法  这里如RSA算法
+-validity：指定生成数字证书的有效期
+-keystore ：指定生成数字证书的存储路径。  （这里默认在keytool.exe 目录下）
+
+
+jarsigner(jdk的bin目录下)命令是用来签名的，调试的时候就是用这个命令签入debug.keystore的
+jarsigner -verbose -keystore debug.keystore -signedjar
+dst.apk src.apk debug.keystore 
+以上命令的说明：
+-verbose：指定生成详细输出
+-keystore：指定数字证书存储路径
+-signedjar：该选项的三个参数为  签名后的apk包  未签名的apk包  数字证书别名
+
+我的debug.keystore在用户目录下的.android文件夹中
+
+查看证书信息keytool -list -keystore debug.keystore
+默认密码为：android
+
+debug.keystore签名的别名为androiddebugkey
 </code></pre>
 
-<p>播放RMTP直播流</p>
+<p>如果用debug.keystore来<strong>签名</strong>:</p>
 
-<pre><code>ffplay -i "rtmp://192.168.24.142/oflaDemo/st6 live=1"
+<p>jarsigner -verbose -keystore C:\Users\用户.android\debug.keystore -signedjar dst.apk src.apk androiddebugkey</p>
+
+<pre><code>正在添加: META-INF/MANIFEST.MF
+正在添加: META-INF/ANDROIDD.SF
+正在添加: META-INF/ANDROIDD.RSA
+正在签名: AndroidManifest.xml
+正在签名: classes.dex
+正在签名: res/anim/calendar_push_left_in.xml
+正在签名: res/anim/calendar_push_left_out.xml
+正在签名: res/anim/calendar_push_right_in.xml
+正在签名: res/anim/calendar_push_right_out.xml
+正在签名: res/anim/push_bottom_in.xml
+正在签名: res/anim/push_bottom_in2.xml
+			。
+			。
 </code></pre>
 
-<p>fplay播放yuv文件命令</p>
+<p>利用这一流程，来做若干测试：</p>
 
-<pre><code>ffplay -f rawvideo -video_size 1920x1080 a.yuv
+<ol>
+  <li>修改反编译后的清单文件（比如为activity添加入口，去掉入口，修改包名等等），打包，签名，安装运行程序，程序能如预期的修改效果。</li>
+  <li>修改反编译后的资源文件(如替换图片)，程序也能如期产生对应效果。</li>
+  <li>
+    <p>修改smali</p>
+
+    <p>Dalvik字节码Dalvik是google专门为Android操作系统设计的一个虚拟机，经过深度的优化。虽然Android上的程序是使用java来开发的，但是Dalvik和标准的java虚拟机JVM是不同的。Dalvik VM是基于寄存器的，而JVM是基于栈的；Dalvik有专属的文件执行格式dex（dalvik executable），而JVM则执行的是java字节码。Dalvik VM比JVM速度更快，占用空间更少。打包成apk的过程就是将java编译成class文件，然后将class文件封装成dex打包入apk的过程。</p>
+  </li>
+</ol>
+
+<p><strong>通过这个方法总结出利用原始apk文件部分功能的方法</strong></p>
+
+<ul>
+  <li>修改apk入口，将之作为插件依附在新建的apk上</li>
+  <li>新建项目写好需要添加的功能，然后编译成apk文件，反编译出源码，对照修改原来的smali文件和资源文件，重新打包签名</li>
+</ul>
+
+<h2 id="classjar">反编译，提取class文件制作jar包</h2>
+
+<p>之前反编译到的文件通过jd-gui读取时有很多乱序代码，所以直接抠出Java代码放在开发环境中修改将是一项相当耗时，而且需要懂其中的的业务逻辑，不然就就不可能还原其代码，那么就只能将它打成jar包在新工程中调用，如果是这样，那么就剩下了一个问题，就是如何修复class文件中的资源id和资源本身的映射关系。</p>
+
+<p>通过实践可知，如果将一个android项目导出为jar包，除了不能包含清单文件和一系列配置文件外（因为配置文件外部也有，如果里面也存在就会造成冲突），资源文件并不能被正确找到。毕竟，资源文件的映射ID是随机生成的。</p>
+
+<p>而Android系统将代码生成apk过程如下：</p>
+
+<blockquote>
+  <p><a href="http://blog.csdn.net/androiddevelop/article/details/10948639">命令行方式生成APK</a></p>
+
+  <p>1、使用Android SDK提供的aapt.exe(build-tools目录)生成R.Java类文件</p>
+
+  <p>2、使用Android SDK提供的aidl.exe(build-tools目录)把.aidl转成.java文件</p>
+
+  <p>3、使用JDK提供的javac.exe（jdk的bin目录下）编译.java类文件生成class文件</p>
+
+  <p>4、使用Android SDK提供的dx.bat(build-tools目录)命令行脚本生成classes.dex文件</p>
+
+  <p>5、使用Android SDK提供的aapt.exe(build-tools目录)生成资源包文件（包括res、assets、androidmanifest.xml等）</p>
+
+  <p>6、使用Android SDK提供的apkbuilder.bat（老版本在sdk中tool目录下，新版是没有这个文件的）生成未签名的apk安装文件</p>
+
+  <p>7、使用jdk的jarsigner.exe（jdk的bin目录下）对未签名的包进行apk签名</p>
+
+  <p>8、安装使用的adb.exe在SDK的platform-tools目录下</p>
+</blockquote>
+
+<p>android.jar里面是有资源文件的，但是通过尝试，发现引入的jar是和android.jar包不一样的，引入的jar包相当于和本地写的代码是一样的，不允许重复，清单文件资源文件还有resources.arsc文件，resources.arsc一开始我认为里面存放的应该是资源的映射关系，所以放在jar包中能有用，但是却会提示和本地生成的resources.arsc有冲突。那么就不能将这些文件一同写入jar包了，但是如果分开来src和jar包只放代码，res放资源，由于开发环境中R映射文件是动态生成的。而我现在操作的是R文件映射关系已经固定的项目，强行指定固然可以一试，但却不是好方法。</p>
+
+<pre><code>dex2jar classes.dex             //dex转jar
+jar xf classes_dex2jar.jar		//解压jar
+jar cvf ketroa.jar *			//打jar包
 </code></pre>
 
-<p>设置播放没有缓冲区</p>
+<p>于是我又想到了第二种导入依赖的方法，项目指定，在eclipse中如果一个项目把另一个项目作为依赖，那么这个项目引用的包就会指向被引用项目的bin文件中自动生成的jar包，这个bin文件中除了有jar包，还有一个res资源文件夹，一个清单文件，和一个R.txt文件，虽然小，但是所有需要的文件都有。R.txt格式文件如下:</p>
 
-<pre><code>ffplay -x 240 -y 320 109.flv -fflags nobuffer
-
-
-ffplay -i "rtmp://192.168.24.142/oflaDemo/st5 live=1" -fflags nobuffer -analyzeduration 1000000
+<pre><code>int dimen activity_horizontal_margin 0x7f040000
+int dimen activity_vertical_margin 0x7f040001
+int drawable ic_launcher 0x7f020000
 </code></pre>
 
-<p>列出本机可用设备</p>
+<p>这种方式虽然可行，但是也需要熟知Android生成apk的过程，对已有打包脚本进行修改才行，虽然是从两种出发点考虑，但是却和上面的强行指定是同一种路子。</p>
 
-<pre><code>ffmpeg -list_devices true -f dshow -i dummy 
-</code></pre>
+<p>关于aapt，可以通过调出命令文档可知aapt d -param apk可以查看apk的各种信息。</p>
 
-<p>播放本机USB摄像头捕捉数据</p>
-
-<pre><code>ffplay -f dshow -i video="USB Camera" -f dshow -i audio="音频设备"
-ffplay -f vfwcap -i 0
-//设置分辨率和帧率播放
-ffplay -s 424x240 -r 5 -f dshow -i video="USB Camera"
-</code></pre>
-
-<p>将USB摄像头捕捉的数据编码成H264保存到文件</p>
-
-<pre><code>ffmpeg -f dshow -i video="USB Camera" -vcodec libx264 camera.mkv
-</code></pre>
-
-<p>将USB摄像头数据通过RTMP协议发送出去</p>
-
-<pre><code>ffmpeg -f dshow -i video="USB Camera" -vcodec libx264 -preset:v ultrafast -tune:v zerolatency -f flv rtmp://localhost/oflaDemo/livestream
-</code></pre>
-
-<p>查看设备选项</p>
-
-<pre><code>ffmpeg -list_options true -f dshow -i video="USB Camera" 
-</code></pre>
-
-<p>分离视频音频流</p>
-
-<pre><code>ffmpeg -i input_file -vcodec copy -an output_file_video　　//分离视频流
-ffmpeg -i input_file -acodec copy -vn output_file_audio　　//分离音频流
-</code></pre>
-
-<p>视频解复用</p>
-
-<pre><code>ffmpeg –i test.mp4 –vcodec copy –an –f m4v test.264
-ffmpeg –i test.avi –vcodec copy –an –f m4v test.264
-//这个m4v是表示mp4的格式，如果是flv就需要写成flv
-</code></pre>
-
-<p>视频转码</p>
-
-<pre><code>ffmpeg –i test.mp4 –vcodec h264 –s 352*278 –an –f m4v test.264              //转码为码流原始文件
-ffmpeg –i test.mp4 –vcodec h264 –bf 0 –g 25 –s 352*278 –an –f m4v test.264  //转码为码流原始文件
-ffmpeg –i test.avi -vcodec mpeg4 –vtag xvid –qsame test_xvid.avi            //转码为封装文件
-//-bf B帧数目控制，-g 关键帧间隔控制，-s 分辨率控制
-</code></pre>
-
-<p>视频封装</p>
-
-<pre><code>ffmpeg –i video_file –i audio_file –vcodec copy –acodec copy output_file
-</code></pre>
-
-<p>视频剪切</p>
-
-<pre><code>ffmpeg –i test.avi –r 1 –f image2 image-%3d.jpeg        //提取图片
-ffmpeg -ss 0:1:30 -t 0:0:20 -i input.avi -vcodec copy -acodec copy output.avi    //剪切视频
-//-r 提取图像的频率，-ss 开始时间，-t 持续时间
-</code></pre>
-
-<p>视频录制</p>
-
-<pre><code>ffmpeg –i rtsp://192.168.3.205:5555/test –vcodec copy out.avi
-</code></pre>
-
-<p>YUV序列播放</p>
-
-<pre><code>ffplay -f rawvideo -video_size 1920x1080 input.yuv
-</code></pre>
-
-<p>YUV序列转AVI</p>
-
-<pre><code>ffmpeg –s w*h –pix_fmt yuv420p –i input.yuv –vcodec mpeg4 output.avi
-</code></pre>
-
-<p>采集usb摄像头视频命令：</p>
-
-<pre><code>ffmpeg -t 20 -f vfwcap -i 0 -r 8 -f mp4 cap1111.mp4
-
-具体说明如下：我们采集10秒，采集设备为vfwcap类型设备，第0个vfwcap采集设备（如果系统有多个vfw的视频采集设备，可以通过-i num来选择），每秒8帧，输出方式为文件，格式为mp4。
-</code></pre>
-
-<p>最简单的抓屏：</p>
-
-<pre><code>ffmpeg -f gdigrab -i desktop out.mpg 
-</code></pre>
-
-<p>从屏幕的（10,20）点处开始，抓取640x480的屏幕，设定帧率为5 ：</p>
-
-<pre><code>ffmpeg -f gdigrab -framerate 5 -offset_x 10 -offset_y 20 -video_size 640x480 -i desktop out.mpg 
-</code></pre>
-
-<p>录屏推流播放</p>
-
-<pre><code>//录屏RTMP推流
-ffmpeg -f gdigrab  -i desktop  -vcodec libx264 -f flv rtmp://192.168.1.14/oflaDemo/str5
-
-//直播RTMP推流
-ffmpeg -f dshow -i video="USB Camera" -f dshow -i audio="麦克风 (Conexant SmartAudio HD)" -r 5 -vcodec libx264 -preset:v ultrafast -tune:v zerolatency -acodec libmp3lame -f flv rtmp://192.168.1.14/oflaDemo/str5
-
-//延迟较小的播放
-ffplay -i "rtmp://192.168.1.14/oflaDemo/str5 live=1" -fflags nobuffer -analyzeduration 1000000
-</code></pre>
-
-<p>gdigrab是基于GDI的抓屏设备，可以用于抓取屏幕的特定区域。</p>
-
-<p>gdigrab通过设定不同的输入URL，支持两种方式的屏幕抓取：</p>
-
-<p>（1）“desktop”：抓取整张桌面。或者抓取桌面中的一个特定的区域。</p>
-
-<p>（2）“title={窗口名称}”：抓取屏幕中特定的一个窗口。</p>
-
-<p>设置编码方式</p>
-
-<pre><code>音频：-acodec libmp3lame
-视频：-vcodec libx264
-</code></pre>
-
-<p>ffmpeg从视频中生成gif图片：</p>
-
-<pre><code>ffmpeg -i capx.mp4 -t 10 -s 320x240 -pix_fmt rgb24 jidu1.gif
-</code></pre>
-
-<p>ffmpeg将图片转换为视频</p>
-
-<pre><code>指定编码，帧率和码率，图片在当前目录下需要按照自然数排序命名
-ffmpeg -f image2 -i c:\temp\d.jpg -vcodec libx264 -r 10 -b 200k  test.mp4
-</code></pre>
-
-<p>将文件当做直播送至live</p>
-
-<pre><code>ffmpeg -re -i localFile.mp4 -c copy -f flv rtmp://server/live/streamName
-</code></pre>
-
-<p>将直播媒体保存至本地文件</p>
-
-<pre><code>ffmpeg -i rtmp://server/live/streamName -c copy dump.flv
-</code></pre>
-
-<p>将其中一个直播流，视频改用h264压缩，音频不变，送至另外一个直播服务流</p>
-
-<pre><code>ffmpeg -i rtmp://server/live/originalStream -c:a copy -c:v libx264 -vpre slow -f flv rtmp://server/live/h264Stream
-</code></pre>
-
-<p>将其中一个直播流，视频改用h264压缩，音频改用faac压缩，送至另外一个直播服务流</p>
-
-<pre><code>ffmpeg -i rtmp://server/live/originalStream -c:a libfaac -ar 44100 -ab 48k -c:v libx264 -vpre slow -vpre baseline -f flv rtmp://server/live/h264Stream
-</code></pre>
-
-<p>将其中一个直播流，视频不变，音频改用faac压缩，送至另外一个直播服务流</p>
-
-<pre><code>ffmpeg -i rtmp://server/live/originalStream -acodec libfaac -ar 44100 -ab 48k -vcodec copy -f flv rtmp://server/live/h264_AAC_Stream
-</code></pre>
-
-<p>将一个高清流，复制为几个不同视频清晰度的流重新发布，其中音频不变</p>
-
-<pre><code>ffmpeg -re -i rtmp://server/live/high_FMLE_stream -acodec copy -vcodec x264lib -s 640×360 -b 500k -vpre medium -vpre baseline rtmp://server/live/baseline_500k -acodec copy -vcodec x264lib -s 480×272 -b 300k -vpre medium -vpre baseline rtmp://server/live/baseline_300k -acodec copy -vcodec x264lib -s 320×200 -b 150k -vpre medium -vpre baseline rtmp://server/live/baseline_150k -acodec libfaac -vn -ab 48k rtmp://server/live/audio_only_AAC_48k
-</code></pre>
-
-<p>功能一样，只是采用-x264opts选项</p>
-
-<pre><code>ffmpeg -re -i rtmp://server/live/high_FMLE_stream -c:a copy -c:v x264lib -s 640×360 -x264opts bitrate=500:profile=baseline:preset=slow rtmp://server/live/baseline_500k -c:a copy -c:v x264lib -s 480×272 -x264opts bitrate=300:profile=baseline:preset=slow rtmp://server/live/baseline_300k -c:a copy -c:v x264lib -s 320×200 -x264opts bitrate=150:profile=baseline:preset=slow rtmp://server/live/baseline_150k -c:a libfaac -vn -b:a 48k rtmp://server/live/audio_only_AAC_48k
-</code></pre>
-
-<p>将当前摄像头及音频通过DSSHOW采集，视频h264、音频faac压缩后发布</p>
-
-<pre><code>ffmpeg -r 25 -f dshow -s 640×480 -i video=”video source name”:audio=”audio source name” -vcodec libx264 -b 600k -vpre slow -acodec libfaac -ab 128k -f flv rtmp://server/application/stream_name
-</code></pre>
-
-<p>将一个JPG图片经过h264压缩循环输出为mp4视频</p>
-
-<pre><code>ffmpeg.exe -i INPUT.jpg -an -vcodec libx264 -coder 1 -flags +loop -cmp +chroma -subq 10 -qcomp 0.6 -qmin 10 -qmax 51 -qdiff 4 -flags2 +dct8x8 -trellis 2 -partitions +parti8x8+parti4x4 -crf 24 -threads 0 -r 25 -g 25 -y OUTPUT.mp4
-</code></pre>
-
-<p>将普通流视频改用h264压缩，音频不变，送至高清流服务(新版本FMS live=1)</p>
-
-<pre><code>ffmpeg -i rtmp://server/live/originalStream -c:a copy -c:v libx264 -vpre slow -f flv “rtmp://server/live/h264Stream live=1〃
-</code></pre>
 
 </article> <!-- end #post__content -->
 
 <div id="post__share">
-  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/11/16/ffplay.html&text=ffmpeg/ffplay命令记录（转载，整理）" target="_blank"></a>
+  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2017/03/15/project.html&text=如何将已存在的APK项目作为资源引用" target="_blank"></a>
   <a id="icon-cc" class="fontello" href="http://creativecommons.org/licenses/by-nc-sa/3.0" target="_blank"></a>
-  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/11/16/ffplay.html&title=ffmpeg/ffplay命令记录（转载，整理）" target="_blank"></a>
+  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2017/03/15/project.html&title=如何将已存在的APK项目作为资源引用" target="_blank"></a>
 </div> <!-- end #post__share -->
 <div id="disqus_thread" name="luofeng">
   <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>

@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
 <!--[if lte IE 9]><meta http-equiv="refresh" content="0;url=/ie.html"><![endif]-->
 
-<title>ffmpeg/ffplay命令记录（转载，整理） | 落风的博客</title>
+<title>python笔记1 | 落风的博客</title>
 <meta name="author" content="落风">
 
-  <meta name="keywords" content="ffmpeg,ffplay">
+  <meta name="keywords" content="Python">
 
 
 
@@ -202,220 +202,307 @@
     <div id="post">
       <div id="pjax">
         <article id="post__content">
-  <h1 id="post__title" data-identifier="20161116">ffmpeg/ffplay命令记录（转载，整理）</h1>
+  <h1 id="post__title" data-identifier="20170425">python笔记1</h1>
   <blockquote>
   <p>文章链接:<a href="http://www.liuschen.com">http://www.liuschen.com</a></p>
 </blockquote>
 
-<p>打出来的视频信息，但是没有播放，但是会输出视频帧到当前目录</p>
+<blockquote>
+  <p>python语言接近于自然语言，基本语法逻辑和其他语言一样，只是一些小的细节不同，python2.x和python3.x的一些函数也有一些细节的不同。<a href="http://www.runoob.com/python/">python2的教程</a>而我首先用的是python3,所以主要记录一下不同。</p>
+</blockquote>
 
-<pre><code>ffmpeg -i "rtmp://192.168.24.142/oflaDemo/st6 live=1" -f image2 -vf fps=fps=1 out%d.png
+<h2 id="python3python2">1.python3和python2差异</h2>
+
+<p>python3中print后面字符串需要加()</p>
+
+<p>urllib分为了若干模块，需要分别引用</p>
+
+<h2 id="section">2.安装下载</h2>
+
+<p>选择下载安装最好选择32位的2.x版的Python，原因如下：</p>
+
+<ul>
+  <li>2.x版的存在时间长，教程比较好找，相关blog也很多</li>
+  <li><a href="https://sourceforge.net/projects/mysql-python/?source=typ_redirect">连接mysql的数据库引擎</a>，诸如此类的插件库比较好找,换32位的也是因为64位的这个插件支持不好，因为插件是32位的，我安装的mysql也是32位的，避免麻烦</li>
+  <li>PIL是一个图形处理库，也是win32的和数据库连接引擎安装方式一样</li>
+</ul>
+
+<h2 id="section-1">3.正则表达式</h2>
+
+<p>python的正则表达式主要有3中判断：</p>
+
+<ul>
+  <li>匹配开始位置，如果不匹配返回none：re.match</li>
+  <li>搜索整个字符串:re.search</li>
+  <li>搜索整个字符串并返回一个list:re.findAll</li>
+</ul>
+
+<p>正则表达式的字符规则不说了，主要需要注意的方面是</p>
+
+<ul>
+  <li>正则表达式前加一个字符’r’</li>
+  <li>正则可以引号嵌套，同时里面可以添加括号
+    <ul>
+      <li>一个括号的话，查找返回的是括号内的表达式匹配内容</li>
+      <li>多个括号的话，是返回的一个多维列表，列表中每一个对象是一个元组，元组中是对每一个括号内容匹配到的值</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="mysql">4.Mysql数据库</h2>
+
+<p>数据库操作比较固定</p>
+
+<pre><code>import MySQLdb
+
+db = MySQLdb.connect("127.0.0.1","user","pwd","数据库名" )
+
+# 使用cursor()方法获取操作游标 
+
+cursor = db.cursor()
+
+# SQL 语句
+sql = ""
+
+try:
+   # 执行sql语句
+   cursor.execute(sql)
+   # 提交到数据库执行
+   db.commit()
+except:
+   # 发生错误时回滚
+   db.rollback()
+
+# 关闭数据库连接
+db.close()
 </code></pre>
 
-<p>播放RMTP直播流</p>
+<h2 id="oracle">4.5.连接Oracle数据库</h2>
 
-<pre><code>ffplay -i "rtmp://192.168.24.142/oflaDemo/st6 live=1"
+<p>下载数据库驱动:<a href="https://pypi.python.org/pypi/cx_Oracle/5.3">https://pypi.python.org/pypi/cx_Oracle/5.3</a></p>
+
+<p>注意下载的python版本的位数和驱动的位数以及安装的oracle数据库位数要一致</p>
+
+<p>我在本机安装的oracle是64位的，而驱动和python都是32位的，所以总是提示：</p>
+
+<pre><code>import cx_Oracle
+ImportError: DLL load failed: %1 不是有效的 Win32 应用程序。
 </code></pre>
 
-<p>fplay播放yuv文件命令</p>
+<p>然后搜索下载一个32位的oci.dll放在python\Lib\site-packages下，问题解决。应该是数据库驱动会访问本机中的oci.dll，一般搜索都会在环境变量目录中和本目录中寻找，python\Lib\site-packages是插件安装目录，所以放在该目录下能被顺利访问到。但是又出现另一个问题，运行到调用数据库的程序会报：</p>
 
-<pre><code>ffplay -f rawvideo -video_size 1920x1080 a.yuv
+<pre><code>cx_Oracle.InterfaceError: Unable to acquire Oracle environment handle
 </code></pre>
 
-<p>设置播放没有缓冲区</p>
+<p>我的处理方法是下载instantclient-basic-win32-11.2.0.1.0.zip，这个是连接数据库的客户端，一定要32位的，不然就没意义了。<br />
+然后拷贝其中的oci.dll, oraociei10.dll, oraocci10.dll到site-package中，当然oci.dll要覆盖之前添加的，因为要保证版本一致才行。</p>
 
-<pre><code>ffplay -x 240 -y 320 109.flv -fflags nobuffer
-
-
-ffplay -i "rtmp://192.168.24.142/oflaDemo/st5 live=1" -fflags nobuffer -analyzeduration 1000000
+<pre><code>db=cx_Oracle.connect('username','password','127.0.0.1/orcl',cx_Oracle.SYSDBA)
 </code></pre>
 
-<p>列出本机可用设备</p>
+<p>开始IP的部分用的是本机的IP地址，但是却会报异常：</p>
 
-<pre><code>ffmpeg -list_devices true -f dshow -i dummy 
+<pre><code>cx_Oracle.DatabaseError: ORA-12541: TNS:no listener
 </code></pre>
 
-<p>播放本机USB摄像头捕捉数据</p>
+<p>将IP地址改为127.0.0.1能正常访问。</p>
 
-<pre><code>ffplay -f dshow -i video="USB Camera" -f dshow -i audio="音频设备"
-ffplay -f vfwcap -i 0
-//设置分辨率和帧率播放
-ffplay -s 424x240 -r 5 -f dshow -i video="USB Camera"
+<h2 id="section-2">5.常见错误(注意问题)</h2>
+
+<ul>
+  <li>IndentationError: unindent does not match any outer indentation level</li>
+</ul>
+
+<p>前面的空格和制表符不能混用，否则就会出现这类问题，写程序时最好将空白的符号显示出来</p>
+
+<ul>
+  <li>
+    <p>格式化输出字符串”%s”%x,字符串和实际值用%隔开</p>
+  </li>
+  <li>
+    <p>AttributeError: ‘module’ object has no attribute ‘XXX’</p>
+  </li>
+</ul>
+
+<p>.pyc是Python的字节码文件，如果新建.py文件时，不要与预留关键字和模块名重复，否则引用就有可能出现问题，实际调用的是.pyc文件，所以解决办法将目录中与模块名重复的.py文件重新命名，并且删除生成的.pyc文件，重新编译即可<br />
+* url中带有‘,’的图片urlretrieve下载不了</p>
+
+<h2 id="section-3">6.多线程使用</h2>
+
+<p>基础用thread</p>
+
+<pre><code>thread.start_new_thread
 </code></pre>
 
-<p>将USB摄像头捕捉的数据编码成H264保存到文件</p>
+<p>也可以用thread的包装threading</p>
 
-<pre><code>ffmpeg -f dshow -i video="USB Camera" -vcodec libx264 camera.mkv
+<p>以上两个都是包里面自带的，还可以使用线程池</p>
+
+<p>python安装目录下有一个script文件夹，里面有包管理工具pip,可以运行如pip install threadpool安装线程池模块</p>
+
+<pre><code>task_pool = threadpool.ThreadPool(10,10,0,10)
+param_list = [(({param1:param1},{param2:param2}))]
+	requests = threadpool.makeRequests(线程函数, param_list)
+	[task_pool.putRequest(req) for req in requests]
+task_pool.wait()
+
+def 线程函数(param1,param2):
+	return;
 </code></pre>
 
-<p>将USB摄像头数据通过RTMP协议发送出去</p>
+<p>直接在主线程中是取不到全局定义的变量的，因为语法原因会被作为新的局部变量，所以如果要在子线程中取全局变量需要在其作用域中加全局声明 global，如要用全局变量context,就需要先</p>
 
-<pre><code>ffmpeg -f dshow -i video="USB Camera" -vcodec libx264 -preset:v ultrafast -tune:v zerolatency -f flv rtmp://localhost/oflaDemo/livestream
+<pre><code>global Context
 </code></pre>
 
-<p>查看设备选项</p>
+<h2 id="scrapy">7.使用Scrapy爬网页</h2>
 
-<pre><code>ffmpeg -list_options true -f dshow -i video="USB Camera" 
+<p>安装</p>
+
+<pre><code>pip install Scrapy
 </code></pre>
 
-<p>分离视频音频流</p>
+<p>安装完后会有提示</p>
 
-<pre><code>ffmpeg -i input_file -vcodec copy -an output_file_video　　//分离视频流
-ffmpeg -i input_file -acodec copy -vn output_file_audio　　//分离音频流
+<pre><code>----------------------------------------
+Command "f:\programer2\python27\python.exe -u -c "import setuptools, tokenize;__file__='c:\\users\\XXX\\appdata\\local
+\\temp\\pip-build-98jdcm\\Twisted\\setup.py';f=getattr(tokenize, 'open', open)(__file__);code=f.read().replace('\r\n', '
+\n');f.close();exec(compile(code, __file__, 'exec'))" install --record c:\users\luofe\appdata\local\temp\pip-j9ztlc-reco
+rd\install-record.txt --single-version-externally-managed --compile" failed with error code 1 in c:\users\luofe\appdata\
+local\temp\pip-build-98jdcm\Twisted\
 </code></pre>
 
-<p>视频解复用</p>
+<p>似乎是window平台对着个框架有些要求，太麻烦就不配置了，对于我的需求，用多线程自己抓取已经能够满足。</p>
 
-<pre><code>ffmpeg –i test.mp4 –vcodec copy –an –f m4v test.264
-ffmpeg –i test.avi –vcodec copy –an –f m4v test.264
-//这个m4v是表示mp4的格式，如果是flv就需要写成flv
+<h2 id="section-4">8.注意</h2>
+
+<p>空值：None<br />
+空字符：NULL</p>
+
+<h2 id="section-5">9.图像处理</h2>
+
+<p>PIL库导入：from PIL import Image, ImageEnhance, ImageDraw,ImageChops</p>
+
+<pre><code>#打开
+img = Image.open("C:\\Users\\luofe\\Pictures\\12.jpg")
+#改变大小
+new_img = img.resize((128, 128), Image.BILINEAR) 
+#旋转
+rot_img = new_img.rotate(45)
+#显示
+img.show()
+#保存
+img.save("name","格式")
+#获取尺寸
+width, height = img.size  
+#绘图，单独开一个图层
+draw = ImageDraw.Draw(img)  
+draw.line( ( (0,0), (width-1, height-1)), fill=255)
+#各种效果
+color = ImageEnhance.Color(img)  
+color_img = color.enhance(3.0)
+
+sharpness = ImageEnhance.Sharpness(img)  
+sharp_img = sharpness.enhance(7.0)
+
+contrast = ImageEnhance.Contrast(img)  
+contrast_img = contrast.enhance(2.0)  
+
+brightness = ImageEnhance.Brightness(img)  
+bright_img = brightness.enhance(2.0) 
+
+#反相
+invert_img = ImageChops.invert(img)
+#混合模式，需要两张图
+#lighter_image = ImageChops.lighter(image1, image2)
+#darker_image = ImageChops.darker(image1, image2)
+#difference_image = ImageChops.difference(image1, image2) 
+#multiply_image = ImageChops.multiply(image1, image2)
+#screen_image = ImageChops.screen(image1, image2)  
+#add_image = ImageChops.add(img1, img2, scale, offset)    
+#subtract_image = ImageChops.subtract(img1, img2, scale, offset)
+
+#获取像素点
+point = img.getpixel((pXX,pYY))
+#设置像素点
+img.putpixel((pXX,pYY),point)
 </code></pre>
 
-<p>视频转码</p>
+<h2 id="jupyter-notebook">10.jupyter notebook</h2>
 
-<pre><code>ffmpeg –i test.mp4 –vcodec h264 –s 352*278 –an –f m4v test.264              //转码为码流原始文件
-ffmpeg –i test.mp4 –vcodec h264 –bf 0 –g 25 –s 352*278 –an –f m4v test.264  //转码为码流原始文件
-ffmpeg –i test.avi -vcodec mpeg4 –vtag xvid –qsame test_xvid.avi            //转码为封装文件
-//-bf B帧数目控制，-g 关键帧间隔控制，-s 分辨率控制
+<blockquote>
+  <p>Jupyter Notebook（此前被称为 IPython notebook）是一个交互式笔记本，支持运行 40 多种编程语言。</p>
+</blockquote>
+
+<p>通过pip install jupyter来安装，提示血少C++库</p>
+
+<pre><code>running install
+running build
+running build_py
+creating build
+creating build\lib.win32-2.7
+copying scandir.py -&gt; build\lib.win32-2.7
+running build_ext
+building '_scandir' extension
+error: Microsoft Visual C++ 9.0 is required. Get it from http://aka.ms/vcpython27
 </code></pre>
 
-<p>视频封装</p>
+<p>下载VCForPython27.msi，安装，然后重试，安装成功</p>
 
-<pre><code>ffmpeg –i video_file –i audio_file –vcodec copy –acodec copy output_file
+<p>将命令路径添加到环境变量后在cmd窗口键入命令：jupyter notebook，启动会打开一个浏览器文本编辑器，在文本编辑器中可以直接执行代码并生成结果。</p>
+
+<h2 id="pythoncaffe">11.Python与caffe结合</h2>
+
+<p>下载的caffe是for window版本的，首先，解压，进入目录下Python文件夹中，查看requirement.txt文件夹，根据内容安装依赖</p>
+
+<pre><code>#和c语言沟通，可以将Python编译成c语言模块使用
+Cython&gt;=0.19.2
+#Python的一种开源的数值计算扩展，有matlabd的一些功能
+numpy&gt;=1.7.1
+#也是一种数字计算库
+scipy&gt;=0.13.2
+#一组用于图像处理的算法的集合，是Python下的一种图形库
+scikit-image&gt;=0.9.3
+#是一个 Python 的 2D绘图库，它以各种硬拷贝格式和跨平台的交互式环境生成出版质量级别的图形。有点类似MATLAB中的统计图。
+matplotlib&gt;=1.3.1
+#一个 python 的交互式 shell，比默认的python shell 好用得多，支持变量自动补全，自动缩进，支持 bash shell 命令，内置了许多很有用的功能和函数。
+ipython&gt;=3.0.0
+#HDF5持久化存储的Python版本
+h5py&gt;=2.2.0
+#一个键值对数据库
+leveldb&gt;=0.191
+#NetworkX是一个用Python语言开发的图论与复杂网络建模工具，内置了常用的图与复杂网络分析算法，可以方便的进行复杂网络数据分析、仿真建模等工作。
+networkx&gt;=1.8.1
+#python测试框架
+nose&gt;=1.3.0
+#Pandas是python的一个数据分析包
+pandas&gt;=0.12.0
+#python时间处理工具类
+python-dateutil&gt;=1.4,&lt;2
+#将文件读取到内存，主要用来读取配置文件
+protobuf&gt;=2.5.0
+#用来解析命令行参数的库
+python-gflags&gt;=2.0
+#L是一个Python的YAML解析器
+pyyaml&gt;=3.10
+#PIL图形库
+Pillow&gt;=2.3.0
+#画图，数据分析的依赖库
+six&gt;=1.1.0
 </code></pre>
 
-<p>视频剪切</p>
+<p>主要是通过<strong>pip install [soft_name]</strong>，可以直接执行：</p>
 
-<pre><code>ffmpeg –i test.avi –r 1 –f image2 image-%3d.jpeg        //提取图片
-ffmpeg -ss 0:1:30 -t 0:0:20 -i input.avi -vcodec copy -acodec copy output.avi    //剪切视频
-//-r 提取图像的频率，-ss 开始时间，-t 持续时间
+<pre><code>pip install -r requirements.txt
 </code></pre>
 
-<p>视频录制</p>
-
-<pre><code>ffmpeg –i rtsp://192.168.3.205:5555/test –vcodec copy out.avi
-</code></pre>
-
-<p>YUV序列播放</p>
-
-<pre><code>ffplay -f rawvideo -video_size 1920x1080 input.yuv
-</code></pre>
-
-<p>YUV序列转AVI</p>
-
-<pre><code>ffmpeg –s w*h –pix_fmt yuv420p –i input.yuv –vcodec mpeg4 output.avi
-</code></pre>
-
-<p>采集usb摄像头视频命令：</p>
-
-<pre><code>ffmpeg -t 20 -f vfwcap -i 0 -r 8 -f mp4 cap1111.mp4
-
-具体说明如下：我们采集10秒，采集设备为vfwcap类型设备，第0个vfwcap采集设备（如果系统有多个vfw的视频采集设备，可以通过-i num来选择），每秒8帧，输出方式为文件，格式为mp4。
-</code></pre>
-
-<p>最简单的抓屏：</p>
-
-<pre><code>ffmpeg -f gdigrab -i desktop out.mpg 
-</code></pre>
-
-<p>从屏幕的（10,20）点处开始，抓取640x480的屏幕，设定帧率为5 ：</p>
-
-<pre><code>ffmpeg -f gdigrab -framerate 5 -offset_x 10 -offset_y 20 -video_size 640x480 -i desktop out.mpg 
-</code></pre>
-
-<p>录屏推流播放</p>
-
-<pre><code>//录屏RTMP推流
-ffmpeg -f gdigrab  -i desktop  -vcodec libx264 -f flv rtmp://192.168.1.14/oflaDemo/str5
-
-//直播RTMP推流
-ffmpeg -f dshow -i video="USB Camera" -f dshow -i audio="麦克风 (Conexant SmartAudio HD)" -r 5 -vcodec libx264 -preset:v ultrafast -tune:v zerolatency -acodec libmp3lame -f flv rtmp://192.168.1.14/oflaDemo/str5
-
-//延迟较小的播放
-ffplay -i "rtmp://192.168.1.14/oflaDemo/str5 live=1" -fflags nobuffer -analyzeduration 1000000
-</code></pre>
-
-<p>gdigrab是基于GDI的抓屏设备，可以用于抓取屏幕的特定区域。</p>
-
-<p>gdigrab通过设定不同的输入URL，支持两种方式的屏幕抓取：</p>
-
-<p>（1）“desktop”：抓取整张桌面。或者抓取桌面中的一个特定的区域。</p>
-
-<p>（2）“title={窗口名称}”：抓取屏幕中特定的一个窗口。</p>
-
-<p>设置编码方式</p>
-
-<pre><code>音频：-acodec libmp3lame
-视频：-vcodec libx264
-</code></pre>
-
-<p>ffmpeg从视频中生成gif图片：</p>
-
-<pre><code>ffmpeg -i capx.mp4 -t 10 -s 320x240 -pix_fmt rgb24 jidu1.gif
-</code></pre>
-
-<p>ffmpeg将图片转换为视频</p>
-
-<pre><code>指定编码，帧率和码率，图片在当前目录下需要按照自然数排序命名
-ffmpeg -f image2 -i c:\temp\d.jpg -vcodec libx264 -r 10 -b 200k  test.mp4
-</code></pre>
-
-<p>将文件当做直播送至live</p>
-
-<pre><code>ffmpeg -re -i localFile.mp4 -c copy -f flv rtmp://server/live/streamName
-</code></pre>
-
-<p>将直播媒体保存至本地文件</p>
-
-<pre><code>ffmpeg -i rtmp://server/live/streamName -c copy dump.flv
-</code></pre>
-
-<p>将其中一个直播流，视频改用h264压缩，音频不变，送至另外一个直播服务流</p>
-
-<pre><code>ffmpeg -i rtmp://server/live/originalStream -c:a copy -c:v libx264 -vpre slow -f flv rtmp://server/live/h264Stream
-</code></pre>
-
-<p>将其中一个直播流，视频改用h264压缩，音频改用faac压缩，送至另外一个直播服务流</p>
-
-<pre><code>ffmpeg -i rtmp://server/live/originalStream -c:a libfaac -ar 44100 -ab 48k -c:v libx264 -vpre slow -vpre baseline -f flv rtmp://server/live/h264Stream
-</code></pre>
-
-<p>将其中一个直播流，视频不变，音频改用faac压缩，送至另外一个直播服务流</p>
-
-<pre><code>ffmpeg -i rtmp://server/live/originalStream -acodec libfaac -ar 44100 -ab 48k -vcodec copy -f flv rtmp://server/live/h264_AAC_Stream
-</code></pre>
-
-<p>将一个高清流，复制为几个不同视频清晰度的流重新发布，其中音频不变</p>
-
-<pre><code>ffmpeg -re -i rtmp://server/live/high_FMLE_stream -acodec copy -vcodec x264lib -s 640×360 -b 500k -vpre medium -vpre baseline rtmp://server/live/baseline_500k -acodec copy -vcodec x264lib -s 480×272 -b 300k -vpre medium -vpre baseline rtmp://server/live/baseline_300k -acodec copy -vcodec x264lib -s 320×200 -b 150k -vpre medium -vpre baseline rtmp://server/live/baseline_150k -acodec libfaac -vn -ab 48k rtmp://server/live/audio_only_AAC_48k
-</code></pre>
-
-<p>功能一样，只是采用-x264opts选项</p>
-
-<pre><code>ffmpeg -re -i rtmp://server/live/high_FMLE_stream -c:a copy -c:v x264lib -s 640×360 -x264opts bitrate=500:profile=baseline:preset=slow rtmp://server/live/baseline_500k -c:a copy -c:v x264lib -s 480×272 -x264opts bitrate=300:profile=baseline:preset=slow rtmp://server/live/baseline_300k -c:a copy -c:v x264lib -s 320×200 -x264opts bitrate=150:profile=baseline:preset=slow rtmp://server/live/baseline_150k -c:a libfaac -vn -b:a 48k rtmp://server/live/audio_only_AAC_48k
-</code></pre>
-
-<p>将当前摄像头及音频通过DSSHOW采集，视频h264、音频faac压缩后发布</p>
-
-<pre><code>ffmpeg -r 25 -f dshow -s 640×480 -i video=”video source name”:audio=”audio source name” -vcodec libx264 -b 600k -vpre slow -acodec libfaac -ab 128k -f flv rtmp://server/application/stream_name
-</code></pre>
-
-<p>将一个JPG图片经过h264压缩循环输出为mp4视频</p>
-
-<pre><code>ffmpeg.exe -i INPUT.jpg -an -vcodec libx264 -coder 1 -flags +loop -cmp +chroma -subq 10 -qcomp 0.6 -qmin 10 -qmax 51 -qdiff 4 -flags2 +dct8x8 -trellis 2 -partitions +parti8x8+parti4x4 -crf 24 -threads 0 -r 25 -g 25 -y OUTPUT.mp4
-</code></pre>
-
-<p>将普通流视频改用h264压缩，音频不变，送至高清流服务(新版本FMS live=1)</p>
-
-<pre><code>ffmpeg -i rtmp://server/live/originalStream -c:a copy -c:v libx264 -vpre slow -f flv “rtmp://server/live/h264Stream live=1〃
-</code></pre>
 
 </article> <!-- end #post__content -->
 
 <div id="post__share">
-  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/11/16/ffplay.html&text=ffmpeg/ffplay命令记录（转载，整理）" target="_blank"></a>
+  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2017/04/25/python.html&text=python笔记1" target="_blank"></a>
   <a id="icon-cc" class="fontello" href="http://creativecommons.org/licenses/by-nc-sa/3.0" target="_blank"></a>
-  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/11/16/ffplay.html&title=ffmpeg/ffplay命令记录（转载，整理）" target="_blank"></a>
+  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2017/04/25/python.html&title=python笔记1" target="_blank"></a>
 </div> <!-- end #post__share -->
 <div id="disqus_thread" name="luofeng">
   <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>

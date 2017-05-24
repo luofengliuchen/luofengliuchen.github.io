@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
 <!--[if lte IE 9]><meta http-equiv="refresh" content="0;url=/ie.html"><![endif]-->
 
-<title>ffmpeg/ffplay命令记录（转载，整理） | 落风的博客</title>
+<title>Retrofit浅析-OkHttp-rxjava | 落风的博客</title>
 <meta name="author" content="落风">
 
-  <meta name="keywords" content="ffmpeg,ffplay">
+  <meta name="keywords" content="retrofit,okhttp,rxjava">
 
 
 
@@ -202,220 +202,246 @@
     <div id="post">
       <div id="pjax">
         <article id="post__content">
-  <h1 id="post__title" data-identifier="20161116">ffmpeg/ffplay命令记录（转载，整理）</h1>
+  <h1 id="post__title" data-identifier="20170506">Retrofit浅析-OkHttp-rxjava</h1>
   <blockquote>
   <p>文章链接:<a href="http://www.liuschen.com">http://www.liuschen.com</a></p>
 </blockquote>
 
-<p>打出来的视频信息，但是没有播放，但是会输出视频帧到当前目录</p>
+<h1 id="retrofit-okhttp-rxjava">1.Retrofit-OkHttp-rxjava</h1>
 
-<pre><code>ffmpeg -i "rtmp://192.168.24.142/oflaDemo/st6 live=1" -f image2 -vf fps=fps=1 out%d.png
+<p>首先，主体是retrofit，这种配置低耦合，通过converter来连接模块，retrofit2的连接模块有如下(在studio的仓库中搜索到的最新版本)：</p>
+
+<pre><code>com.squareup.retrofit2:converter-moshi:2.3.0
+com.squareup.retrofit2:converter-scalars:2.3.0
+com.squareup.retrofit2:converter-simplexml:2.3.0
+com.squareup.retrofit2:converter-wire:2.3.0
+com.squareup.retrofit2:converter-java8:2.3.0
+com.squareup.retrofit2:converter-jackson:2.3.0
+com.squareup.retrofit2:converter-protobuf:2.3.0
+com.squareup.retrofit2:converter-guava:2.3.0
+com.squareup.retrofit2:converter-gson:2.3.0
 </code></pre>
 
-<p>播放RMTP直播流</p>
+<p>同rxjava适配需要导入</p>
 
-<pre><code>ffplay -i "rtmp://192.168.24.142/oflaDemo/st6 live=1"
+<pre><code>com.squareup.retrofit2:adapter-rxjava:2.3.0
 </code></pre>
 
-<p>fplay播放yuv文件命令</p>
+<h1 id="section">2.资源拦截器</h1>
 
-<pre><code>ffplay -f rawvideo -video_size 1920x1080 a.yuv
+<p>BasicParamsInterceptor:这是一个独立的类，github上作者项目:<a href="https://github.com/jkyeo/okhttp-basicparamsinterceptor">https://github.com/jkyeo/okhttp-basicparamsinterceptor</a></p>
+
+<p>用来向请求添加公共的参数，但是实际用，可能是因为一个独立文件，并不好使，没细究。</p>
+
+<p>因为就是一个普通的拦截器，完全可以自己定义：</p>
+
+<pre><code>OkHttpClient.Builder builder = new OkHttpClient.Builder();
+   		builder.connectTimeout(30, TimeUnit.SECONDS);//连接超时时间
+    builder.writeTimeout(30, TimeUnit.SECONDS);//写操作 超时时间
+    builder.readTimeout(30, TimeUnit.SECONDS);//读操作超时时间
+    builder.interceptors().add(new MyInterceptor());
 </code></pre>
 
-<p>设置播放没有缓冲区</p>
+<p>拦截器：</p>
 
-<pre><code>ffplay -x 240 -y 320 109.flv -fflags nobuffer
-
-
-ffplay -i "rtmp://192.168.24.142/oflaDemo/st5 live=1" -fflags nobuffer -analyzeduration 1000000
+<pre><code>public class MyInterceptor implements okhttp3.Interceptor {
+    @Override
+    public Response intercept(Chain chain) throws IOException {
+        Request.Builder builder = chain.request().newBuilder();
+		/**为请求添加头*/
+        Request requst = builder.addHeader("Content-type", "application/json").build();
+        return chain.proceed(requst);
+    }
+}
 </code></pre>
 
-<p>列出本机可用设备</p>
+<h1 id="retrofit">3.Retrofit使用</h1>
 
-<pre><code>ffmpeg -list_devices true -f dshow -i dummy 
+<p>基础版：</p>
+
+<pre><code>Retrofit retrofit = new Retrofit.Builder()
+//加入OkHttpClient.Builder支持，这个是内部默认的，默认使用OkHttpClient
+            .client(builder.build())
+//加入基本url,最好如此，只到端口，后面‘/不能少’
+            .baseUrl("http://192.168.24.76:8080/")
+            .build();
 </code></pre>
 
-<p>播放本机USB摄像头捕捉数据</p>
+<p>升级版：</p>
 
-<pre><code>ffplay -f dshow -i video="USB Camera" -f dshow -i audio="音频设备"
-ffplay -f vfwcap -i 0
-//设置分辨率和帧率播放
-ffplay -s 424x240 -r 5 -f dshow -i video="USB Camera"
+<pre><code>Retrofit retrofit = new Retrofit.Builder()
+//加入OkHttpClient.Builder支持，这个是内部默认的，默认使用OkHttpClient
+            .client(builder.build())
+//加入字符串支持
+            .addConverterFactory(ScalarsConverterFactory.create())
+//加入gson支持
+            .addConverterFactory(GsonConverterFactory.create())
+//加入rxJava2支持
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+//加入基本url,最好如此，只到端口，后面‘/不能少’
+            .baseUrl("http://192.168.24.76:8080/")
+            .build();
 </code></pre>
 
-<p>将USB摄像头捕捉的数据编码成H264保存到文件</p>
+<h1 id="model">4.请求model</h1>
 
-<pre><code>ffmpeg -f dshow -i video="USB Camera" -vcodec libx264 camera.mkv
+<p>Retrofit的参数是通过一个接口的注解来标明，用Java的动态代理来将参数传递进去，很巧妙将参数的定义和参数分开，简化了可见的代码，如下是定义的接口：</p>
+
+<pre><code>public interface BlogService {
+    @FormUrlEncoded
+    @POST("AndroidService/{id}/android_msg!androidMsg.action")
+    Call&lt;ResponseBody&gt; getBlog(@Path("id") int id, @Query("name") int name, @Field("page") int page);
+}
 </code></pre>
 
-<p>将USB摄像头数据通过RTMP协议发送出去</p>
+<p>首先知道，post请求方式和get请求方式不同，post是将参数单独编码传递，在URL中是不可见的</p>
 
-<pre><code>ffmpeg -f dshow -i video="USB Camera" -vcodec libx264 -preset:v ultrafast -tune:v zerolatency -f flv rtmp://localhost/oflaDemo/livestream
+<p>@FormUrlEncoded 和@POST以及参数注解中的@Field是用于定义POST的单独参数编码的，@FormUrlEncoded 和@Field相互依赖，必须同时存在且只能在@POST时才能存在</p>
+
+<p>@Query定义的是URL中附带的可见参数注解中的是key,参数表示的是value</p>
+
+<p>发出请求：</p>
+
+<pre><code>BlogService service = retrofit.create(BlogService.class);
+    Call&lt;ResponseBody&gt; call = service.getBlog(2,3,9);
+    call.enqueue(new Callback&lt;ResponseBody&gt;() {
+        @Override
+        public void onResponse(Call&lt;ResponseBody&gt; call, Response&lt;ResponseBody&gt; response) {
+            try {
+                System.out.println("成功1:"+new String(response.body().bytes(),"utf-8"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            System.out.println("成功1.2:"+response.body().contentType());
+            System.out.println("成功1.5:"+response.body().contentLength());
+            System.out.println("成功2:"+response.message());
+            System.out.println("成功3:"+response.toString());
+            System.out.println("成功4:"+response.headers().toString());
+            System.out.println("成功5:"+response.code());
+            System.out.println("成功6:"+response.isSuccessful());
+            System.out.println("成功7:"+response.raw());
+        }
+        @Override
+        public void onFailure(Call&lt;ResponseBody&gt; call, Throwable t) {
+            System.out.println("失败："+t.toString());
+        }
+    });
 </code></pre>
 
-<p>查看设备选项</p>
+<p>其中可见ResponseBody是一个基础的返回对象，包含了很多东西，以下是测试返回值：</p>
 
-<pre><code>ffmpeg -list_options true -f dshow -i video="USB Camera" 
+<pre><code>成功1:{"message":"success","success":true}
+成功1.2:application/json;charset=UTF-8
+成功1.5:-1
+成功2:OK
+成功3:Response{protocol=http/1.1, code=200, message=OK, url=http://192.168.24.76:8080/AndroidService/2/android_msg!androidMsg.action?name=3}
+成功4:Server: Apache-Coyote/1.1
+ Content-Type: application/json;charset=UTF-8
+Transfer-Encoding: chunked
+ Date: Tue, 23 May 2017 06:55:27 GMT
+成功5:200
+成功6:true
+成功7:Response{protocol=http/1.1, code=200, message=OK, url=http://192.168.24.76:8080/AndroidService/2/android_msg!androidMsg.action?name=3}
 </code></pre>
 
-<p>分离视频音频流</p>
+<h1 id="section-1">5.可插拔的的数据转换支持</h1>
 
-<pre><code>ffmpeg -i input_file -vcodec copy -an output_file_video　　//分离视频流
-ffmpeg -i input_file -acodec copy -vn output_file_audio　　//分离音频流
+<p>gson支持，当然，需要相应的jar包</p>
+
+<pre><code>addConverterFactory(GsonConverterFactory.create())
 </code></pre>
 
-<p>视频解复用</p>
+<p>将ResponseBody替换成自己定义的返回对象MyResultBean，就会自动解析，不添加上面支持的话会报错（直接down掉）；</p>
 
-<pre><code>ffmpeg –i test.mp4 –vcodec copy –an –f m4v test.264
-ffmpeg –i test.avi –vcodec copy –an –f m4v test.264
-//这个m4v是表示mp4的格式，如果是flv就需要写成flv
+<p>String字符串支持,当然，也需要相应的jar包</p>
+
+<pre><code>.addConverterFactory(ScalarsConverterFactory.create())
 </code></pre>
 
-<p>视频转码</p>
+<p>将ResponseBody替换成自己定义的返回对象String，就会自动解析，不添加上面支持的话会报错(会走失败的方法):</p>
 
-<pre><code>ffmpeg –i test.mp4 –vcodec h264 –s 352*278 –an –f m4v test.264              //转码为码流原始文件
-ffmpeg –i test.mp4 –vcodec h264 –bf 0 –g 25 –s 352*278 –an –f m4v test.264  //转码为码流原始文件
-ffmpeg –i test.avi -vcodec mpeg4 –vtag xvid –qsame test_xvid.avi            //转码为封装文件
-//-bf B帧数目控制，-g 关键帧间隔控制，-s 分辨率控制
+<pre><code>失败：java.lang.IllegalStateException: Expected a string but was BEGIN_OBJECT at line 1 column 2 path $
 </code></pre>
 
-<p>视频封装</p>
+<h1 id="rxjava2">6.RxJava2支持</h1>
 
-<pre><code>ffmpeg –i video_file –i audio_file –vcodec copy –acodec copy output_file
+<p>RxJava2是响应式编程框架，因为在Android开发中，请求网络只能在子线程，绘制界面只能在主线程，所以有些操作就需要分开来执行，AsyncTask就是一种解决方案。</p>
+
+<p>call是retrofit返回的对象，其中的回调方法都是在主线程中执行</p>
+
+<pre><code>call.enqueue(new Callback&lt;String&gt;() {
+        @Override
+        public void onResponse(Call&lt;String&gt; call, Response&lt;String&gt; response) {
+        }
+        @Override
+        public void onFailure(Call&lt;String&gt; call, Throwable t) {
+        }
+    });
 </code></pre>
 
-<p>视频剪切</p>
+<p>添加rxjava2支持，将可以把返回对象由原来的call变为Observable，Observable订阅线程执行：</p>
 
-<pre><code>ffmpeg –i test.avi –r 1 –f image2 image-%3d.jpeg        //提取图片
-ffmpeg -ss 0:1:30 -t 0:0:20 -i input.avi -vcodec copy -acodec copy output.avi    //剪切视频
-//-r 提取图像的频率，-ss 开始时间，-t 持续时间
+<pre><code>observable.subscribeOn(Schedulers.from(Executors.newFixedThreadPool(10)))
+            .subscribe(new Observer&lt;String&gt;() {
+                @Override
+                public void onSubscribe(Disposable d) {
+
+                    System.out.println("resultBean:");
+                    System.out.println("当前所在线程为onResponse:"+Thread.currentThread().getName());
+                }
+
+                @Override
+                public void onNext(String value) {
+                    System.out.println("resultBean:"+value);
+                    System.out.println("当前所在线程为onResponse:"+Thread.currentThread().getName());
+                }
+
+                @Override
+                public void onError(Throwable e) {
+                    System.out.println("resultBean:"+e.toString());
+                    System.out.println("当前所在线程为onResponse:"+Thread.currentThread().getName());
+                }
+
+                @Override
+                public void onComplete() {
+                    System.out.println("resultBean:onComplete");
+                    System.out.println("当前所在线程为onResponse:"+Thread.currentThread().getName());
+                }
+            });
 </code></pre>
 
-<p>视频录制</p>
+<p>其中onSubscribe方法在所有方法之前执行，甚至在Okhttp的拦截器之前执行，运行在主线程</p>
 
-<pre><code>ffmpeg –i rtsp://192.168.3.205:5555/test –vcodec copy out.avi
+<p>onNext和onerror,onComplete运行在订阅的线程，subscribeOn的传入对象：</p>
+
+<pre><code>//订阅线程传入的是一个10线程的线程池
+Schedulers.from(Executors.newFixedThreadPool(10))
+//订阅线程是新开一个线程
+Schedulers.newThread()	
+/**
+订阅线程做io操作，也是新线程，I/O 操作（读写文件、读写数据库、网络信息交互等）所使用的 Scheduler。行为模式和 newThread() 差不多，区别在于 io() 的内部实现是是用一个无数量上限的线程池，可以重用空闲的线程，因此多数情况下 io() 比 newThread() 更有效率。不要把计算工作放在 io() 中，可以避免创建不必要的线程。
+*/
+Schedulers.io()
+/**
+计算所使用的 Scheduler。这个计算指的是 CPU 密集型计算，即不会被 I/O 等操作限制性能的操作，例如图形的计算。这个 Scheduler 使用的固定的线程池，大小为 CPU 核数。不要把 I/O 操作放在 computation() 中，否则 I/O 操作的等待时间会浪费 CPU。
+*/
+Schedulers.computation()
+//独立线程：RxSingleScheduler-1
+Schedulers.single()
+//主线程，会报异常：android.os.NetworkOnMainThreadException
+Schedulers.trampoline()
+/***/
 </code></pre>
 
-<p>YUV序列播放</p>
+<p>所以，如果想要返回的结果在主线程中，就直接用返回的call,如果希望返回的结果订阅在特定子线程，就返回observable对象来使用，rxjava与retrofit结合，observable是被创造好的，不需要重新create，消息也都给定了，只需要定义要发布的线程即可。</p>
 
-<pre><code>ffplay -f rawvideo -video_size 1920x1080 input.yuv
-</code></pre>
-
-<p>YUV序列转AVI</p>
-
-<pre><code>ffmpeg –s w*h –pix_fmt yuv420p –i input.yuv –vcodec mpeg4 output.avi
-</code></pre>
-
-<p>采集usb摄像头视频命令：</p>
-
-<pre><code>ffmpeg -t 20 -f vfwcap -i 0 -r 8 -f mp4 cap1111.mp4
-
-具体说明如下：我们采集10秒，采集设备为vfwcap类型设备，第0个vfwcap采集设备（如果系统有多个vfw的视频采集设备，可以通过-i num来选择），每秒8帧，输出方式为文件，格式为mp4。
-</code></pre>
-
-<p>最简单的抓屏：</p>
-
-<pre><code>ffmpeg -f gdigrab -i desktop out.mpg 
-</code></pre>
-
-<p>从屏幕的（10,20）点处开始，抓取640x480的屏幕，设定帧率为5 ：</p>
-
-<pre><code>ffmpeg -f gdigrab -framerate 5 -offset_x 10 -offset_y 20 -video_size 640x480 -i desktop out.mpg 
-</code></pre>
-
-<p>录屏推流播放</p>
-
-<pre><code>//录屏RTMP推流
-ffmpeg -f gdigrab  -i desktop  -vcodec libx264 -f flv rtmp://192.168.1.14/oflaDemo/str5
-
-//直播RTMP推流
-ffmpeg -f dshow -i video="USB Camera" -f dshow -i audio="麦克风 (Conexant SmartAudio HD)" -r 5 -vcodec libx264 -preset:v ultrafast -tune:v zerolatency -acodec libmp3lame -f flv rtmp://192.168.1.14/oflaDemo/str5
-
-//延迟较小的播放
-ffplay -i "rtmp://192.168.1.14/oflaDemo/str5 live=1" -fflags nobuffer -analyzeduration 1000000
-</code></pre>
-
-<p>gdigrab是基于GDI的抓屏设备，可以用于抓取屏幕的特定区域。</p>
-
-<p>gdigrab通过设定不同的输入URL，支持两种方式的屏幕抓取：</p>
-
-<p>（1）“desktop”：抓取整张桌面。或者抓取桌面中的一个特定的区域。</p>
-
-<p>（2）“title={窗口名称}”：抓取屏幕中特定的一个窗口。</p>
-
-<p>设置编码方式</p>
-
-<pre><code>音频：-acodec libmp3lame
-视频：-vcodec libx264
-</code></pre>
-
-<p>ffmpeg从视频中生成gif图片：</p>
-
-<pre><code>ffmpeg -i capx.mp4 -t 10 -s 320x240 -pix_fmt rgb24 jidu1.gif
-</code></pre>
-
-<p>ffmpeg将图片转换为视频</p>
-
-<pre><code>指定编码，帧率和码率，图片在当前目录下需要按照自然数排序命名
-ffmpeg -f image2 -i c:\temp\d.jpg -vcodec libx264 -r 10 -b 200k  test.mp4
-</code></pre>
-
-<p>将文件当做直播送至live</p>
-
-<pre><code>ffmpeg -re -i localFile.mp4 -c copy -f flv rtmp://server/live/streamName
-</code></pre>
-
-<p>将直播媒体保存至本地文件</p>
-
-<pre><code>ffmpeg -i rtmp://server/live/streamName -c copy dump.flv
-</code></pre>
-
-<p>将其中一个直播流，视频改用h264压缩，音频不变，送至另外一个直播服务流</p>
-
-<pre><code>ffmpeg -i rtmp://server/live/originalStream -c:a copy -c:v libx264 -vpre slow -f flv rtmp://server/live/h264Stream
-</code></pre>
-
-<p>将其中一个直播流，视频改用h264压缩，音频改用faac压缩，送至另外一个直播服务流</p>
-
-<pre><code>ffmpeg -i rtmp://server/live/originalStream -c:a libfaac -ar 44100 -ab 48k -c:v libx264 -vpre slow -vpre baseline -f flv rtmp://server/live/h264Stream
-</code></pre>
-
-<p>将其中一个直播流，视频不变，音频改用faac压缩，送至另外一个直播服务流</p>
-
-<pre><code>ffmpeg -i rtmp://server/live/originalStream -acodec libfaac -ar 44100 -ab 48k -vcodec copy -f flv rtmp://server/live/h264_AAC_Stream
-</code></pre>
-
-<p>将一个高清流，复制为几个不同视频清晰度的流重新发布，其中音频不变</p>
-
-<pre><code>ffmpeg -re -i rtmp://server/live/high_FMLE_stream -acodec copy -vcodec x264lib -s 640×360 -b 500k -vpre medium -vpre baseline rtmp://server/live/baseline_500k -acodec copy -vcodec x264lib -s 480×272 -b 300k -vpre medium -vpre baseline rtmp://server/live/baseline_300k -acodec copy -vcodec x264lib -s 320×200 -b 150k -vpre medium -vpre baseline rtmp://server/live/baseline_150k -acodec libfaac -vn -ab 48k rtmp://server/live/audio_only_AAC_48k
-</code></pre>
-
-<p>功能一样，只是采用-x264opts选项</p>
-
-<pre><code>ffmpeg -re -i rtmp://server/live/high_FMLE_stream -c:a copy -c:v x264lib -s 640×360 -x264opts bitrate=500:profile=baseline:preset=slow rtmp://server/live/baseline_500k -c:a copy -c:v x264lib -s 480×272 -x264opts bitrate=300:profile=baseline:preset=slow rtmp://server/live/baseline_300k -c:a copy -c:v x264lib -s 320×200 -x264opts bitrate=150:profile=baseline:preset=slow rtmp://server/live/baseline_150k -c:a libfaac -vn -b:a 48k rtmp://server/live/audio_only_AAC_48k
-</code></pre>
-
-<p>将当前摄像头及音频通过DSSHOW采集，视频h264、音频faac压缩后发布</p>
-
-<pre><code>ffmpeg -r 25 -f dshow -s 640×480 -i video=”video source name”:audio=”audio source name” -vcodec libx264 -b 600k -vpre slow -acodec libfaac -ab 128k -f flv rtmp://server/application/stream_name
-</code></pre>
-
-<p>将一个JPG图片经过h264压缩循环输出为mp4视频</p>
-
-<pre><code>ffmpeg.exe -i INPUT.jpg -an -vcodec libx264 -coder 1 -flags +loop -cmp +chroma -subq 10 -qcomp 0.6 -qmin 10 -qmax 51 -qdiff 4 -flags2 +dct8x8 -trellis 2 -partitions +parti8x8+parti4x4 -crf 24 -threads 0 -r 25 -g 25 -y OUTPUT.mp4
-</code></pre>
-
-<p>将普通流视频改用h264压缩，音频不变，送至高清流服务(新版本FMS live=1)</p>
-
-<pre><code>ffmpeg -i rtmp://server/live/originalStream -c:a copy -c:v libx264 -vpre slow -f flv “rtmp://server/live/h264Stream live=1〃
-</code></pre>
 
 </article> <!-- end #post__content -->
 
 <div id="post__share">
-  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2016/11/16/ffplay.html&text=ffmpeg/ffplay命令记录（转载，整理）" target="_blank"></a>
+  <a id="icon-twitter" class="fontello" href="https://twitter.com/intent/tweet?url=http://www.liuschen.com/2017/05/06/retrofit.html&text=Retrofit浅析-OkHttp-rxjava" target="_blank"></a>
   <a id="icon-cc" class="fontello" href="http://creativecommons.org/licenses/by-nc-sa/3.0" target="_blank"></a>
-  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2016/11/16/ffplay.html&title=ffmpeg/ffplay命令记录（转载，整理）" target="_blank"></a>
+  <a id="icon-weibo" class="fontello" href="http://v.t.sina.com.cn/share/share.php?url=http://www.liuschen.com/2017/05/06/retrofit.html&title=Retrofit浅析-OkHttp-rxjava" target="_blank"></a>
 </div> <!-- end #post__share -->
 <div id="disqus_thread" name="luofeng">
   <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
