@@ -9,9 +9,29 @@
 
 
 
+  /2017/10/07/point2.html
+
+  /2017/09/27/GoogleMap.html
+
+  /2017/09/23/GoogleMap.html
+
   /2017/09/20/gps2.html
 
   /2017/09/20/gps1.html
+
+  /2017/09/10/php.html
+
+  /2017/09/03/thresd2.html
+
+  /2017/09/03/thread1.html
+
+  /2017/08/05/AndroidSafe.html
+
+  /2017/07/25/maven2.html
+
+  /2017/07/20/dbtest.html
+
+  /2017/07/02/cordova.html
 
   /2017/06/08/kotlin.html
 

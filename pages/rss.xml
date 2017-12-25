@@ -6,6 +6,293 @@
     <description>落风的博客</description>
     
       <item>
+        <title>混淆点义</title>
+        <link>http://www.liuschen.com/2017/10/07/point2.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2017/10/07/point2.html</guid>
+        <pubDate>Sat, 07 Oct 2017 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&quot;not-found&quot;&gt;1.NOT FOUND&lt;/h2&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;java.lang.NoClassDefFoundError是运行阶段无法加载到类&lt;/p&gt;
+
+  &lt;p&gt;java.lang.ClassNotfoundException是编译阶段无法找到类&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&quot;section&quot;&gt;2.代理模式和装饰模式&lt;/h2&gt;
+
+&lt;p&gt;代码类似，都是两个类实现同一个接口，一个类实际功能操作，传给另一个作为代理或是装饰的类；&lt;/p&gt;
+
+&lt;p&gt;功能不同，装饰旨在增加功能（不妨碍直接访问功能类的方法），代理则重在控制访问（会在访问功能类的方法中添加访问规则）&lt;/p&gt;
+
+&lt;h2 id=&quot;jdk&quot;&gt;3.JDK动态代理:&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;定义代理对象接口以及代理对象实现&lt;/p&gt;
+
+    &lt;p&gt;如：UserService userService = new UserServiceImpl();&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;实现InvocationHandler接口，将代理对象传入(其中Invoke方法可以实现代理功能//通过反射)&lt;/p&gt;
+
+    &lt;p&gt;如：MyInvocationHandler invocationHandler = new MyInvocationHandler(userService);&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;根据目标对象生成代理对象(classLoader只要选对就行，加载普通类用的同一种classLoader)&lt;/p&gt;
+
+    &lt;p&gt;如：UserService proxy = (UserService) Proxy.newProxyInstance(userService.getClass().getClassLoader(),  &lt;br /&gt;
+              userService.getClass().getInterfaces(), invocationHandler);&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;根据需要调用代理对象的方法&lt;/p&gt;
+
+    &lt;p&gt;如：proxy.getXXX()&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;CGLib代理(针对目标类没有实现目标接口的代理):&lt;/p&gt;
+
+&lt;p&gt;动态生成子类，需要外部包，适合不频繁创建类的代理&lt;/p&gt;
+
+</description>
+      </item>
+    
+      <item>
+        <title>oracle数据库入门</title>
+        <link>http://www.liuschen.com/2017/09/27/GoogleMap.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2017/09/27/GoogleMap.html</guid>
+        <pubDate>Wed, 27 Sep 2017 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&quot;oracle&quot;&gt;安装Oracle数据库&lt;/h2&gt;
+
+&lt;p&gt;访问安装的Oracle数据库：&lt;/p&gt;
+
+&lt;p&gt;1.https://localhost:1158/em&lt;/p&gt;
+
+&lt;p&gt;2.命令行输入sqlplus&lt;/p&gt;
+
+&lt;h2 id=&quot;oracle-1&quot;&gt;oracle数据库服务&lt;/h2&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;
+    &lt;p&gt;Oracle ORCL VSS Writer Service：Oracle卷映射拷贝写入服务，VSS（Volume Shadow Copy Service）能够让存储基础设备（比如磁盘，阵列等）创建高保真的时间点映像，即映射拷贝（shadow copy）。它可以在多卷或者单个卷上创建映射拷贝，同时不会影响到系统的系统能。（非必须启动）&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;OracleDBConsoleorcl：Oracle数据库控制台服务，orcl是Oracle的实例标识，默认的实例为orcl。在运行Enterprise Manager（企业管理器OEM）的时候，需要启动这个服务。（非必须启动）&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;OracleJobSchedulerORCL：Oracle作业调度（定时器）服务，ORCL是Oracle实例标识。（非必须启动）&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;OracleMTSRecoveryService：服务端控制。该服务允许数据库充当一个微软事务服务器MTS、COM/COM+对象和分布式环境下的事务的资源管理器。（非必须启动)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;OracleOraDb11g_home1ClrAgent：Oracle数据库.NET扩展服务的一部分。 （非必须启动）&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;OracleOraDb11g_home1TNSListener：监听器服务，服务只有在数据库需要远程访问的时候才需要。（非必须启动）。&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;OracleServiceORCL：数据库服务(数据库实例)，是Oracle核心服务该服务，是数据库启动的基础， 只有该服务启动，Oracle数据库才能正常启动。(必须启动)&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;只用Oracle自带的sql*plus的话，只要启动OracleServiceORCL即可，要是使用PL/SQL Developer等第三方工具的话，OracleOraDb11g_home1TNSListener服务也要开启。OracleDBConsoleorcl是进入基于web的EM必须开启的，其余服务很少用。&lt;/p&gt;
+
+&lt;h1 id=&quot;plsql&quot;&gt;PLSQL远程访问数据库&lt;/h1&gt;
+
+&lt;p&gt;PLSQL Developer\instantclient_11_2下的文件tnsnames.ora配置数据库的访问地址&lt;/p&gt;
+
+&lt;h1 id=&quot;section&quot;&gt;问题&lt;/h1&gt;
+
+&lt;p&gt;如果通过浏览器访问不到数据库了，那么需要在服务管理器中（window）依次关闭，然后依次重启以下服务：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;OracleOraDb11g_home1TNSListener
+OracleDbConsoleorcl
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+      </item>
+    
+      <item>
+        <title>Google离线地图</title>
+        <link>http://www.liuschen.com/2017/09/23/GoogleMap.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2017/09/23/GoogleMap.html</guid>
+        <pubDate>Sat, 23 Sep 2017 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&quot;section&quot;&gt;1.初始化地图&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;map = new google.maps.Map(document.getElementById(&#39;map&#39;), {
+      center: {lat: -34.397, lng: 150.644},
+      zoom: 8
+    });
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;section-1&quot;&gt;2.还可以添加地图选项：&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;map = new google.maps.Map(document.getElementById(&#39;map_canvas&#39;), mapOptions);
+ var mapOptions = {
+      zoom: 16,
+      center: myLatlng,
+	  mapTypeControl: true,
+      mapTypeControlOptions: {
+		  style: google.maps.MapTypeControlStyle.DROPDOWN_MENU,
+		mapTypeIds: [
+		&#39;localMap&#39; ]  //定义地图类型
+	  },
+	  //平移控制器
+	  panControl: false,
+	  //缩放控制器
+	  zoomControl: false,
+	  //地图切换
+	  mapTypeControl: true,
+	  scaleControl: false,
+	  //街道视图控制（小人）
+	  streetViewControl: false,
+	  //鹰眼图
+	  overviewMapControl: true
+    }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;section-2&quot;&gt;3.绑定本地地图&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;map.mapTypes.set(&#39;localMap&#39;, localMapType);   //绑定本地地图类型
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;localMapType是返回的瓦片，可以这样获取：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;function LocalMapType() {}
+  
+    LocalMapType.prototype.tileSize = new google.maps.Size(256, 256);
+    LocalMapType.prototype.maxZoom = 16;   //地图显示最大级别
+    LocalMapType.prototype.name = &quot;本地地图&quot;;
+    LocalMapType.prototype.alt = &quot;显示本地地图数据&quot;;
+	//设置地图瓦片的边框和颜色，当前为不可见，因为width为0
+    LocalMapType.prototype.getTile = function(coord, zoom, ownerDocument) {
+		var div = ownerDocument.createElement(&#39;div&#39;);
+		div.innerHTML = &#39;&amp;lt;img name=&quot;&quot; src=&quot;./maptile/googlemaps/roadmap/&#39; + zoom + &#39;/&#39; + coord.x + &#39;/&#39; + coord.y+&#39;.jpg&quot;/&amp;gt;&#39;; 
+		div.style.width = this.tileSize.width + &#39;px&#39;;
+		div.style.height = this.tileSize.height + &#39;px&#39;;
+		div.style.fontSize = &#39;10&#39;;
+		div.style.borderStyle = &#39;solid&#39;;
+		div.style.borderWidth = &#39;0px&#39;;
+		div.style.borderColor = &#39;#AAAAAA&#39;;
+		//瓦片背景颜色
+		div.style.backgroundColor = &#39;#E5E3DF&#39;;
+	  return div;
+    };
+  var localMapType = new LocalMapType();
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;section-3&quot;&gt;5.基本的一个坐标点对象：&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;var myLatlng = new google.maps.LatLng(39.97094, 116.37234);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;section-4&quot;&gt;6.指定显示本地地图&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;map.setMapTypeId(&#39;localMap&#39;);  
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;section-5&quot;&gt;7.设置可拖曳地图：&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;map.setOptions({draggable: true});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;section-6&quot;&gt;8.获取地图边界：&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;mapRangeBound = map.getBounds();
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;map&quot;&gt;9.map上添加事件，如下为点击事件：&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;map.addListener(&#39;click&#39;, function(event) {})
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;mapdiv&quot;&gt;10.为map瓦块div添加点击事件：&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;google.maps.event.addDomListener(mapDiv, &#39;click&#39;, function() {});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;section-7&quot;&gt;11.点击事件：&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;google.maps.event.addListener
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;section-8&quot;&gt;12.代码拖动地图：&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;map.panTo(new google.maps.LatLng(39.97094, 116.37234));
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;section-9&quot;&gt;13.拖动地图事件：&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;map.addListener(&#39;center_changed&#39;, function() {
+      // 3 seconds after the center of the map has changed, pan back to the
+      // marker.
+      window.setTimeout(function() {
+        map.panTo(marker.getPosition());
+      }, 3000);
+    });
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;marker&quot;&gt;14.点击marker改变地图显示等级和中心：&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;marker.addListener(&#39;click&#39;, function() {
+      map.setZoom(8);
+      map.setCenter(marker.getPosition());
+    });
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;section-10&quot;&gt;15.添加消息显示框：&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code&gt;function attachSecretMessage(marker, secretMessage) {
+    var infowindow = new google.maps.InfoWindow({
+      content: secretMessage
+    });
+	
+    marker.addListener(&#39;click&#39;, function() {
+      infowindow.open(marker.get(&#39;map&#39;), marker);
+    });
+  }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&quot;section-11&quot;&gt;注意:&lt;/h2&gt;
+
+&lt;p&gt;google.maps.event.addListener是为其他对象添加事件，而map.addListener是为map本身添加对象&lt;/p&gt;
+
+&lt;p&gt;google.maps.event是事件对象，可以通过获取到很多东西。如坐标还可能是图形对象，具体看情况，以下就是图形对象：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;	google.maps.event.addListener(drawingManager, &#39;circlecomplete&#39;, function(circle) {
+  var radius = circle.getRadius();
+});
+
+google.maps.event.addListener(drawingManager, &#39;overlaycomplete&#39;, function(event) {
+  if (event.type == &#39;circle&#39;) {
+    var radius = event.overlay.getRadius();
+  }
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;js&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;设置位置没有加单位导致不能用，在地图上绘图时，google.maps.Map 事件（如 click 和 mousemove）将被禁用。
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;google地图的点击事件会有遮挡和屏蔽的效果。所以如果处于绘图模式map的点击等一系列效果会被屏蔽。&lt;/p&gt;
+
+</description>
+      </item>
+    
+      <item>
         <title>GPS坐标区域判定2</title>
         <link>http://www.liuschen.com/2017/09/20/gps2.html</link>
         <guid isPermaLink="true">http://www.liuschen.com/2017/09/20/gps2.html</guid>
@@ -393,6 +680,791 @@ public static double calculateDistance(double[] point,double[][] polygon){
 
 &lt;p&gt;参考:&lt;a href=&quot;http://blog.csdn.net/kikitamoon/article/details/46124935&quot;&gt;Web Mercator 公开的小秘密&lt;/a&gt;&lt;br /&gt;
 参考:&lt;a href=&quot;http://www.movable-type.co.uk/scripts/latlong.html&quot;&gt;Calculate distance, bearing and more between Latitude/Longitude points&lt;/a&gt;&lt;/p&gt;
+
+</description>
+      </item>
+    
+      <item>
+        <title>PHP开发环境搭建</title>
+        <link>http://www.liuschen.com/2017/09/10/php.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2017/09/10/php.html</guid>
+        <pubDate>Sun, 10 Sep 2017 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;最近买了个虚拟主机，但是买回来后却发现不支持java程序，只支持PHP，想想也不是想做什么复杂的东西，所以将就着先用用看。毕竟，所有语言都是共通的。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h1 id=&quot;section&quot;&gt;环境安装&lt;/h1&gt;
+
+&lt;p&gt;下载&lt;a href=&quot;http://www.apachelounge.com/download/&quot;&gt;httpd-2.4.29-Win32-VC15&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;下载&lt;a href=&quot;http://windows.php.net/download#php-5.5&quot;&gt;php-5.6.32-Win32-VC11-x64&lt;/a&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;apache&quot;&gt;Apache配置&lt;/h1&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;注意:下面安装服务必须使用管理员权限，所以打开CMD的时候要用管理员的身份打开&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;同java一样，先配置了环境变量，然后打开CMD（必须使用管理员权限），不然不能安装服务：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;首先配置:httpd.conf
+ServerRoot &quot;httpd的根目录&quot;
+DocumentRoot “根目录下同样位置”
+以及其下的Directory路径也配置相同
+
+httpd -k install（将apache注册为window的服务）
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;经常出现的错误是端口占用，这时候只需要更改默认的端口即可(至少两处)。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Errors reported here must be corrected before the service can be started
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这句话并不是错误，而是提示如果下面有错误要先解决。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;httpd -k start
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;启动（必须先安装服务），可以访问了，通过127.0.0.1：端口&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;继续配置httpd.conf
+DirectoryIndex index.html 后添加index.php index.htm
+ScriptAlias后目录同样修改为本机的相对应目录，后面Directory里面的当然也要修改
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;文件尾部最后添加对PHP支持：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;LoadModule php5_module &quot;本机php路径/php5apache2_4.dll&quot;
+AddType application/x-httpd-php .php .html .htm
+PHPIniDir &quot;本机php路径&quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;最后一句是为了找PHP根目录下的PHP.ini文件，是由php.ini-production重命名后得到，添加后如果提示不能载入php5_module，那么要么是window下的依赖没配置好（单独启动php试试），也可能就是我遇到的版本搭配问题，网上有关于这个问题的解答，我在版本号上的选择是没错的，只是，64位和32位的弄混了。应该下载httpd-2.4.29-Win64-VC15，才对，这是它起名造成的误解。&lt;/p&gt;
+
+&lt;h1 id=&quot;eclipse-for-php&quot;&gt;eclipse for PHP调试环境的搭建&lt;/h1&gt;
+
+&lt;p&gt;配置完调试没反应,修改php.ini文件,在结尾添加:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;;zend_extension = F:\programer4\php-5.6.32-Win32-VC11-x64\ext\php_xdebug.dll
+zend_extension_ts = F:\programer4\php-5.6.32-Win32-VC11-x64\ext\php_xdebug.dll
+;extension = php_xdebug.dll
+[Xdebug]
+xdebug.auto_trace = 1
+xdebug.show_exception_trace = 1
+xdebug.remote_autostart = 1
+xdebug.remote_enable = 1
+xdebug.collect_vars = 1
+xdebug.collect_return = 1
+xdebug.collect_params = 1
+xdebug.trace_output_dir=”D:/xDebugLog”
+xdebug.profiler_output_dir=”D:/xDebugLog”
+xdebug.profiler_enable= 1
+xdebug.remote_host=localhost
+xdebug.remote_port=9000
+xdebug.remote_mode = req
+xdebug.remote_handler=dbgp
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;注意：配置文件中的”；”为注释符号，end_extension要根据自己下载的放出合适的版本（TS线程安全和非线程安全）&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;xdebug.remote_port=9000
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;远程端口要和eclipse中设置一致，&lt;/p&gt;
+
+&lt;p&gt;选中php文件，点击Debug As-&amp;gt;PHP Script执行调试&lt;/p&gt;
+
+&lt;h1 id=&quot;section-1&quot;&gt;错误&lt;/h1&gt;
+
+&lt;p&gt;使用mysqli连接数据库错误:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Call to undefined function mysqli_connect()错误
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;解决:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;在php.ini文件中extension=php_mysqli.dll去掉前面的分号，然后再添加extension_dir=&quot;ext&quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;万网数据库访问遇到问题：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;using the old insecure authentication. Please use an administration tool to reset your password with the command SET PASSWORD = PASSWORD(&#39;your_existing_password&#39;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;重新修改数据库密码，并把密码设置为41位加密的&lt;/p&gt;
+
+&lt;p&gt;服务端错误：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Call to undefined function mysqli_connect()错误
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;开始我还以为是同一个问题，后来梳理清楚了，发现解决上面这个问题的方法，只是在eclipse中执行脚本时运行通过了（eclipse中关联php.ini文件了）。但是一旦在服务器上让网页访问还是会出现这个问题。&lt;/p&gt;
+
+&lt;h1 id=&quot;php&quot;&gt;更换PHP版本&lt;/h1&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;鉴于阿里云上的PHP没有5.6版本的支持，最终选择7.0版本作为使用版本，因为阿里云最高支持到7.1版本，为了避免麻烦，使用7.0版的。&lt;br /&gt;
+配置依照上面配置只是php5换成php7&lt;/p&gt;
+&lt;/blockquote&gt;
+
+</description>
+      </item>
+    
+      <item>
+        <title>线程实例分析</title>
+        <link>http://www.liuschen.com/2017/09/03/thresd2.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2017/09/03/thresd2.html</guid>
+        <pubDate>Sun, 03 Sep 2017 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;场景一：&lt;/p&gt;
+
+&lt;p&gt;如果在主线程中启动一个子线程，将这个子线程join到主线程上，子线程中再开一个线程池来启动一个新的任务。这个新的任务中设置一个无限循环。当程序执行5分钟后，有多少线程还在执行。程序如下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;public class Main {
+	public static void main(String[] args){
+		try {
+		Thread thread;
+		thread = new Thread(){
+			 @Override
+			public void run() {
+				 ExecutorService fixPool = Executors.newFixedThreadPool(5);
+				 WorkRunable1 runa = new WorkRunable1();
+				 //WorkRunable1 runa2 = new WorkRunable1();
+				 fixPool.execute(runa);
+				 //fixPool.execute(runa2);
+				 System.out.println(&quot;该线程已经执行完毕:当前线程为&quot;+Thread.currentThread().getName());
+			}
+		};
+		thread.start();
+		thread.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		System.out.println(&quot;主线程已经执行完毕:&quot;+Thread.currentThread().getName());
+		
+	}
+	
+	public static class WorkRunable1 implements Runnable{
+
+		@Override
+		public void run() {
+			while(true){
+				try {
+					Thread.sleep(3000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				System.out.println(&quot;我一直在输出:&quot;+Thread.activeCount());
+			}
+		}
+		
+	}
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;执行显示将会有两个线程：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Thread[pool-1-thread-1]
+Thread[DestoryJavaVM]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这时，第一个启动的子线程早已经结束，所以main线程也随之结束。但是，还有线程执行，在主线程结束后启动了DestoryJavaVM，监听是否还有非守护线程执行，如果没有将关闭JVM。&lt;/p&gt;
+
+&lt;p&gt;如果在一个子线程中开一个无限循环，那么执行的线程将会变为2个，分别是：&lt;/p&gt;
+
+&lt;p&gt;主线程，第一个启动的子线程，和持续输出的线程池中的线程。&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;虽然这个结果一直在实践中被证实，但是没深究过，总是主观以为主线程结束了，其他所有线程理应就跟着完了。&lt;/p&gt;
+&lt;/blockquote&gt;
+</description>
+      </item>
+    
+      <item>
+        <title>线程复习笔记</title>
+        <link>http://www.liuschen.com/2017/09/03/thread1.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2017/09/03/thread1.html</guid>
+        <pubDate>Sun, 03 Sep 2017 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;内容主要来自《Java多线程编程核心技术》 高洪岩著&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&quot;section&quot;&gt;1.线程的生命周期&lt;/h2&gt;
+
+&lt;p&gt;线程是一个动态执行的过程，它也有一个从产生到死亡的过程。&lt;/p&gt;
+
+&lt;h3 id=&quot;section-1&quot;&gt;(1)生命周期的五种状态&lt;/h3&gt;
+
+&lt;h4 id=&quot;new-thread&quot;&gt;新建（new Thread）&lt;/h4&gt;
+
+&lt;p&gt;当创建Thread类的一个实例（对象）时，此线程进入新建状态（未被启动）。&lt;br /&gt;
+例如：Thread  t1=new Thread();&lt;/p&gt;
+
+&lt;h4 id=&quot;runnable&quot;&gt;就绪（runnable）&lt;/h4&gt;
+
+&lt;p&gt;线程已经被启动，正在等待被分配给CPU时间片，也就是说此时线程正在就绪队列中排队等候得到CPU资源。例如：t1.start();&lt;/p&gt;
+
+&lt;h4 id=&quot;running&quot;&gt;运行（running）&lt;/h4&gt;
+
+&lt;p&gt;线程获得CPU资源正在执行任务（run()方法），此时除非此线程自动放弃CPU资源或者有优先级更高的线程进入，线程将一直运行到结束。&lt;/p&gt;
+
+&lt;h4 id=&quot;dead&quot;&gt;死亡（dead）&lt;/h4&gt;
+
+&lt;p&gt;当线程执行完毕或被其它线程杀死，线程就进入死亡状态，这时线程不可能再进入就绪状态等待执行。&lt;br /&gt;
+自然终止：正常运行run()方法后终止&lt;br /&gt;
+异常终止：调用stop()方法让一个线程终止运行&lt;/p&gt;
+
+&lt;h4 id=&quot;blocked&quot;&gt;堵塞（blocked）&lt;/h4&gt;
+
+&lt;p&gt;由于某种原因导致正在运行的线程让出CPU并暂停自己的执行，即进入堵塞状态。&lt;/p&gt;
+
+&lt;p&gt;正在睡眠：用sleep(long t) 方法可使线程进入睡眠方式。一个睡眠着的线程在指定的时间过去可进入就绪状态。&lt;/p&gt;
+
+&lt;p&gt;正在等待：调用wait()方法。（调用motify()方法回到就绪状态）&lt;br /&gt;
+被另一个线程所阻塞：调用suspend()方法。（调用resume()方法恢复）&lt;/p&gt;
+
+&lt;h3 id=&quot;section-2&quot;&gt;2.常用方法&lt;/h3&gt;
+&lt;p&gt;void run()   创建该类的子类时必须实现的方法&lt;br /&gt;
+void start() 开启线程的方法&lt;br /&gt;
+static void sleep(long t) 释放CPU的执行权，不释放锁&lt;br /&gt;
+static void sleep(long millis,int nanos)&lt;br /&gt;
+final void wait()释放CPU的执行权，释放锁&lt;br /&gt;
+final void notify()&lt;br /&gt;
+static void yied()可以对当前线程进行临时暂停（让线程将资源释放出来）&lt;br /&gt;
+3.（1）结束线程原理：就是让run方法结束。而run方法中通常会定义循环结构，所以只要控制住循环即可&lt;br /&gt;
+(2)方法—-可以boolean标记的形式完成，只要在某一情况下将标记改变，让循环停止即可让线程结束&lt;br /&gt;
+（3）public final void join()//让线程加入执行，执行某一线程join方法的线程会被冻结，等待某一线程执行结束，该线程才会恢复到可运行状态&lt;/p&gt;
+
+&lt;p&gt;引用出处:&lt;a href=&quot;http://blog.csdn.net/mayouarebest8621/article/details/6755036&quot;&gt;http://blog.csdn.net/mayouarebest8621/article/details/6755036&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;section-3&quot;&gt;2.方法&lt;/h2&gt;
+
+&lt;p&gt;currentThread():返回调用代码段的线程信息&lt;/p&gt;
+
+&lt;p&gt;isAlive():判断线程是否处于活动状态，start之前调用为false,start之后为true&lt;/p&gt;
+
+&lt;p&gt;sleep():指定毫秒数让当前线程休眠&lt;/p&gt;
+
+&lt;p&gt;getId():取得线程的唯一标识&lt;/p&gt;
+
+&lt;p&gt;suspend()：挂起(也是有死锁的隐患，和锁有关，废除)&lt;/p&gt;
+
+&lt;p&gt;resume():重新开始执行，（和suspend，因为很容易造成资源独占，导致死锁，废除）&lt;/p&gt;
+
+&lt;p&gt;stop():停止（一般线程结束都是在线程中通过流程控制来结束，因为用stop太过暴力，会释放线程所有保有的资源，废除）&lt;/p&gt;
+
+&lt;p&gt;setPriority():设置线程的优先级&lt;/p&gt;
+
+&lt;p&gt;join(重要):当前线程等待新开的线程结束后再结束，多用于主线程和子线程&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;子线程.start()
+子线程.join()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;join(long),延时，内部用wait()释放锁&lt;br /&gt;
+sleep(long),不释放锁&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;join方法会阻塞线程，所以一个线程不能同时开启多个线程然后join,这样用非但不能达到目的，反而会使逻辑变的混乱。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h1 id=&quot;section-4&quot;&gt;3.对象监视器(锁)&lt;/h1&gt;
+
+&lt;p&gt;方法内变量为线程安全，实例中变量非线程安全（多个线程可能会访问同一个实例中的变量）&lt;/p&gt;
+
+&lt;p&gt;synchronized修饰方法，先调用该方法在没执行完时会持有锁，使后调用该方法的线程阻塞，直到前一个线程将锁释放。&lt;/p&gt;
+
+&lt;p&gt;synchronized（this）同步代码块，两个线程同时访问一个对象中的同步代码块时，先进入线程释放锁之前，后访问的线程阻塞等待。&lt;/p&gt;
+
+&lt;p&gt;synchronized同步方法和synchronized（this）互相阻塞&lt;/p&gt;
+
+&lt;p&gt;synchronized(非this对象)互相阻塞,互相阻塞表示的是对象监视器相同，在一个线程持有锁，另一个线程调用具有加锁的代码块时就会等待，&lt;strong&gt;wait()方法会释放当前线程的锁，sleep()不会释放锁&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;static方法加synchronized持有的是class锁，而普通方法加synchronized持有的是对象锁，所以两者不能同步&lt;/p&gt;
+
+&lt;h1 id=&quot;section-5&quot;&gt;原子性&lt;/h1&gt;
+
+&lt;p&gt;原子性就是操作的不可分割性，就和加上同步是一个效果，一个线程对一些变量进行操作，操作没有完成就不能有其他线程操作，否则，回写的值就会出现问题，产生脏数据。&lt;/p&gt;
+
+&lt;p&gt;volatile是强制从公共堆栈中取得变量，而不是从线程专有的线程中取得，对它的操作不具备原子性，也就是在不同线程同时写入可能会出错。&lt;/p&gt;
+
+&lt;p&gt;原子类如：AtomicInteger，前有前缀Atomic&lt;/p&gt;
+
+&lt;p&gt;原子类的操作也不一定是线程安全的，因为之外可能有不安全的操作，要综合考虑。&lt;/p&gt;
+
+&lt;h1 id=&quot;section-6&quot;&gt;等待通知&lt;/h1&gt;
+
+&lt;p&gt;锁对象所属的wait()和notify()方法是等待和唤醒，在同步代码块之中，如果所属同一个锁对象的wait()被多个线程调用，那么调用的线程会释放对象锁，然后进入线程等待池中，等待被唤醒。如果调用notify()会随机唤醒锁对象，多调用几次就能唤醒全部，也可以直接调用notifyAll()&lt;/p&gt;
+
+&lt;h1 id=&quot;threadlocalinheritablethreadlocal&quot;&gt;ThreadLocal和InheritableThreadLocal&lt;/h1&gt;
+
+&lt;p&gt;InheritableThreadLocal继承于前者&lt;/p&gt;
+
+&lt;p&gt;#同步锁&lt;/p&gt;
+
+&lt;p&gt;Lock lock = new ReentrantLock();&lt;br /&gt;
+Condition condition = lock.newCondition();&lt;br /&gt;
+lock.lock();&lt;/p&gt;
+
+&lt;p&gt;condition.await()&lt;br /&gt;
+condition.signal()&lt;br /&gt;
+condition.signalAll()&lt;/p&gt;
+
+&lt;p&gt;lock相当于之前的synchronized&lt;br /&gt;
+condition相当于之前的锁对象，里面有相关的等待唤醒方法。只是功能更强大。可以建立多个来保证等待与唤醒线程的准确切换。&lt;/p&gt;
+
+&lt;p&gt;公平锁与非公平锁：传入一个boolean来指定&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;tryLock()立即返回，可以带延时
+lock()获取不到，就使当前线程休眠等待
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id=&quot;reentrantreadwritelock&quot;&gt;ReentrantReadWriteLock读写锁&lt;/h1&gt;
+
+&lt;p&gt;读读共享，写写互斥，读写互斥，写读互斥&lt;/p&gt;
+
+&lt;p&gt;#线程组与线程池&lt;/p&gt;
+
+&lt;p&gt;线程组是为了方便线程的管理&lt;/p&gt;
+
+&lt;p&gt;线程池是为了减少线程创建与销毁的开销&lt;/p&gt;
+
+&lt;h1 id=&quot;section-7&quot;&gt;单例模式&lt;/h1&gt;
+
+&lt;p&gt;饿汉模式:直接建立对象，获取直接返回&lt;/p&gt;
+
+&lt;p&gt;懒汉模式：为了解决多线程下问题，需要对对象进行双检查，既防止不同线程多次创建实例，又保证了效率&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;if(obj!=null){
+}else{
+	synchronized(){
+		if(obj==null)
+			obj = new Obj();
+	}
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id=&quot;section-8&quot;&gt;守护线程&lt;/h1&gt;
+
+&lt;p&gt;在新建的线程启动前setDaemon(true)即可，在守护线程中新开的线程也是守护线程，守护线程不应访问资源，因为守护线程有中断的危险。当JVM中不存在非守护线程时，就会销毁JVM。&lt;/p&gt;
+
+</description>
+      </item>
+    
+      <item>
+        <title>android权限管理</title>
+        <link>http://www.liuschen.com/2017/08/05/AndroidSafe.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2017/08/05/AndroidSafe.html</guid>
+        <pubDate>Sat, 05 Aug 2017 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;android6.0后权限管理上更为严格，原本安装程序时确认的权限信息，也被分散到了调用的地方。也就是说除了在清单文件中声明权限外，对于一些安全敏感的权限而言，需要在调用的时候请求用户手动去开启权限。以内存卡读写权限为例。&lt;/p&gt;
+
+&lt;p&gt;首先，应该在清单文件中添加：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;uses-permission android:name=&quot;android.permission.WRITE_EXTERNAL_STORAGE&quot; /&amp;gt;
+&amp;lt;uses-permission android:name=&quot;android.permission.READ_EXTERNAL_STORAGE&quot; /&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;其次，需要在调用的地方手动请求：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;	int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+    if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 001);
+    } else {
+		
+        String path = Environment.getExternalStorageDirectory().getAbsolutePath();
+        File file = new File(path+File.separator+&quot;pdemo5&quot;);
+        Toast.makeText(this,&quot;开始执行&quot;,Toast.LENGTH_SHORT).show();
+        if (!file.exists()){
+            Toast.makeText(this,&quot;文件不存在，创建文件夹&quot;,Toast.LENGTH_SHORT).show();
+            file.mkdir();
+            if(!file.exists()){
+                Toast.makeText(this,&quot;创建失败，文件依旧不存在&quot;,Toast.LENGTH_SHORT).show();
+            }else{
+                Toast.makeText(this,&quot;文件创建成功&quot;,Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;然后通过以下方法在activity中监听向用户申请权限得到的结果：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;@Override
+public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+    switch (requestCode) {
+        case 001:
+            Toast.makeText(this,&quot;开始执行回调&quot;,Toast.LENGTH_SHORT).show();
+            if ((grantResults.length &amp;gt; 0) &amp;amp;&amp;amp; (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                Toast.makeText(this,&quot;开始执行回调判断&quot;,Toast.LENGTH_SHORT).show();
+            }
+            break;
+        default:
+            break;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;代码中需要实时授权的权限，同组只需要授权一个就行：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;CALENDAR（日历）&lt;/li&gt;
+  &lt;li&gt;READ_CALENDAR&lt;/li&gt;
+  &lt;li&gt;WRITE_CALENDAR&lt;/li&gt;
+  &lt;li&gt;CAMERA（相机）&lt;/li&gt;
+  &lt;li&gt;CAMERA&lt;/li&gt;
+  &lt;li&gt;CONTACTS（联系人）&lt;/li&gt;
+  &lt;li&gt;READ_CONTACTS&lt;/li&gt;
+  &lt;li&gt;WRITE_CONTACTS&lt;/li&gt;
+  &lt;li&gt;GET_ACCOUNTS&lt;/li&gt;
+  &lt;li&gt;LOCATION（位置）&lt;/li&gt;
+  &lt;li&gt;ACCESS_FINE_LOCATION&lt;/li&gt;
+  &lt;li&gt;ACCESS_COARSE_LOCATION&lt;/li&gt;
+  &lt;li&gt;MICROPHONE（麦克风）&lt;/li&gt;
+  &lt;li&gt;RECORD_AUDIO&lt;/li&gt;
+  &lt;li&gt;PHONE（手机）&lt;/li&gt;
+  &lt;li&gt;READ_PHONE_STATE&lt;/li&gt;
+  &lt;li&gt;CALL_PHONE&lt;/li&gt;
+  &lt;li&gt;READ_CALL_LOG&lt;/li&gt;
+  &lt;li&gt;WRITE_CALL_LOG&lt;/li&gt;
+  &lt;li&gt;ADD_VOICEMAIL&lt;/li&gt;
+  &lt;li&gt;USE_SIP&lt;/li&gt;
+  &lt;li&gt;PROCESS_OUTGOING_CALLS&lt;/li&gt;
+  &lt;li&gt;SENSORS（传感器）&lt;/li&gt;
+  &lt;li&gt;BODY_SENSORS&lt;/li&gt;
+  &lt;li&gt;SMS（短信）&lt;/li&gt;
+  &lt;li&gt;SEND_SMS&lt;/li&gt;
+  &lt;li&gt;RECEIVE_SMS&lt;/li&gt;
+  &lt;li&gt;READ_SMS&lt;/li&gt;
+  &lt;li&gt;RECEIVE_WAP_PUSH&lt;/li&gt;
+  &lt;li&gt;RECEIVE_MMS&lt;/li&gt;
+  &lt;li&gt;STORAGE（存储卡）&lt;/li&gt;
+  &lt;li&gt;READ_EXTERNAL_STORAGE&lt;/li&gt;
+  &lt;li&gt;WRITE_EXTERNAL_STORAGE&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;同一个应用同一种权限正常情况下只会向用户请求一次，如果只在清单中加，而没有在代码中申请权限，那么是得不到相关的安全敏感的权限的，用得不到操作权限的操作操作数据处理信息会导致程序异常退出，但程序退出可能并不是直接由权限缺失导致。&lt;/p&gt;
+
+&lt;p&gt;参考:&lt;a href=&quot;http://blog.csdn.net/yanzhenjie1003/article/details/52503533/&quot;&gt;http://blog.csdn.net/yanzhenjie1003/article/details/52503533/&lt;/a&gt;&lt;/p&gt;
+</description>
+      </item>
+    
+      <item>
+        <title>maven2</title>
+        <link>http://www.liuschen.com/2017/07/25/maven2.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2017/07/25/maven2.html</guid>
+        <pubDate>Tue, 25 Jul 2017 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;maven同gradle以及git,svn等版本控制软件一样，都有局部设置（用户的目录下都有一个默认的.m2/repository/路径作为本地仓库，.m2文件夹中的settings.xml）和全局设置（maven目录下config中的settings.xml）。&lt;/p&gt;
+
+&lt;p&gt;maven的远程仓库分为中央仓库，和私服。中央仓库时默认的，因为新建的pom.xml默认继承了超级pom.xml而这个超级pom.xml配置了中央仓库的地址。可以在pom.xml中配置其他仓库地址：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;repositories&amp;gt;  
+&amp;lt;repository&amp;gt;  
+  &amp;lt;id&amp;gt;central&amp;lt;/id&amp;gt;  
+  &amp;lt;name&amp;gt;Central Repository&amp;lt;/name&amp;gt;  
+  &amp;lt;url&amp;gt;http://repo.maven.apache.org/maven2&amp;lt;/url&amp;gt;  
+  &amp;lt;layout&amp;gt;default&amp;lt;/layout&amp;gt;  
+  &amp;lt;snapshots&amp;gt;  
+    &amp;lt;enabled&amp;gt;false&amp;lt;/enabled&amp;gt;  
+  &amp;lt;/snapshots&amp;gt;  
+&amp;lt;/repository&amp;gt;  
+  	&amp;lt;/repositories&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;如果要将项目发布到远程服务器上可以这样设置:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;distributionManagement&amp;gt;
+	&amp;lt;repository&amp;gt;
+		&amp;lt;id&amp;gt;releases&amp;lt;/id&amp;gt;
+		&amp;lt;name&amp;gt;Nexus Release Repository&amp;lt;/name&amp;gt;
+		&amp;lt;url&amp;gt;http://10.168.1.105:8081/nexus/content/repositories/releases/&amp;lt;/url&amp;gt;
+	&amp;lt;/repository&amp;gt;
+	&amp;lt;snapshotRepository&amp;gt;
+		&amp;lt;id&amp;gt;snapshots&amp;lt;/id&amp;gt;
+		&amp;lt;name&amp;gt;Nexus Snapshots Repository&amp;lt;/name&amp;gt;
+		&amp;lt;url&amp;gt;http://10.168.1.105:8081/nexus/content/repositories/snapshots/&amp;lt;/url&amp;gt;
+	&amp;lt;/snapshotRepository&amp;gt;
+&amp;lt;/distributionManagement&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;需要验证身份信息的话，在settings.xml中配置：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;server&amp;gt;  
+	&amp;lt;id&amp;gt;releases&amp;lt;/id&amp;gt;  
+	&amp;lt;username&amp;gt;deployment&amp;lt;/username&amp;gt;  
+	&amp;lt;password&amp;gt;deployment123&amp;lt;/password&amp;gt;  
+&amp;lt;/server&amp;gt;
+&amp;lt;server&amp;gt;
+	&amp;lt;id&amp;gt;snapshots&amp;lt;/id&amp;gt;  
+	&amp;lt;username&amp;gt;deployment&amp;lt;/username&amp;gt;  
+	&amp;lt;password&amp;gt;deployment123&amp;lt;/password&amp;gt;  
+&amp;lt;/server&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;远程仓库的配置同样也是可以在settings.xml中:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;profile&amp;gt;
+  &amp;lt;id&amp;gt;jdk-1.4&amp;lt;/id&amp;gt;
+
+  &amp;lt;activation&amp;gt;
+    &amp;lt;jdk&amp;gt;1.4&amp;lt;/jdk&amp;gt;
+  &amp;lt;/activation&amp;gt;
+
+  &amp;lt;repositories&amp;gt;
+    &amp;lt;repository&amp;gt;
+      &amp;lt;id&amp;gt;jdk14&amp;lt;/id&amp;gt;
+      &amp;lt;name&amp;gt;Repository for JDK 1.4 builds&amp;lt;/name&amp;gt;
+      &amp;lt;url&amp;gt;http://www.myhost.com/maven/jdk14&amp;lt;/url&amp;gt;
+      &amp;lt;layout&amp;gt;default&amp;lt;/layout&amp;gt;
+      &amp;lt;snapshotPolicy&amp;gt;always&amp;lt;/snapshotPolicy&amp;gt;
+    &amp;lt;/repository&amp;gt;
+  &amp;lt;/repositories&amp;gt;
+&amp;lt;/profile&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;其中profile标签中的内容是满足条件时激活该profile,activation表示激活条件，也就是jdk版本是1.4时激活该profile，如果要始终生效，可以添加激活条件:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;activeProfiles&amp;gt;  
+ &amp;lt;activeProfile&amp;gt;profileTest1&amp;lt;/activeProfile&amp;gt;  
+&amp;lt;/activeProfiles&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这个激活条件时在settings.xml的根标签中配置的，profileTest1是要激活的profile的id，而profile中的activation是主动选择执行情况&lt;/p&gt;
+
+&lt;p&gt;还可以直接在项目中的pom.xml中配置私服地址（只在本项目起作用）:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;repositories&amp;gt;  
+    &amp;lt;repository&amp;gt;  
+        &amp;lt;id&amp;gt;nexus&amp;lt;/id&amp;gt;  
+        &amp;lt;name&amp;gt;nexus&amp;lt;/name&amp;gt;  
+        &amp;lt;url&amp;gt;http://192.168.1.103:8081/nexus/content/groups/public/&amp;lt;/url&amp;gt;  
+        &amp;lt;releases&amp;gt;  
+            &amp;lt;enabled&amp;gt;true&amp;lt;/enabled&amp;gt;  
+        &amp;lt;/releases&amp;gt;  
+        &amp;lt;snapshots&amp;gt;  
+            &amp;lt;enabled&amp;gt;true&amp;lt;/enabled&amp;gt;  
+        &amp;lt;/snapshots&amp;gt;  
+    &amp;lt;/repository&amp;gt;  
+&amp;lt;/repositories&amp;gt;  
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;指定插件地址:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;pluginRepositories&amp;gt;  
+    &amp;lt;pluginRepository&amp;gt;  
+        &amp;lt;id&amp;gt;nexus&amp;lt;/id&amp;gt;  
+        &amp;lt;name&amp;gt;nexus&amp;lt;/name&amp;gt;  
+        &amp;lt;url&amp;gt;http://192.168.1.103:8081/nexus/content/groups/public/&amp;lt;/url&amp;gt;  
+        &amp;lt;releases&amp;gt;  
+            &amp;lt;enabled&amp;gt;true&amp;lt;/enabled&amp;gt;  
+        &amp;lt;/releases&amp;gt;  
+        &amp;lt;snapshots&amp;gt;  
+            &amp;lt;enabled&amp;gt;true&amp;lt;/enabled&amp;gt;  
+        &amp;lt;/snapshots&amp;gt;  
+    &amp;lt;/pluginRepository&amp;gt;  
+&amp;lt;/pluginRepositories&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;或是在settdings.xml中配置:&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;mvn install 会将项目生成的构件安装到本地Maven仓库，mvn deploy 用来将项目生成的构件分发到远程Maven仓库。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;正式版本在不更改版本号的情况下，编译打包时如果本地已经存在该版本的模块则不会主动去镜像服务器上下载。快照版本会主动下载最新。&lt;/p&gt;
+&lt;/blockquote&gt;
+</description>
+      </item>
+    
+      <item>
+        <title>数据库测试</title>
+        <link>http://www.liuschen.com/2017/07/20/dbtest.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2017/07/20/dbtest.html</guid>
+        <pubDate>Thu, 20 Jul 2017 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;测试MYSQL数据库操作性能&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;建立3个相互关联的表:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;create table table_test1(id varchar(50) primary key not null,table_c1 varchar(50),table_c2 varchar(40),table_c3 varchar(40),table_c4 varchar(40));
+
+create table table_test2(id varchar(50) primary key not null,table2_c1 varchar(50),table2_c2 varchar(40),table2_c3 varchar(40),table2_c4 varchar(40),test1_id varchar(50) not null,foreign key(test1_id) references table_test1(id));
+
+create table table_test3(id varchar(50) primary key not null,table3_c1 varchar(50),table3_c2 varchar(40),table3_c3 varchar(40),table3_c4 varchar(40),test2_id varchar(50) not null,foreign key(test2_id) references table_test2(id));
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;第一个表为主表，第二个表为第一个表的从表，第三个表为第二个表的从表。&lt;/p&gt;
+
+&lt;p&gt;然后通过sql语句插入数据(插入数据的关系为，主表一条数据，从表为10条，从表的从表为100条)：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;| 插入主表的条目 	| 执行消耗的时间 	| CPU消耗的时间  | 删除表耗时 |
+| ------------- |:-------------:| -------------:|----------:|
+| 1      		| &amp;lt;1s 			| &amp;lt;1s 			| &amp;lt;1s 		|
+| 10      		| &amp;lt;1s      		| &amp;lt;1s			| &amp;lt;1s		|
+| 100 			| 5s      		| 5s 			| &amp;lt;1s		|
+| 1000 			| 55s      		| 55s 			| 9s		|
+| 2000 			| 296s      	| 296s 			| 59s		|
+| 3000 			| 1350ss      	| 1350ss 		| 574s		|
+| 4000 			| 3741s      	| 3741s 		| 930s		|
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;插入40万条数据（严格来说是444000条）时就已经执行了很长时间，要1个小时多。按照增加的速度，下一次将会好几个小时才能执行完成。那么，如果要在这种情况下插入100w+测试数据没有几天根本跑不下来。&lt;/p&gt;
+</description>
+      </item>
+    
+      <item>
+        <title>cordova</title>
+        <link>http://www.liuschen.com/2017/07/02/cordova.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2017/07/02/cordova.html</guid>
+        <pubDate>Sun, 02 Jul 2017 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;首先安装&lt;a href=&quot;https://nodejs.org/en/download/&quot;&gt;Node.js&lt;/a&gt;;&lt;/p&gt;
+
+&lt;p&gt;在命令行中安装cordova&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;npm install -g cordova
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;创建工程&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;cordova create hello com.example.hello HelloWorld
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;执行完这一步，会在当前目录之下生成一个hello文件夹，文件夹内目录结构:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;--hooks(文件夹)
+--platforms(空文件夹)
+--plugins(空文件夹)
+--www(存放网页js代码)
+-config.xml(配置文件)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;进入目录并添加打包平台&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;cd hello
+cordova platform add ios --save
+cordova platform add android --save
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;添加平台时可以指定版本&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;cordova platform add android@5.1 --save
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;此时在platforms(空文件夹)和plugins(空文件夹)下都会生成相应内容，如果后面加–save则会在config.xml中添加&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;engine name=&quot;android&quot; spec=&quot;~5.1.1&quot; /&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;命令文档cordova platform –help&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Synopsis
+
+    cordova platform &amp;lt;command&amp;gt; [options]
+
+Manage project platforms
+
+    add &amp;lt;plat-spec&amp;gt; [...].............. Add specified platforms
+        --save ........................ Save specified platforms into config.xml after installing them
+
+        --link ........................ When &amp;lt;plat-spec&amp;gt; is a local path, links the platform
+                                        library directly instead of making a copy of it (support
+                                        varies by platform; useful for platform development)
+
+        --fetch ....................... Fetches the plugin into the project&#39;s node_modules directory.
+                                        Uses `npm install` to do the fetching.
+
+
+
+
+    remove &amp;lt;platform&amp;gt; [...] ........... Remove specified platforms
+        --save ........................ Delete specified platforms from config.xml after removing them
+        --fetch ....................... Removes the plugin from the project&#39;s node_modules directory.
+                                        Runs `npm uninstall` under the hood.
+
+
+    update &amp;lt;plat-spec&amp;gt; ................ Update the version of Cordova used for a specific platform;
+                                        update to the latest &amp;lt;version&amp;gt; if no &amp;lt;plat-spec&amp;gt; is specified
+
+        --save ........................ Save the latest versions for specified platforms into config.xml
+
+        --fetch ....................... Fetches the plugin into the project&#39;s node_modules directory.
+                                        Uses `npm install` to do the fetching.
+
+    list .............................. List all installed and available platforms
+    check ............................. List platforms which can be updated by `cordova platform update`
+    save .............................. Save version of all platforms added to config.xml
+
+
+Syntax
+    &amp;lt;plat-spec&amp;gt; : &amp;lt;platform&amp;gt;[@&amp;lt;version&amp;gt;]|&amp;lt;path&amp;gt;|&amp;lt;url&amp;gt;[#&amp;lt;commit-ish&amp;gt;]
+
+    &amp;lt;platform&amp;gt; ........................ Platform name e.g. android, ios, windows etc.
+    &amp;lt;version&amp;gt; ......................... Major.minor.patch version specifier using semver
+    &amp;lt;path&amp;gt; ............................ Path to a directory containing a platform
+    &amp;lt;url&amp;gt; ............................. Url to a git repository containing a platform
+    &amp;lt;commit-ish&amp;gt; ...................... Commit/tag/bramch reference. If none is specified, &#39;master&#39; is used
+
+Aliases
+    platforms -&amp;gt; platform
+    rm -&amp;gt; remove
+    ls -&amp;gt; list
+
+Examples
+    cordova platform add android ios --save
+    cordova platform add android@^5.0.0 --save
+    cordova platform add https://github.com/myfork/cordova-android.git#4.0.0 --save
+    cordova platform add ../android --save
+    cordova platform add ../cordova-android.tgz --save
+    cordova platform rm android --save
+    cordova platform ls
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;配置环境变量ANDROID_HOME(SDK路径)和JAVA_HOME(JDK路径)&lt;/p&gt;
+
+&lt;p&gt;查看环境需求&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;cordova requirements
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;编译&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;cordova build
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;编译过程，如果选择新版本本地没有相关资源会自动下载，编译后会在&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;/platforms/android/build/outputs/apk/
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;目录下生成android版的app&lt;/p&gt;
 
 </description>
       </item>
@@ -1692,1312 +2764,6 @@ grunt （重新构建所有内容并运行测试用例）
 &lt;h2 id=&quot;bootstrap-3&quot;&gt;为什么需要编译bootstrap&lt;/h2&gt;
 
 &lt;p&gt;我们知道，js和css和Java代码不同是不需要编译的，但是bootstrap的编译主要是为了生成javascript和css代码；存储bootstrap样式的代码主要写在less中，通过编译可以生成对应的css代码，从而使更改样式变得简单。&lt;/p&gt;
-</description>
-      </item>
-    
-      <item>
-        <title>android反编译还原项目指南</title>
-        <link>http://www.liuschen.com/2017/03/21/smali2.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2017/03/21/smali2.html</guid>
-        <pubDate>Tue, 21 Mar 2017 00:00:00 +0800</pubDate>
-        <description>&lt;blockquote&gt;
-  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;Android反编译工具就不说了，之前已经具体说过，只要会用几个功能，就能解出源码，如果恰巧源码没有进行混淆，那么就赚了，理论上可以还原出项目的开发文件的&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;首先举一个例子，以下是原始代码，某个ListView的adapter的getView方法&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
-		
-		if (getCount() == 0) {
-			return null;
-		}
-		ViewHolder holder = null;
-		if (convertView == null) {
-			holder=new ViewHolder();
-			convertView=mInflater.inflate(R.layout.list_item_updownload, null);
-			holder.tv1=(TextView) convertView.findViewById(R.id.listitem_1);
-			holder.tv2=(TextView) convertView.findViewById(R.id.listitem_2);
-			holder.tv3=(TextView) convertView.findViewById(R.id.listitem_3);
-			holder.tv4=(TextView) convertView.findViewById(R.id.listitem_4);
-			holder.tv5=(TextView) convertView.findViewById(R.id.listitem_5);
-			holder.tv6=(TextView) convertView.findViewById(R.id.listitem_6);
-			
-			convertView.setTag(holder);
-			
-		} else {
-			holder = (ViewHolder) convertView.getTag();
-		}
-		holder.tv1.setText(mList.get(position).getNum());
-		holder.tv2.setText(mList.get(position).getProjectName());
-		holder.tv3.setText(mList.get(position).getZypName());
-		holder.tv4.setText(mList.get(position).getZuoyedanwei());
-		holder.tv5.setText(mList.get(position).getStartTime());
-		holder.tv6.setText(mList.get(position).getEndTime());
-		return convertView;
-	}
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;以下是编译成class文件后反解后对应的方法&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt; public View getView(int paramInt, View paramView, ViewGroup paramViewGroup)
-{
-  if (getCount() == 0)
-    return null;
-  DataUploadActivity.ViewHolder localViewHolder;
-  if (paramView == null)
-  {
-    localViewHolder = new DataUploadActivity.ViewHolder(null);
-    paramView = this.mInflater.inflate(2130903048, null);
-    DataUploadActivity.ViewHolder.access$1(localViewHolder, (TextView)paramView.findViewById(2131492897));
-    DataUploadActivity.ViewHolder.access$2(localViewHolder, (TextView)paramView.findViewById(2131492898));
-    DataUploadActivity.ViewHolder.access$3(localViewHolder, (TextView)paramView.findViewById(2131492899));
-    DataUploadActivity.ViewHolder.access$4(localViewHolder, (TextView)paramView.findViewById(2131492901));
-    DataUploadActivity.ViewHolder.access$5(localViewHolder, (TextView)paramView.findViewById(2131492902));
-    DataUploadActivity.ViewHolder.access$6(localViewHolder, (TextView)paramView.findViewById(2131492903));
-    paramView.setTag(localViewHolder);
-  }
-  while (true)
-  {
-    DataUploadActivity.ViewHolder.access$7(localViewHolder).setText(((ZYPbeanUpDownLoad)this.mList.get(paramInt)).getNum());
-    DataUploadActivity.ViewHolder.access$8(localViewHolder).setText(((ZYPbeanUpDownLoad)this.mList.get(paramInt)).getProjectName());
-    DataUploadActivity.ViewHolder.access$9(localViewHolder).setText(((ZYPbeanUpDownLoad)this.mList.get(paramInt)).getZypName());
-    DataUploadActivity.ViewHolder.access$10(localViewHolder).setText(((ZYPbeanUpDownLoad)this.mList.get(paramInt)).getZuoyedanwei());
-    DataUploadActivity.ViewHolder.access$11(localViewHolder).setText(((ZYPbeanUpDownLoad)this.mList.get(paramInt)).getStartTime());
-    DataUploadActivity.ViewHolder.access$12(localViewHolder).setText(((ZYPbeanUpDownLoad)this.mList.get(paramInt)).getEndTime());
-    return paramView;
-    localViewHolder = (DataUploadActivity.ViewHolder)paramView.getTag();
-  }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;可以看出的是：&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;原始代码的注解不见了&lt;/li&gt;
-  &lt;li&gt;资源文件变成了一串数字&lt;/li&gt;
-  &lt;li&gt;里面多了很多个$&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;先来说第三点，因为第三点出现的范围相当广而且需要先进行修改来使项目顺利通过编译。&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;首先，当定义一个变量并被赋值，然后再回调方法中被调用，这时由于回调方法内部和定义变量的位置位于不同作用域，所以需要变量前加final修饰，当编译在反编译后的得到的代码将没有final修饰符，该变量作为一个参数传入回调的类中，在类中引用该变量则变为 val$原始类名&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;由此引申，一个回调方法即使没有参数，也会默认传入null，遇到删除就好&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;break的用法，在反编译得到的代码中会遇到break label+数字  的代码，这个其实和goto语句一样是一个跳转语句，千万不要大惊小怪。可见，其实像if这样的条件语句都是翻译成跳转语句执行的。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;for循环会变成while(true)+if条件判断，if条件语句如果体量过大，会被优化为if-break跳转语句。我遇到的多重嵌套语句，很多都会变成break（这里同goto,因为Java中没有goto,所以用break）+while循环形式&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;上面例子中的access$数字形式，适用于内部类访问外部类数据成员时，是编译阶段自动生成的&lt;/li&gt;
-  &lt;li&gt;switch语句也是有点头疼，反编译出来会变得很错乱，就不要看代码表面的逻辑了，还是会出现一个while循环，而且里面可能有出现的很不可理的return和continue，这是就看对代码上下文理解来整理了，没什么技巧。switch的default会被放在第一个，还有最后的return会被提前&lt;/li&gt;
-  &lt;li&gt;还有一个有趣的现象，就是值数字的变量名会被改为诸如i,j,k这种让人混淆的名字。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;还有诸多小问题，如&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;变量没有初始化值&lt;/li&gt;
-  &lt;li&gt;优化后代码出现大量跟在return或是break后的不可用语句&lt;/li&gt;
-  &lt;li&gt;至于资源文件的对照，只能参考反编译出来的R文件批量修改了&lt;/li&gt;
-  &lt;li&gt;大多注解都是对应的编译阶段，还有泛型就是为了编译而生的，如果因为缺少而报错需要加上&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;这里还有一个很重要的问题，有时候一大段代码会反编译不出来，反编译的结果是注释掉的代码块，然后提示说是这一段代码有错误。那么，这一大段代码就只有自己根据上下文的逻辑自己写了。&lt;/p&gt;
-</description>
-      </item>
-    
-      <item>
-        <title>一些web相关东西(摘自网络)</title>
-        <link>http://www.liuschen.com/2017/03/20/something.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2017/03/20/something.html</guid>
-        <pubDate>Mon, 20 Mar 2017 00:00:00 +0800</pubDate>
-        <description>&lt;h2 id=&quot;js&quot;&gt;1.js框架&lt;/h2&gt;
-
-&lt;h3 id=&quot;bootstrap&quot;&gt;bootstrap&lt;/h3&gt;
-
-&lt;h3 id=&quot;propeller&quot;&gt;Propeller&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;Propeller 是一个基于 Bootstrap 和 Google’s Material Design 语言的 CSS 组件框架。它包含 25 个组件，响应敏捷，具有典型 Material Design 动画的特点。该项目可以作为 Bootstrap 主题下载，也可作为完整的框架或独立的组件下载。
-BaguetteBox
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&quot;baguetteboxjs&quot;&gt;baguetteBox.js&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;baguetteBox.js 是一个简单简单、易用的 JavaScript lightbox库，它具有一下特点：
-纯 JavaScript 实现，无需依赖其他库
-支持触摸屏设备手势操作
-支持显示标题（说明）
-支持响应式图像
-支持CSS3过渡
-使用 SVG 按钮，没有多余的文件下载
-启用 gzip 压缩后仅 2KB
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&quot;whitestorm&quot;&gt;Whitestorm&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;Whitestorm 使用 Three.js 引擎开发 3D 网页应用和游戏，它为普通的 Three.js 任务提供封装，使搭建环境，创建对象，添加物件等操作更简单。官方提供了很好的项目教程，以及与 React 集成的工具。
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&quot;animatelo&quot;&gt;Animatelo&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;Animatelo 是极度流行的 Animate.css 库的端口，它用 Web Animations API 克隆代替 CSS 转换。所有原始的 Animate.css 效果都被重建，但现在的 API 是基于 JavaScript 类而不是 CSS 类。该库轻量且不依赖 jQuery，但在旧版浏览器要求 polyfill。
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&quot;fusebox&quot;&gt;FuseBox&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;FuseBox 是一个用于 JavaScript 和 CSS 的捆绑加载器，带有 TypeScript，Sass 等可选的附加组件。它以简洁与性能为主，为 webpack 提供替代方案。相关教程：Angular 2 + TypeScript, React + Babel, Vue.js, Electron 等。
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&quot;yargs&quot;&gt;Yargs&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;Yargs 框架通过使用 Node.js 构建功能全面的命令行应用，它能轻松配置命令，解析多个参数，并设置快捷方式等，还能自动生成帮助菜单。
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&quot;webgradients&quot;&gt;WebGradients&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;WebGradients 含有多种漂亮的渐变色，可在任何 HTML 页面轻松应用。你可在项目网站快速预览可用的渐变色，还能一键复制 CSS 到你的项目中去。
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&quot;sticky-kit&quot;&gt;Sticky-Kit&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;Sticky-kit 是一个 jQuery 插件，它允许你在页面附加元素，设置跟随滚动的侧边栏效果。
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&quot;scrolldir&quot;&gt;ScrollDir&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;ScrollDir 是一个超轻量无依赖的 JavaScript 库，用以检查滚动条的移动，并根据你的选择元素切换 上/下 数据属性。该项目能给你带来平滑的用户体验。
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&quot;svgo&quot;&gt;Svgo&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;用以优化 SVG 文件的 Node.js 工具，它将它们从非必要的信息中剥离出来，如，编辑器元数据，注释，隐藏元素等。SVGO 具有基于插件的架构，你可自由选择需要删除和保留的内容。
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&quot;storejs&quot;&gt;Store.js&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;Store.js 是一个跨浏览器的用于高级本地存储的解决方案，它实现了浏览器的本地存储的 JavaScript 封装 API，不是通过 Cookie 和 Flash 技术实现，而是使用 localStorage、globalStorage 和 userData 行为。
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&quot;snarkdown&quot;&gt;Snarkdown&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;Snarkdown 是一个用 JavaScript 编写的极简的 Markdown 解析器。它不是功能最全的，但可能是最容易实现的一款解析器。Snarkdown 只有 1Kb 大小，且只有一种方法，适合速成项目。
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&quot;unfetch&quot;&gt;Unfetch&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;Fetch API 能让开发者更好地处理异步请求，它能在大多数浏览器上受支持，但 fetch() 方法在 IE 浏览器中仍不可用。
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&quot;scrollanim&quot;&gt;Scrollanim&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;Scrollanim 是使用 CSS3 + JavaScript 实现的用于创建滚动动画的库，应用到元素上后，当此元素出现在浏览器可视区域时便会执行对应的动画。Scrollanim 是 Kissui 的一部分，所以使用 Scrollanim 时需要用到 kissui.css。
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&quot;neurojs&quot;&gt;Neurojs&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;用于在浏览器中进行深度学习 JavaScript 框架，可以通过强化学习进行全栈神经网络。演示：Demo app
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&quot;reactjs&quot;&gt;ReactJS&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;用于提高js页面刷新性能
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&quot;section&quot;&gt;2.自动化构建工具&lt;/h2&gt;
-
-&lt;p&gt;Jenkins(Java),jekyll(基于模版轻量级博客系统)&lt;/p&gt;
-
-&lt;h2 id=&quot;section-1&quot;&gt;3.自动化运维工具&lt;/h2&gt;
-
-&lt;p&gt;&lt;a href=&quot;http://www.ansible.com.cn/docs/intro.html&quot;&gt;ansible&lt;/a&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;section-2&quot;&gt;4.分布式计算&lt;/h2&gt;
-
-&lt;p&gt;Apache Spark&lt;/p&gt;
-</description>
-      </item>
-    
-      <item>
-        <title>linux网络调试</title>
-        <link>http://www.liuschen.com/2017/03/16/linux.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2017/03/16/linux.html</guid>
-        <pubDate>Thu, 16 Mar 2017 00:00:00 +0800</pubDate>
-        <description>&lt;blockquote&gt;
-  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;这个文件是网络连接的文件，可视化的编辑也是修改和创建的这个文件&lt;br /&gt;
-vi /etc/sysconfig/network-scripts/ifcfg-networkname修改onBoot=yes&lt;/p&gt;
-
-&lt;p&gt;网络服务的开关&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;service network stop
-service network start
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;查看网络连接状态&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;systemctl status network.service
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;查看关于网络部分的日志&lt;br /&gt;
-cat /var/log/messages | grep -n network&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;19746:Mar  6 11:40:58 localhost network: 正在打开接口 eno16777736： 成功激活的连接（D-Bus 激活路径：/org/freedesktop/NetworkManager/ActiveConnection/11）
-19747:Mar  6 11:40:58 localhost network: [  确定  ]
-19750:Mar  6 11:40:58 localhost systemd: Started LSB: Bring up/down networking.
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;设置开机启动一个NetworkManager服务&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;systemctl enable NetworkManager-wait-online.service
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;重启&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;service NetworkManager restart
-&lt;/code&gt;&lt;/pre&gt;
-
-</description>
-      </item>
-    
-      <item>
-        <title>如何将已存在的APK项目作为资源引用</title>
-        <link>http://www.liuschen.com/2017/03/15/project.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2017/03/15/project.html</guid>
-        <pubDate>Wed, 15 Mar 2017 00:00:00 +0800</pubDate>
-        <description>&lt;blockquote&gt;
-  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;android开发中，调用外部引用的方法分为三种：&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;引入jar包文件&lt;/li&gt;
-  &lt;li&gt;把项目整体作为依赖&lt;/li&gt;
-  &lt;li&gt;通过maven或是gradle直接配置依赖&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;基本上，项目如果要开发更简洁，引入外部的依赖是不可避免的，这些引入的方法都很简单，不多加详述，现在我主要探究的是如何通过已有的apk拓展源，来制作可用的依赖。&lt;/p&gt;
-
-&lt;p&gt;关于这点有两点设想&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;反编译apk，修改清单文件，重新打包，将apk作为插件供新程序调用。&lt;/li&gt;
-  &lt;li&gt;反编译apk,将反编译出的class文件打成jar包，供新程序调用，引入资源文件，修改映射关系&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h2 id=&quot;section&quot;&gt;反编译，重打包&lt;/h2&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;将apk反编译后会解出一个smali文件夹和res文件夹以及一个解码过的清单文件，如果单纯的解压apk,得到的则是dex文件和resources.arsc文件以及没有解码的res和清单文件，将反编译后的文件夹重新打包，会生成一个build文件夹，里面的内容和解压apk得到的文件类似。也就是说，其实反编译得到的代码是一个完整的开发工程，只是不是Java而已。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;&lt;strong&gt;反编译  apktool d -f -.apk&lt;/strong&gt;，会生成一个apk的同名文件夹&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;重打包  apktool b -f 反编译得到的文件夹&lt;/strong&gt;,然后会在该文件夹下的dist目录中得到未签名的apk&lt;/p&gt;
-
-&lt;p&gt;这时，包是没有签名的，没有签名的apk是不能安装到手机上的，所以，先简单说一下签名&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;每个程序在安装前都需要签名，即是是调试的apk也不例外，发布到市场上的apk一般会单独生成一个keystore,而一般调试用的是系统里面的一个debug.keystore
-
-keytool(jdk的bin目录下)是用来生成keystore的，eclipse和studio里面有图形化的生成方式其实也是调用的这个命令
-keytool -genkeypair -alias - debug.keystore -keyalg RSA -validity  100
--keystore debug.keystore
-命令说明如下：
- -genkeypair  ：指定生成数字证书
--alias ：指定生成数字证书的别名
--keyalg：指定生成数字证书的算法  这里如RSA算法
--validity：指定生成数字证书的有效期
--keystore ：指定生成数字证书的存储路径。  （这里默认在keytool.exe 目录下）
-
-
-jarsigner(jdk的bin目录下)命令是用来签名的，调试的时候就是用这个命令签入debug.keystore的
-jarsigner -verbose -keystore debug.keystore -signedjar
-dst.apk src.apk debug.keystore 
-以上命令的说明：
--verbose：指定生成详细输出
--keystore：指定数字证书存储路径
--signedjar：该选项的三个参数为  签名后的apk包  未签名的apk包  数字证书别名
-
-我的debug.keystore在用户目录下的.android文件夹中
-
-查看证书信息keytool -list -keystore debug.keystore
-默认密码为：android
-
-debug.keystore签名的别名为androiddebugkey
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;如果用debug.keystore来&lt;strong&gt;签名&lt;/strong&gt;:&lt;/p&gt;
-
-&lt;p&gt;jarsigner -verbose -keystore C:\Users\用户.android\debug.keystore -signedjar dst.apk src.apk androiddebugkey&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;正在添加: META-INF/MANIFEST.MF
-正在添加: META-INF/ANDROIDD.SF
-正在添加: META-INF/ANDROIDD.RSA
-正在签名: AndroidManifest.xml
-正在签名: classes.dex
-正在签名: res/anim/calendar_push_left_in.xml
-正在签名: res/anim/calendar_push_left_out.xml
-正在签名: res/anim/calendar_push_right_in.xml
-正在签名: res/anim/calendar_push_right_out.xml
-正在签名: res/anim/push_bottom_in.xml
-正在签名: res/anim/push_bottom_in2.xml
-			。
-			。
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;利用这一流程，来做若干测试：&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;修改反编译后的清单文件（比如为activity添加入口，去掉入口，修改包名等等），打包，签名，安装运行程序，程序能如预期的修改效果。&lt;/li&gt;
-  &lt;li&gt;修改反编译后的资源文件(如替换图片)，程序也能如期产生对应效果。&lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;修改smali&lt;/p&gt;
-
-    &lt;p&gt;Dalvik字节码Dalvik是google专门为Android操作系统设计的一个虚拟机，经过深度的优化。虽然Android上的程序是使用java来开发的，但是Dalvik和标准的java虚拟机JVM是不同的。Dalvik VM是基于寄存器的，而JVM是基于栈的；Dalvik有专属的文件执行格式dex（dalvik executable），而JVM则执行的是java字节码。Dalvik VM比JVM速度更快，占用空间更少。打包成apk的过程就是将java编译成class文件，然后将class文件封装成dex打包入apk的过程。&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;&lt;strong&gt;通过这个方法总结出利用原始apk文件部分功能的方法&lt;/strong&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;修改apk入口，将之作为插件依附在新建的apk上&lt;/li&gt;
-  &lt;li&gt;新建项目写好需要添加的功能，然后编译成apk文件，反编译出源码，对照修改原来的smali文件和资源文件，重新打包签名&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;classjar&quot;&gt;反编译，提取class文件制作jar包&lt;/h2&gt;
-
-&lt;p&gt;之前反编译到的文件通过jd-gui读取时有很多乱序代码，所以直接抠出Java代码放在开发环境中修改将是一项相当耗时，而且需要懂其中的的业务逻辑，不然就就不可能还原其代码，那么就只能将它打成jar包在新工程中调用，如果是这样，那么就剩下了一个问题，就是如何修复class文件中的资源id和资源本身的映射关系。&lt;/p&gt;
-
-&lt;p&gt;通过实践可知，如果将一个android项目导出为jar包，除了不能包含清单文件和一系列配置文件外（因为配置文件外部也有，如果里面也存在就会造成冲突），资源文件并不能被正确找到。毕竟，资源文件的映射ID是随机生成的。&lt;/p&gt;
-
-&lt;p&gt;而Android系统将代码生成apk过程如下：&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;&lt;a href=&quot;http://blog.csdn.net/androiddevelop/article/details/10948639&quot;&gt;命令行方式生成APK&lt;/a&gt;&lt;/p&gt;
-
-  &lt;p&gt;1、使用Android SDK提供的aapt.exe(build-tools目录)生成R.Java类文件&lt;/p&gt;
-
-  &lt;p&gt;2、使用Android SDK提供的aidl.exe(build-tools目录)把.aidl转成.java文件&lt;/p&gt;
-
-  &lt;p&gt;3、使用JDK提供的javac.exe（jdk的bin目录下）编译.java类文件生成class文件&lt;/p&gt;
-
-  &lt;p&gt;4、使用Android SDK提供的dx.bat(build-tools目录)命令行脚本生成classes.dex文件&lt;/p&gt;
-
-  &lt;p&gt;5、使用Android SDK提供的aapt.exe(build-tools目录)生成资源包文件（包括res、assets、androidmanifest.xml等）&lt;/p&gt;
-
-  &lt;p&gt;6、使用Android SDK提供的apkbuilder.bat（老版本在sdk中tool目录下，新版是没有这个文件的）生成未签名的apk安装文件&lt;/p&gt;
-
-  &lt;p&gt;7、使用jdk的jarsigner.exe（jdk的bin目录下）对未签名的包进行apk签名&lt;/p&gt;
-
-  &lt;p&gt;8、安装使用的adb.exe在SDK的platform-tools目录下&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;android.jar里面是有资源文件的，但是通过尝试，发现引入的jar是和android.jar包不一样的，引入的jar包相当于和本地写的代码是一样的，不允许重复，清单文件资源文件还有resources.arsc文件，resources.arsc一开始我认为里面存放的应该是资源的映射关系，所以放在jar包中能有用，但是却会提示和本地生成的resources.arsc有冲突。那么就不能将这些文件一同写入jar包了，但是如果分开来src和jar包只放代码，res放资源，由于开发环境中R映射文件是动态生成的。而我现在操作的是R文件映射关系已经固定的项目，强行指定固然可以一试，但却不是好方法。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;dex2jar classes.dex             //dex转jar
-jar xf classes_dex2jar.jar		//解压jar
-jar cvf ketroa.jar *			//打jar包
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;于是我又想到了第二种导入依赖的方法，项目指定，在eclipse中如果一个项目把另一个项目作为依赖，那么这个项目引用的包就会指向被引用项目的bin文件中自动生成的jar包，这个bin文件中除了有jar包，还有一个res资源文件夹，一个清单文件，和一个R.txt文件，虽然小，但是所有需要的文件都有。R.txt格式文件如下:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;int dimen activity_horizontal_margin 0x7f040000
-int dimen activity_vertical_margin 0x7f040001
-int drawable ic_launcher 0x7f020000
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;这种方式虽然可行，但是也需要熟知Android生成apk的过程，对已有打包脚本进行修改才行，虽然是从两种出发点考虑，但是却和上面的强行指定是同一种路子。&lt;/p&gt;
-
-&lt;p&gt;关于aapt，可以通过调出命令文档可知aapt d -param apk可以查看apk的各种信息。&lt;/p&gt;
-
-</description>
-      </item>
-    
-      <item>
-        <title>protobuf基本使用</title>
-        <link>http://www.liuschen.com/2017/03/13/caffe.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2017/03/13/caffe.html</guid>
-        <pubDate>Mon, 13 Mar 2017 00:00:00 +0800</pubDate>
-        <description>&lt;blockquote&gt;
-  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;下载protobuf，安装都是很简单的步骤，如果想要将安装文件安装到特定目录，需要在configure的时候加入具体的路径参数&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;./configure --prefix=/home/myprotobuf(自己指定的路径)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;使用：&lt;/p&gt;
-
-&lt;p&gt;为了方便可以先将目录加入环境变量(这个是临时的)：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;exprot PATH=/home/myprotobuf/bin/:$PATH
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;将动态连接库的搜索路径加入到系统中（之后编译链接代码时会用到）：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;export LD_LIBRARY_PATH=/home/myprotobuf/lib:$LD_LIBRARY_PATH
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;首先，建一个文件protobuf_demo.proto，通过命令生成cc文件和头文件&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;protoc --cpp_out=. ./protobuf_demo.proto
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;protobuf_demo.proto记录了目标文件需要配置的元素&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;message protobuf_demo{
-
-required int32 id = 1;
-required string str = 2;
-required string hello = 4;
-
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;然后再编写cpp文件并在文件中引用上面生成的C++头文件，我的文件如下&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;#include &quot;protobuf_demo.pb.h&quot;
-#include &amp;lt;google/protobuf/io/coded_stream.h&amp;gt;
-#include &amp;lt;google/protobuf/io/zero_copy_stream_impl.h&amp;gt;
-#include &amp;lt;google/protobuf/text_format.h&amp;gt;
-
-#include &amp;lt;iostream&amp;gt;
-#include &amp;lt;fcntl.h&amp;gt;
-
-using namespace std;
-using google::protobuf::io::FileInputStream;
-using google::protobuf::io::FileOutputStream;
-using google::protobuf::io::ZeroCopyInputStream;
-using google::protobuf::io::CodedInputStream;
-using google::protobuf::io::ZeroCopyOutputStream;
-using google::protobuf::io::CodedOutputStream;
-
-int main(void)
-{
-protobuf_demo msg;
-const char * filename = &quot;some.prototxt&quot;;
-int fd = open(filename,O_RDONLY);
-if(fd == -1)
-{
-  cout &amp;lt;&amp;lt; &quot;File not found:&quot; &amp;lt;&amp;lt; filename &amp;lt;&amp;lt; endl;
-}
-FileInputStream* input = new FileInputStream(fd);
-bool success = google::protobuf::TextFormat::Parse(input,&amp;amp;msg);
-
-cout &amp;lt;&amp;lt; msg.id() &amp;lt;&amp;lt; endl;
-cout &amp;lt;&amp;lt; msg.str() &amp;lt;&amp;lt; endl;
-cout &amp;lt;&amp;lt; msg.hello() &amp;lt;&amp;lt; endl;
-
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;编译生成可执行文件，然后通过该文件就可以读出当前文件加下some.prototxt的值&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;id: 1888
-str: &quot;192.168.0.1
-hello: &quot;haha&quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-</description>
-      </item>
-    
-      <item>
-        <title>docker</title>
-        <link>http://www.liuschen.com/2017/03/09/docker.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2017/03/09/docker.html</guid>
-        <pubDate>Thu, 09 Mar 2017 00:00:00 +0800</pubDate>
-        <description>&lt;blockquote&gt;
-  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h2 id=&quot;httpsdocsdockercomengineinstallationlinuxcentos&quot;&gt;1.&lt;a href=&quot;https://docs.docker.com/engine/installation/linux/centos/&quot;&gt;安装过程:&lt;/a&gt;&lt;/h2&gt;
-
-&lt;p&gt;如果已经安装过客户端，先进行清理&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;sudo yum -y remove docker docker-common container-selinux
-sudo yum -y remove docker-selinux
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;安装之前，先更新仓库，添加仓库源地址&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;sudo yum install -y yum-utils
-sudo yum-config-manager \
---add-repo \
-https://docs.docker.com/engine/installation/linux/repo_files/centos/docker.repo
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;如果添加仓库失败，可以先执行&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;sudo yum-config-manager --enable docker-testing
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;或者&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;sudo yum-config-manager --disable docker-testing
-sudo yum-config-manager --enable docker-testing
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;安装docker之前，先更新包索引&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;sudo yum makecache fast
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;安装docker,可以先列出所有版本，选择需要版本安装&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;yum list docker-engine.x86_64  --showduplicates |sort -r
-sudo yum -y install docker-engine-&amp;lt;VERSION_STRING&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;也可以直接安装最新版&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;sudo yum -y install docker-engine
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;启动docker&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;sudo systemctl start docker
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;启动helloword测试镜像,没有会自动下载&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;sudo docker run hello-world
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;更新docker，先更新包索引，然后安装&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;sudo yum makecache fast
-sudo yum -y upgrade docker-engine
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;卸载docker&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;sudo yum -y remove docker-engine
-sudo rm -rf /var/lib/docker
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;如果不想每次都用sudo来获取管理员权限，可以建立用户组&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;sudo groupadd docker //新建组
-sudo usermod -aG docker $USER //添加用户
-docker run hello-world  //测试
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&quot;dockers&quot;&gt;2.配置dockers开机启动&lt;/h2&gt;
-
-&lt;p&gt;systemd(RHEL, CentOS, Fedora, Ubuntu 16.04 and higher)&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;sudo systemctl enable docker  开机自启动
-sudo systemctl disable docker  取消开机自启动
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;upstart(Ubuntu 14.10 and below)&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;默认开机自启动，可以通过以下方法关闭
-echo manual | sudo tee /etc/init/docker.override
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;chkconfi(Oracle Linux 6)&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;sudo chkconfig docker on
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&quot;docker&quot;&gt;3.查看docker信息&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code&gt;sudo docker version
-sudo docker info
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&quot;httpblogcsdnnetzjinhuaarticledetails52041757&quot;&gt;4.&lt;a href=&quot;http://blog.csdn.net/zjin_hua/article/details/52041757&quot;&gt;数据卷&lt;/a&gt;&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code&gt;//创建数据卷
-sudo docker run --name data -v /data -t -i centos /bin/bash
-//可以找到host主机挂载数据卷对应的目录
-docker inspect data
-//将主机根目录下的Source文件夹作为共享目录挂载到container根下的web文件夹
-sudo docker run --name web -v /source/:/web -t -i centos /bin/bash
-//同上，只是挂载文件夹只读
-sudo docker run --rm --name test -v /source/:/test:ro -t -i centos /bin/bash
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&quot;section&quot;&gt;5.容器命名&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code&gt;sudo docker run -d -t -i --name test centos bash
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;持久化镜像&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;docker save -o webapp.tar 6fae60ef3446
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;持久化容器&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;docker export 6fae60ef3446 &amp;gt; webapp.tar
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;DockerFile的使用&lt;/p&gt;
-
-&lt;p&gt;dockerFile相当于Linux中的shell脚本和window批处理文件，通过自动化的脚本程序自动生成所需的镜像文件&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;docker build -t &amp;lt;待生成的镜像名&amp;gt; &amp;lt;dockerfile所在的文件路径&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;ENV 设置环境变量&lt;br /&gt;
-ADD 往里面拷贝东西&lt;br /&gt;
-RUN 运行镜像中的命令&lt;br /&gt;
-EXPOSE 暴露端口&lt;br /&gt;
-CMD 启动时执行命令，可替代性&lt;/p&gt;
-
-&lt;p&gt;源镜像在文件中通过From来指定&lt;/p&gt;
-
-&lt;h2 id=&quot;docker-help&quot;&gt;6.docker help&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code&gt;Usage:	docker COMMAND
-
-A self-sufficient runtime for containers
-
-Options:
-      --config string      Location of client config files (default &quot;/root/.docker&quot;)
-  -D, --debug              Enable debug mode
-      --help               Print usage
-  -H, --host list          Daemon socket(s) to connect to (default [])
-  -l, --log-level string   Set the logging level (&quot;debug&quot;, &quot;info&quot;, &quot;warn&quot;, &quot;error&quot;, &quot;fatal&quot;) (default &quot;info&quot;)
-      --tls                Use TLS; implied by --tlsverify
-      --tlscacert string   Trust certs signed only by this CA (default &quot;/root/.docker/ca.pem&quot;)
-      --tlscert string     Path to TLS certificate file (default &quot;/root/.docker/cert.pem&quot;)
-      --tlskey string      Path to TLS key file (default &quot;/root/.docker/key.pem&quot;)
-      --tlsverify          Use TLS and verify the remote
-  -v, --version            Print version information and quit
-
-Management Commands:
-  container   Manage containers
-  image       Manage images
-  network     Manage networks
-  node        Manage Swarm nodes
-  plugin      Manage plugins
-  secret      Manage Docker secrets
-  service     Manage services
-  stack       Manage Docker stacks
-  swarm       Manage Swarm
-  system      Manage Docker
-  volume      Manage volumes
-
-Commands:
-  attach      Attach to a running container
-  build       Build an image from a Dockerfile
-  commit      Create a new image from a container&#39;s changes
-  cp          Copy files/folders between a container and the local filesystem
-  create      Create a new container
-  diff        Inspect changes on a container&#39;s filesystem
-  events      Get real time events from the server
-  exec        Run a command in a running container
-  export      Export a container&#39;s filesystem as a tar archive
-  history     Show the history of an image
-  images      List images
-  import      Import the contents from a tarball to create a filesystem image
-  info        Display system-wide information
-  inspect     Return low-level information on Docker objects
-  kill        Kill one or more running containers
-  load        Load an image from a tar archive or STDIN
-  login       Log in to a Docker registry
-  logout      Log out from a Docker registry
-  logs        Fetch the logs of a container
-  pause       Pause all processes within one or more containers
-  port        List port mappings or a specific mapping for the container
-  ps          List containers
-  pull        Pull an image or a repository from a registry
-  push        Push an image or a repository to a registry
-  rename      Rename a container
-  restart     Restart one or more containers
-  rm          Remove one or more containers
-  rmi         Remove one or more images
-  run         Run a command in a new container
-  save        Save one or more images to a tar archive (streamed to STDOUT by default)
-  search      Search the Docker Hub for images
-  start       Start one or more stopped containers
-  stats       Display a live stream of container(s) resource usage statistics
-  stop        Stop one or more running containers
-  tag         Create a tag TARGET_IMAGE that refers to SOURCE_IMAGE
-  top         Display the running processes of a container
-  unpause     Unpause all processes within one or more containers
-  update      Update configuration of one or more containers
-  version     Show the Docker version information
-  wait        Block until one or more containers stop, then print their exit codes
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h1 id=&quot;section-1&quot;&gt;例子一：鲸语者&lt;/h1&gt;
-
-&lt;pre&gt;&lt;code&gt;docker run docker/whalesay cowsay boo-boo
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Dockerfile脚本&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;FROM docker/whalesay:latest
-RUN apt-get -y update &amp;amp;&amp;amp; apt-get install -y fortunes
-CMD /usr/games/fortune -a | cowsay
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;生成&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;docker build -t docker-whale .
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;生成container并启动&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;docker run docker-whale
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;container启动方式指定的不同，效果不同。&lt;/p&gt;
-
-&lt;h1 id=&quot;docker-1&quot;&gt;docker中网络的配置&lt;/h1&gt;
-
-&lt;p&gt;既然docker是一个虚拟化的轻量解决方案，那么自然我们要考虑它的隔离性和通信问题，如何访问它是我们应用docker的最终问题。&lt;/p&gt;
-
-&lt;p&gt;run容器时通过-P或-p指定绑定端口，如果不指定，docker会随机映射一个49000~49900的端口至容器内部开放的网络端口&lt;/p&gt;
-
-&lt;p&gt;-p可以指定要映射的端口，并且，在一个指定端口上只能绑定一个容器。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;ip:hostPort:containerPort  映射指定地址的特定端口
-ip::containerPort          映射指定地址的任意端口
-hostPort:containerPort     映射所有地址端口，可以-p多次指定
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;容器互联&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;--link 链接容器:链接别名
-&lt;/code&gt;&lt;/pre&gt;
-</description>
-      </item>
-    
-      <item>
-        <title>网络探测技术初探</title>
-        <link>http://www.liuschen.com/2017/03/06/broadcast.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2017/03/06/broadcast.html</guid>
-        <pubDate>Mon, 06 Mar 2017 00:00:00 +0800</pubDate>
-        <description>&lt;h2 id=&quot;section&quot;&gt;使用组播&lt;/h2&gt;
-
-&lt;p&gt;广播地址就是为一就对了，子网内传播主机号全为一，所有子网内传播，子网号和主机号全为一。&lt;/p&gt;
-
-&lt;p&gt;组播就是以组为单位的广播，以下摘自百度百科：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;组播组可以是永久的也可以是临时的。组播组地址中，有一部分由官方分配的，称为永久组播组。永久组播组保持不变的是它的ip地址，组中的成员构成可以发生变化。永久组播组中成员的数量都可以是任意的，甚至可以为零。那些没有保留下来供永久组播组使用的ip组播地址，可以被临时组播组利用。
-224.0.0.0～224.0.0.255为预留的组播地址（永久组地址），地址224.0.0.0保留不做分配，其它地址供路由协议使用；
-224.0.1.0～224.0.1.255是公用组播地址，可以用于Internet；
-224.0.2.0～238.255.255.255为用户可用的组播地址（临时组地址），全网范围内有效；
-239.0.0.0～239.255.255.255为本地管理组播地址，仅在特定的本地范围内有效。
-组播地址
-列表如下：
-224.0.0.0 基准地址（保留）
-224.0.0.1 所有主机的地址 （包括所有路由器地址）
-224.0.0.2 所有组播路由器的地址
-224.0.0.3 不分配
-224.0.0.4 dvmrp路由器
-224.0.0.5 所有ospf路由器
-224.0.0.6 ospf DR/BDR
-224.0.0.7 st路由器
-224.0.0.8 st主机
-224.0.0.9 rip-2路由器
-224.0.0.10 Eigrp路由器
-224.0.0.11 活动代理
-224.0.0.12 dhcp 服务器/中继代理
-224.0.0.13 所有pim路由器
-224.0.0.14 rsvp封装
-224.0.0.15 所有cbt路由器
-224.0.0.16 指定sbm
-224.0.0.17 所有sbms
-224.0.0.18 vrrp
-以太网传输单播ip报文的时候，目的mac地址使用的是接收者的mac地址。但是在传输组播报文时，传输目的不再是一个具体的接收者，而是一个成员不确定的组，所以使用的是组播mac地址。组播mac地址是和组播ip地址对应的。iana（internet assigned number authority）规定，组播mac地址的高24bit为0x01005e，mac 地址的低23bit为组播ip地址的低23bit。
-由于ip组播地址的后28位中只有23位被映射到mac地址，这样就会有32个ip组播地址映射到同一mac地址上。
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;之前做过一个手机之间互发消息探测存在的APP，是先使用组播发消息，局域网内有设备收到，这个设备就会发送一条UDP数据报来声明存在，发送探测消息的一端接收到这个消息，就回复一条UDP数据报。一来一回，两个设备就都知晓了对方的存在。然而，在实际应用中两个Android设备互相探测是没问题的，但是由电脑端发送组播消息探测手机端却收不到任何回应，调试时知道手机端根本没收到组播消息（电脑端防火墙是关闭着的），因为手机和手机之间的组播就能接收，所以，我怀疑网络底层可能加了某些过滤规则，在加上网上有些说法，组播和广播的消息很容易被屏蔽，所以暂时放弃这种思路。免得所付者巨多，所得者却少之又少。&lt;/p&gt;
-
-&lt;h2 id=&quot;socket&quot;&gt;Socket轮询&lt;/h2&gt;
-
-&lt;p&gt;这种方法有点笨，就是算出局域网的网段，然后向可能的IP地址发起SOCKet连接，如果能连上，就让客户端机器向服务端发起Netty连接请求。&lt;/p&gt;
-
-</description>
-      </item>
-    
-      <item>
-        <title>GBK编码问题</title>
-        <link>http://www.liuschen.com/2017/02/26/GBK.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2017/02/26/GBK.html</guid>
-        <pubDate>Sun, 26 Feb 2017 00:00:00 +0800</pubDate>
-        <description>&lt;blockquote&gt;
-  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;&lt;a href=&quot;http://www.qqxiuzi.cn/zh/hanzi-gbk-bianma.php&quot;&gt;http://www.qqxiuzi.cn/zh/hanzi-gbk-bianma.php&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;GBK 亦采用双字节表示，总体编码范围为 8140-FEFE，首字节在 81-FE 之间，尾字节在 40-FE 之间&lt;/p&gt;
-
-&lt;p&gt;全部编码分为三大部分：&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;
-    &lt;p&gt;汉字区。包括：&lt;br /&gt;
-a. GB 2312 汉字区。即 GBK/2: B0A1-F7FE。收录 GB 2312 汉字 6763 个，按原顺序排列。&lt;br /&gt;
-b. GB 13000.1 扩充汉字区。包括：&lt;br /&gt;
-(1) GBK/3: 8140-A0FE。收录 GB 13000.1 中的 CJK 汉字 6080 个。&lt;br /&gt;
-(2) GBK/4: AA40-FEA0。收录 CJK 汉字和增补的汉字 8160 个。CJK 汉字在前，按 UCS 代码大小排列；增补的汉字（包括部首和构件）在后，按《康熙字典》的页码/字位排列。&lt;br /&gt;
-(3) 汉字“〇”安排在图形符号区GBK/5：A996。&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;图形符号区。包括：&lt;br /&gt;
-a. GB 2312 非汉字符号区。即 GBK/1: A1A1-A9FE。其中除 GB 2312 的符号外，还有 10 个小写罗马数字和 GB 12345 增补的符号。计符号 717 个。&lt;br /&gt;
-b. GB 13000.1 扩充非汉字区。即 GBK/5: A840-A9A0。BIG-5 非汉字符号、结构符和“〇”排列在此区。计符号 166 个。&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;用户自定义区：分为(1)(2)(3)三个小区。&lt;br /&gt;
-(1) AAA1-AFFE，码位 564 个。&lt;br /&gt;
-(2) F8A1-FEFE，码位 658 个。&lt;br /&gt;
-(3) A140-A7A0，码位 672 个。&lt;br /&gt;
-第(3)区尽管对用户开放，但限制使用，因为不排除未来在此区域增补新字符的可能性。&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;其中用户自定义区即表示空白部分，在使用GBK编码时，由于我们一般不改动编码，所以用户自定义区是没有定义的，所以如果要检测半编码的字符，假如字符的编码为ABCD&lt;/p&gt;
-
-&lt;p&gt;首先A不能为4,5,6,7,然后就是编码不能在用户定义区的范围内，以下代码是从byte数组中提取60字节来检测是否编码错乱&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;public static boolean isErrorGBKCode(byte[] bytes){
-	for (int i = 0; i &amp;lt; 30; i++) {
-		String hexStringHeader = Integer.toHexString(bytes[i*2]);
-		String hexStringTail = Integer.toHexString(bytes[i*2+1]);
-		System.out.println(hexStringHeader+&quot;=======&quot;+hexStringTail);
-		if(hexStringHeader.length()&amp;lt;8 || hexStringTail.length()&amp;lt;8)
-			continue;
-		char first = hexStringHeader.charAt(6);
-		char second = hexStringHeader.charAt(7);
-		char third = hexStringTail.charAt(6);
-		char fourth = hexStringTail.charAt(7);
-
-		char[] code = {first,second,third,fourth};
-		String codeStr = new String(code);
-
-		/**
-		 * (1) AAA1-AFFE，码位 564 个。
-		 (2) F8A1-FEFE，码位 658 个。
-		 (3) A140-A7A0，码位 672 个。
-		 * */
-		if(codeStr.matches(&quot;^a[a-f][a-f][1-9a-e]$&quot;))
-			return true;
-		if(codeStr.matches(&quot;^f[8-9a-f][a-f][1-9a-e]$&quot;))
-			return true;
-		if(codeStr.matches(&quot;^a[1-7][4-9a]0$&quot;))
-			return true;
-		if(codeStr.matches(&quot;^[^4-7]]&quot;))
-			return true;
-
-	}
-	return false;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-</description>
-      </item>
-    
-      <item>
-        <title>FastDFS配置文档</title>
-        <link>http://www.liuschen.com/2017/01/16/fastdfs.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2017/01/16/fastdfs.html</guid>
-        <pubDate>Mon, 16 Jan 2017 00:00:00 +0800</pubDate>
-        <description>&lt;blockquote&gt;
-  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h2 id=&quot;section&quot;&gt;1.简介&lt;/h2&gt;
-
-&lt;p&gt;FastDFS是一个开源的轻量级分布式文件系统，它对文件进行管理，功能包括：文件存储、文件同步、文件访问（文件上传、文件下载）等，解决了大容量存储（不是大文件）和负载均衡的问题。特别适合以文件为载体的在线服务。&lt;/p&gt;
-
-&lt;p&gt;FastDFS有两个重要模块，tracker和storage。tracker负责调度分配文件的访问和负载均衡。storage则负责文件的管理，其中包括文件的存储，同步，和提供文件的访问接口。其中还允许以键值对的形式对文件写入一些元数据。&lt;/p&gt;
-
-&lt;p&gt;tracker和storage可以包括一个或多个服务端，这些服务端可以在不影响对外提供服务的情况下动态的添加和删除。集群中的每个服务器是对等的。&lt;/p&gt;
-
-&lt;h2 id=&quot;linux&quot;&gt;1.Linux部署&lt;/h2&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;注意:一定要下载正确的版本，我最开始下载了v1.27，结果Java端死活上载不了文件，之前的版本是依赖libevent这个库的，而新的版本依赖的是libfastcommon，一定要按照给出的下载地址下载libfastcommon,以防出错，以下步骤为v5.08中的INSTALL文件中给出的步骤，如果亲下载的版本更新，请以FastDFS目录下INSTALL中给出的安装步骤为准。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;下载最新版本v5.0.8FastDFS:&lt;a href=&quot;https://sourceforge.net/projects/fastdfs/files/&quot;&gt;https://sourceforge.net/projects/fastdfs/files/&lt;/a&gt;&lt;/p&gt;
-
-&lt;h3 id=&quot;github-libfastcommon-&quot;&gt;步骤一. 从github上下载 libfastcommon 源码包并且安装它&lt;/h3&gt;
-
-&lt;p&gt;the github address:&lt;br /&gt;
-   https://github.com/happyfish100/libfastcommon.git&lt;/p&gt;
-
-&lt;h3 id=&quot;fastdfs&quot;&gt;步骤二.下载 FastDFS源码包（已下载），并且解压&lt;/h3&gt;
-
-&lt;p&gt;tar xzf FastDFS_v5.x.tar.gz&lt;/p&gt;
-
-&lt;h3 id=&quot;fastdfs-1&quot;&gt;步骤三.进入FastDFS目录&lt;/h3&gt;
-&lt;p&gt;cd FastDFS&lt;/p&gt;
-
-&lt;h3 id=&quot;section-1&quot;&gt;步骤四.执行命令:&lt;/h3&gt;
-
-&lt;p&gt;./make.sh&lt;/p&gt;
-
-&lt;h3 id=&quot;section-2&quot;&gt;步骤五.执行安装命令&lt;/h3&gt;
-
-&lt;p&gt;./make.sh install&lt;/p&gt;
-
-&lt;h3 id=&quot;config&quot;&gt;步骤六.编辑修改config文件&lt;/h3&gt;
-
-&lt;p&gt;config文件是用来启动tracker和storage的，在conf目录下，执行安装命令后在/etc/fdfs/目录下也有备份&lt;/p&gt;
-
-&lt;p&gt;在这一步先做简单的修改，只需要改配置文件的中设置的IP和搜索‘home’,更改需要设置本地存储位置即可&lt;/p&gt;
-
-&lt;h3 id=&quot;section-3&quot;&gt;步骤七.启动服务器&lt;/h3&gt;
-
-&lt;h4 id=&quot;tracker-&quot;&gt;启动 tracker 程序:&lt;/h4&gt;
-
-&lt;p&gt;/usr/bin/fdfs_trackerd /etc/fdfs/tracker.conf restart&lt;/p&gt;
-
-&lt;h4 id=&quot;in-linux-you-can-start-fdfstrackerd-as-a-service&quot;&gt;in Linux, you can start fdfs_trackerd as a service:&lt;/h4&gt;
-
-&lt;p&gt;/sbin/service fdfs_trackerd start&lt;/p&gt;
-
-&lt;h4 id=&quot;storage-&quot;&gt;启动 storage 程序:&lt;/h4&gt;
-
-&lt;p&gt;/usr/bin/fdfs_storaged /etc/fdfs/storage.conf restart&lt;/p&gt;
-
-&lt;h4 id=&quot;in-linux-you-can-start-fdfsstoraged-as-a-service&quot;&gt;in Linux, you can start fdfs_storaged as a service:&lt;/h4&gt;
-
-&lt;p&gt;/sbin/service fdfs_storaged start&lt;/p&gt;
-
-&lt;h3 id=&quot;section-4&quot;&gt;步骤八.测试启动的程序&lt;/h3&gt;
-
-&lt;h4 id=&quot;section-5&quot;&gt;启动测试程序格式:&lt;/h4&gt;
-
-&lt;p&gt;/usr/bin/fdfs_test 客户端配置文件 操作(download,upload)&lt;/p&gt;
-
-&lt;p&gt;/usr/bin/fdfs_test1 客户端配置文件 操作(download,upload)&lt;/p&gt;
-
-&lt;h4 id=&quot;section-6&quot;&gt;上传文件示例:&lt;/h4&gt;
-
-&lt;p&gt;/usr/bin/fdfs_test conf/client.conf upload /usr/include/stdlib.h&lt;/p&gt;
-
-&lt;h3 id=&quot;monitor&quot;&gt;步骤九.启动monitor程序&lt;/h3&gt;
-
-&lt;p&gt;/usr/bin/fdfs_monitor 客户端配置文件&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;注意：启动完后有时需要一点时间才可以访问，如果马上测试返回不成功的话，并不一定是配置错了。&lt;/strong&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;section-7&quot;&gt;2.配置文件和启动的一些补充&lt;/h2&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;由于是分布式存储，在一个服务器上可以选择tracker和storage进行部署。&lt;br /&gt;
-修改配置文件，FastDFS目录下conf下以conf为扩展名的文件都是配置文件。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;配置tracker.conf和storage.conf中的参数&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;base_path:存储数据和log文件
-
-store_path0:存储文件路径
-
-tracker_server：tracker服务器
-
-group_name=group1:设置storage所属的组，同组磁盘存储单元互相备份
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;启动tracker：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;fdfs_trackerd ./conf/tracker.conf restart
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;启动storage：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;fdfs_storaged ./conf/storage.conf restart
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;测试：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;/usr/bin/fdfs_test /etc/fdfs/client.conf upload file
-/usr/bin/fdfs_test /etc/fdfs/client.conf download file
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;输出配置信息：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;/usr/bin/fdfs_monitor /etc/fdfs/client.conf
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;fdfs_trackerd和fdfs_storaged是安装的可执行文件，如果安装的目录没有加入了环境变量，需要加上全路径，就是上面说的可执行文件的安装路径,新版本的fdfs_trackerd和fdfs_storaged是安装在/usr/bin中，需要加全路径，修改的conf最好也是修改/etc/fdfs下的相关配置文件，便于寻找部署。&lt;/p&gt;
-
-&lt;h2 id=&quot;section-8&quot;&gt;3.搭建反向代理服务器&lt;/h2&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;到这一步，不是必须的，但是由于FastDFS新版本不支持HTTP服务了，所以需要自己搭建该服务，同时，也可以解决不同storage之间复制文件时，访问未传输文件导致的错误，nginx能将访问链接重定向到源文件。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;依然是这个地址：&lt;a href=&quot;https://sourceforge.net/projects/fastdfs/files/&quot;&gt;https://sourceforge.net/projects/fastdfs/files/&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;下载fastdfs-nginx-module&lt;/p&gt;
-
-&lt;p&gt;下载nginx(我下载的是稳定版1.10.2):&lt;a href=&quot;http://nginx.org/en/download.html&quot;&gt;http://nginx.org/en/download.html&lt;/a&gt;&lt;/p&gt;
-
-&lt;h3 id=&quot;nginx&quot;&gt;安装nginx&lt;/h3&gt;
-
-&lt;p&gt;解压，fastdfs-nginx-module，内有一个src文件夹，路径假设为$(PATH)&lt;/p&gt;
-
-&lt;p&gt;添加依赖（我没有执行这一步，考虑到安装的环境可能不同，最好一次性将依赖安装，就可以避免下面的一些配置和编译的错误）：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;yum install gcc gcc-c++ make automake autoconf libtool pcre pcre-devel zlib zlib-devel openssl openssl-devel
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;切换到nginx目录中，执行&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;./configure --add-module=$(PATH)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;如果报错：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;./configure: error: the HTTP rewrite module requires the PCRE library.
-./configure: error: the HTTP gzip module requires the zlib library.
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;执行&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;yum -y install pcre-devel
-yum install zlib-devel
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;执行make,如果报错yacc命令未找到：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;yum install bison-devel
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;注意:devel表示的是开发版本，与源码编译来相同，有暴露的include和链接库供其他程序编译时调用&lt;/p&gt;
-
-&lt;p&gt;报错：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;fastdfs-nginx-module/src/common.c:29:27: 致命错误：local_ip_func.h：没有那个文件或目录
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;local_ip_func.h经过搜索发现是fastcommon中的头文件，这里找不到，可能是编译目录未包含，事实上也是如此，编译时包含了/usr/local/include/fastcommon目录，但是local_ip_func.h确是在/usr/include/fastcommon&lt;/p&gt;
-
-&lt;p&gt;所以，只需要生成makefile（这个文件在obj目录下）文件后，添加一下include目录搜索地址即可&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;将-L/usr/local/lib改为-L/usr/lib
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;ALL_INCS中添加：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;-I /usr/include/fastdfs \
--I /usr/include \
--I /usr/local/include \
--I /usr/include/fastcommon/ \
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;编译中出现这个问题就是fastcommon的安装路径和nginx中添加插件找寻的目录不一致导致的，当然也可以一开始不要将fastcommon安装在local下.&lt;/p&gt;
-
-&lt;p&gt;编译成功后，执行&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;make install
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;安装完成&lt;/p&gt;
-
-</description>
-      </item>
-    
-      <item>
-        <title>eclipse配合maven导入项目遇到的问题</title>
-        <link>http://www.liuschen.com/2017/01/16/error.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2017/01/16/error.html</guid>
-        <pubDate>Mon, 16 Jan 2017 00:00:00 +0800</pubDate>
-        <description>&lt;blockquote&gt;
-  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h2 id=&quot;section&quot;&gt;错误一：&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code&gt;Multiple annotations found at this line:
-	- cvc-complex-type.2.4.c: The matching wildcard is strict, but no declaration can be found for element &#39;dubbo:application&#39;.
-	- schema_reference.4: Failed to read schema document &#39;http://code.alibabatech.com/schema/dubbo/dubbo.xsd&#39;, because 1) could not 
- find the document; 2) the document could not be read; 3) the root element of the document is not &amp;lt;xsd:schema&amp;gt;.
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&quot;section-1&quot;&gt;解决办法：&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;http://blog.csdn.net/tech4j/article/details/46754751
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&quot;section-2&quot;&gt;错误二：&lt;/h2&gt;
-
- 	jsp文件报错：The superclass “javax.servlet.http.HttpServlet” was not found on the Java Build Path&lt;br /&gt;
-
-&lt;h3 id=&quot;section-3&quot;&gt;解决办法：&lt;/h3&gt;
-
-&lt;p&gt;将jre system library改为本机存在的正确的版本，添加serverRuntime&lt;/p&gt;
-
-&lt;h2 id=&quot;section-4&quot;&gt;错误三：&lt;/h2&gt;
-
-&lt;p&gt;Multiple annotations found at this line:&lt;br /&gt;
-	- Plugin execution not covered by lifecycle configuration: org.apache.maven.plugins:maven-compiler-plugin:3.1:testCompile (execution: &lt;br /&gt;
-	 default-testCompile, phase: test-compile)&lt;/p&gt;
-
-&lt;p&gt;maven-&amp;gt;Lifecycle Mapping载入如下文件：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;lt;lifecycleMappingMetadata&amp;gt;
-  &amp;lt;pluginExecutions&amp;gt;
-    &amp;lt;pluginExecution&amp;gt;
-      &amp;lt;pluginExecutionFilter&amp;gt;
-        &amp;lt;groupId&amp;gt;org.apache.maven.plugins&amp;lt;/groupId&amp;gt;
-        &amp;lt;artifactId&amp;gt;maven-compiler-plugin&amp;lt;/artifactId&amp;gt;
-        &amp;lt;goals&amp;gt;
-          &amp;lt;goal&amp;gt;compile&amp;lt;/goal&amp;gt;
-          &amp;lt;goal&amp;gt;testCompile&amp;lt;/goal&amp;gt;
-        &amp;lt;/goals&amp;gt;
-        &amp;lt;versionRange&amp;gt;[3.1,)&amp;lt;/versionRange&amp;gt;
-      &amp;lt;/pluginExecutionFilter&amp;gt;
-      &amp;lt;action&amp;gt;
-        &amp;lt;ignore/&amp;gt;
-      &amp;lt;/action&amp;gt;
-    &amp;lt;/pluginExecution&amp;gt;
-  &amp;lt;/pluginExecutions&amp;gt;
-&amp;lt;/lifecycleMappingMetadata&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;其中artifactId的值maven-compiler-plugin，versionRange的值和goal的值根据报的错误不同，做不同改动&lt;/p&gt;
-
-&lt;h2 id=&quot;section-5&quot;&gt;错误四：&lt;/h2&gt;
-
-&lt;p&gt;Cannot change version of project facet Dynamic Web Module to 2.3&lt;/p&gt;
-
-&lt;h3 id=&quot;section-6&quot;&gt;解决方法&lt;/h3&gt;
-
-&lt;p&gt;http://www.cnblogs.com/yezhenhan/archive/2011/10/17/2215279.html&lt;/p&gt;
-
-&lt;h2 id=&quot;section-7&quot;&gt;错误五：&lt;/h2&gt;
-
-&lt;p&gt;One or more constraints have not been satisfied.&lt;/p&gt;
-
-&lt;h2 id=&quot;section-8&quot;&gt;错误六：&lt;/h2&gt;
-
-&lt;p&gt;安装完tomcat插件后，点击启动tomcat的小猫图标，没有启动tomcat，反而在没有断点的情况下进入了调试。&lt;/p&gt;
-
-&lt;h3 id=&quot;section-9&quot;&gt;解决方法：&lt;/h3&gt;
-
-&lt;p&gt;重新建立工作区，重新导入，重新设置，这个情况出现是由于工作区配置在导入tomcat插件后出现混乱了。&lt;/p&gt;
-
-&lt;h2 id=&quot;section-10&quot;&gt;错误七：&lt;/h2&gt;
-
-&lt;p&gt;重新建立工作区，重新配置，git,maven，tomcat插件都设置好了，项目重新导入没有异常，但启动tomcat时报异常&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;java.lang.ClassNotFoundException: org.apache.catalina.loader.DevLoader
-at java.net.URLClassLoader$1.run(URLClassLoader.java:372)
-at java.net.URLClassLoader$1.run(URLClassLoader.java:361)
-at java.security.AccessController.doPrivileged(Native Method)
-at java.net.URLClassLoader.findClass(URLClassLoader.java:360)
-at java.lang.ClassLoader.loadClass(ClassLoader.java:424)
-at java.lang.ClassLoader.loadClass(ClassLoader.java:357)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&quot;section-11&quot;&gt;解决方法：&lt;/h3&gt;
-
-&lt;p&gt;1、在eclipse目录下，找到DevLoader包，位于\eclipse\plugins\com.sysdeo.eclipse.tomcat（tomcat插件） 的DevLoader.zip&lt;/p&gt;
-
-&lt;p&gt;2、复制到apache-tomcat-6.0.x 里的lib里, 并改为DevLoader.jar&lt;/p&gt;
-
-&lt;p&gt;3、重启tomcat.&lt;/p&gt;
-
-&lt;h2 id=&quot;section-12&quot;&gt;错误八：&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code&gt;java.lang.ClassNotFoundException: org.springframework.web.context.ContextLoaderListener
-at org.apache.catalina.loader.WebappClassLoader.loadClass(WebappClassLoader.java:1698)
-at org.apache.catalina.loader.WebappClassLoader.loadClass(WebappClassLoader.java:1544)
-at org.apache.catalina.core.StandardContext.listenerStart(StandardContext.java:4219)
-at org.apache.catalina.core.StandardContext.start(StandardContext.java:4779)
-at org.apache.catalina.core.ContainerBase.addChildInternal(ContainerBase.java:803)
-at org.apache.catalina.core.ContainerBase.addChild(ContainerBase.java:780)
-at org.apache.catalina.core.StandardHost.addChild(StandardHost.java:583)
-at org.apache.catalina.startup.HostConfig.deployDescriptor(HostConfig.java:676)
-at org.apache.catalina.startup.HostConfig.deployDescriptors(HostConfig.java:602)
-at org.apache.catalina.startup.HostConfig.deployApps(HostConfig.java:503)
-at org.apache.catalina.startup.HostConfig.start(HostConfig.java:1322)
-at org.apache.catalina.startup.HostConfig.lifecycleEvent(HostConfig.java:325)
-at org.apache.catalina.util.LifecycleSupport.fireLifecycleEvent(LifecycleSupport.java:142)
-at org.apache.catalina.core.ContainerBase.start(ContainerBase.java:1069)
-at org.apache.catalina.core.StandardHost.start(StandardHost.java:822)
-at org.apache.catalina.core.ContainerBase.start(ContainerBase.java:1061)
-at org.apache.catalina.core.StandardEngine.start(StandardEngine.java:463)
-at org.apache.catalina.core.StandardService.start(StandardService.java:525)
-at org.apache.catalina.core.StandardServer.start(StandardServer.java:761)
-at org.apache.catalina.startup.Catalina.start(Catalina.java:595)
-at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
-at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-at java.lang.reflect.Method.invoke(Method.java:483)
-at org.apache.catalina.startup.Bootstrap.start(Bootstrap.java:289)
-at org.apache.catalina.startup.Bootstrap.main(Bootstrap.java:414)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&quot;section-13&quot;&gt;解决方法：&lt;/h3&gt;
-
-&lt;h2 id=&quot;section-14&quot;&gt;错误九：&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code&gt;XX cannot be resolved
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&quot;section-15&quot;&gt;解决方法：&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;将编码格式改为UTF-8
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&quot;section-16&quot;&gt;错误十：&lt;/h2&gt;
-
-&lt;p&gt;web.xml is missing and &lt;failonmissingwebxml&gt; is set to true、&lt;/failonmissingwebxml&gt;&lt;/p&gt;
-
-&lt;h3 id=&quot;section-17&quot;&gt;解决方法：&lt;/h3&gt;
-
-&lt;p&gt;如果你的项目在 /src/main/webapp/WEB-INF 下有web.xml，但是仍然还是报这个错误，需要两步操作&lt;/p&gt;
-
-&lt;p&gt;1）右击项目，打开Properties对话框，点击Deployment Assembly选项，在右边添加一个文件夹，并且保存设置&lt;/p&gt;
-
-&lt;p&gt;2）在eclispe上方点击Project -&amp;gt;Clean 清理一下这个项目&lt;/p&gt;
-
-&lt;h2 id=&quot;section-18&quot;&gt;错误十一&lt;/h2&gt;
-
-&lt;p&gt;编译项目时，编译到一半，eclipse卡死&lt;/p&gt;
-
-&lt;h3 id=&quot;section-19&quot;&gt;解决办法&lt;/h3&gt;
-
-&lt;p&gt;每次卡死的地方找到是一个js文件，所以，取消掉js的校验&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;Window-&amp;gt;Preferences-&amp;gt;Valiation
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;取消表中关于javascript Client校验的勾选&lt;/p&gt;
-
-&lt;p&gt;删除.project中校验js的配置项&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;	&amp;lt;buildCommand&amp;gt;
-		&amp;lt;name&amp;gt;org.eclipse.wst.jsdt.core.javascriptValidator&amp;lt;/name&amp;gt;
-		&amp;lt;arguments&amp;gt;
-		&amp;lt;/arguments&amp;gt;
-	&amp;lt;/buildCommand&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;和&lt;br /&gt;
-		&lt;nature&gt;org.eclipse.wst.jsdt.core.jsNature&lt;/nature&gt;&lt;/p&gt;
-
-&lt;p&gt;删除项目中的js文件，重新添加&lt;/p&gt;
 </description>
       </item>
     
