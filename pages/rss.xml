@@ -6,6 +6,569 @@
     <description>落风的博客</description>
     
       <item>
+        <title>GPS坐标区域判定2</title>
+        <link>http://www.liuschen.com/2017/09/20/gps2.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2017/09/20/gps2.html</guid>
+        <pubDate>Wed, 20 Sep 2017 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h1 id=&quot;section&quot;&gt;1.两点之间距离&lt;/h1&gt;
+
+&lt;p&gt;通过手动算法计算：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;public static double getEarthDistance(double lat1,double lon1,
+                             double lat2, double lon2){
+    double φ1 = Math.toRadians(lat1);
+    double φ2 = Math.toRadians(lat2);
+    double Δφ = Math.toRadians(lat2-lat1);
+    double Δλ =  Math.toRadians(lon2-lon1);
+
+    double a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+            Math.cos(φ1) * Math.cos(φ2) *
+                    Math.sin(Δλ/2) * Math.sin(Δλ/2);
+
+    double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    double d = EARTH_RADIUS_KM * c;
+    return d;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;通过android中现成的方法:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;private static void computeDistanceAndBearing(double lat1, double lon1,
+    double lat2, double lon2, float[] results) {
+    // Based on http://www.ngs.noaa.gov/PUBS_LIB/inverse.pdf
+    // using the &quot;Inverse Formula&quot; (section 4)
+
+    int MAXITERS = 20;
+    // Convert lat/long to radians
+    lat1 *= Math.PI / 180.0;
+    lat2 *= Math.PI / 180.0;
+    lon1 *= Math.PI / 180.0;
+    lon2 *= Math.PI / 180.0;
+
+    double a = 6378137.0; // WGS84 major axis
+    double b = 6356752.3142; // WGS84 semi-major axis
+    double f = (a - b) / a;
+    double aSqMinusBSqOverBSq = (a * a - b * b) / (b * b);
+
+    double L = lon2 - lon1;
+    double A = 0.0;
+    double U1 = Math.atan((1.0 - f) * Math.tan(lat1));
+    double U2 = Math.atan((1.0 - f) * Math.tan(lat2));
+
+    double cosU1 = Math.cos(U1);
+    double cosU2 = Math.cos(U2);
+    double sinU1 = Math.sin(U1);
+    double sinU2 = Math.sin(U2);
+    double cosU1cosU2 = cosU1 * cosU2;
+    double sinU1sinU2 = sinU1 * sinU2;
+
+    double sigma = 0.0;
+    double deltaSigma = 0.0;
+    double cosSqAlpha = 0.0;
+    double cos2SM = 0.0;
+    double cosSigma = 0.0;
+    double sinSigma = 0.0;
+    double cosLambda = 0.0;
+    double sinLambda = 0.0;
+
+    double lambda = L; // initial guess
+    for (int iter = 0; iter &amp;lt; MAXITERS; iter++) {
+        double lambdaOrig = lambda;
+        cosLambda = Math.cos(lambda);
+        sinLambda = Math.sin(lambda);
+        double t1 = cosU2 * sinLambda;
+        double t2 = cosU1 * sinU2 - sinU1 * cosU2 * cosLambda;
+        double sinSqSigma = t1 * t1 + t2 * t2; // (14)
+        sinSigma = Math.sqrt(sinSqSigma);
+        cosSigma = sinU1sinU2 + cosU1cosU2 * cosLambda; // (15)
+        sigma = Math.atan2(sinSigma, cosSigma); // (16)
+        double sinAlpha = (sinSigma == 0) ? 0.0 :
+            cosU1cosU2 * sinLambda / sinSigma; // (17)
+        cosSqAlpha = 1.0 - sinAlpha * sinAlpha;
+        cos2SM = (cosSqAlpha == 0) ? 0.0 :
+            cosSigma - 2.0 * sinU1sinU2 / cosSqAlpha; // (18)
+
+        double uSquared = cosSqAlpha * aSqMinusBSqOverBSq; // defn
+        A = 1 + (uSquared / 16384.0) * // (3)
+            (4096.0 + uSquared *
+             (-768 + uSquared * (320.0 - 175.0 * uSquared)));
+        double B = (uSquared / 1024.0) * // (4)
+            (256.0 + uSquared *
+             (-128.0 + uSquared * (74.0 - 47.0 * uSquared)));
+        double C = (f / 16.0) *
+            cosSqAlpha *
+            (4.0 + f * (4.0 - 3.0 * cosSqAlpha)); // (10)
+        double cos2SMSq = cos2SM * cos2SM;
+        deltaSigma = B * sinSigma * // (6)
+            (cos2SM + (B / 4.0) *
+             (cosSigma * (-1.0 + 2.0 * cos2SMSq) -
+              (B / 6.0) * cos2SM *
+              (-3.0 + 4.0 * sinSigma * sinSigma) *
+              (-3.0 + 4.0 * cos2SMSq)));
+
+        lambda = L +
+            (1.0 - C) * f * sinAlpha *
+            (sigma + C * sinSigma *
+             (cos2SM + C * cosSigma *
+              (-1.0 + 2.0 * cos2SM * cos2SM))); // (11)
+
+        double delta = (lambda - lambdaOrig) / lambda;
+        if (Math.abs(delta) &amp;lt; 1.0e-12) {
+            break;
+        }
+    }
+
+    float distance = (float) (b * A * (sigma - deltaSigma));
+    results[0] = distance;
+    if (results.length &amp;gt; 1) {
+        float initialBearing = (float) Math.atan2(cosU2 * sinLambda,
+            cosU1 * sinU2 - sinU1 * cosU2 * cosLambda);
+        initialBearing *= 180.0 / Math.PI;
+        results[1] = initialBearing;
+        if (results.length &amp;gt; 2) {
+            float finalBearing = (float) Math.atan2(cosU1 * sinLambda,
+                -sinU1 * cosU2 + cosU1 * sinU2 * cosLambda);
+            finalBearing *= 180.0 / Math.PI;
+            results[2] = finalBearing;
+        }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id=&quot;section-1&quot;&gt;2.判断一点是否在不规则多边形中&lt;/h1&gt;
+
+&lt;p&gt;判断一点是否在多边形中，常用的是射线法，个人觉得也是最简单的一种，因为比较角度和面积都会牵扯到正负的判断，而射线法则不需要。规则：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;以给定的点为起点，向任意方向做一条射线。如果射线与给定的多边形的交点为奇数则该点在多边形内部（点不再多边形边上且不与顶点重合），为偶数则为点在多边形外（0是偶数）。
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;单单这样看的话，也并不简单，首先应该先建立坐标系，然后取一条过点的射线，列出函数表达式，然后因为已知多边形各各点的坐标，求出每条边的函数，遍历每条边，计算与射线的交点并计算交点是否在多边形的边上。如果在，算作一个交点。最后算出总的交点个数即可。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;特殊情况：当所选取的射线与一条边重合时，如果点不在重合线段上，算作两个交点，如果在，算作一个交点，并且排除相邻两边的计算，排除以上情况后，如果射线过多边形的一个顶点，那么依旧算作两个交点，并且排除过该顶点的另一条边的计算。其余的按照正常计算即可。
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;具体问题具体分析，gps坐标是地理坐标，是在一个球体上表示，如果求一个点是否在指定图形区域内，如果要在笛卡尔坐标系中计算，就需要将坐标投影到平面上，可以用web墨卡托坐标系，在平面坐标系中求得多边形距离给定点最近的一点的坐标，将此点再次转化为gps坐标，然后计算给定点与该点的距离即可。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;之所以做两次转化是因为平面坐标系计算距离不准确，而且维度不同误差很大，所以平面坐标系将点到多边形转化为点到点的计算，然后可以在球面坐标系中用现成的方法来计算
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;但是，以上方法还是太麻烦了，因为是应用计算，完全不必要，只需要取一个特殊的射线即可，我取的是 给定点指向北极点（将极点看作无穷远）的射线。那么只需要3步骤即可：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;1.判断射线是否与多边形边重合&lt;/li&gt;
+  &lt;li&gt;2.判断给定点是否与多边形顶点重合&lt;/li&gt;
+  &lt;li&gt;3.判断多边形每条边是否与射线相交（遍历，以下是对多边形每条线段的处理）&lt;/li&gt;
+  &lt;li&gt;3.1.线段两个端点的纬度如果大于给定点，经度如果一个大于一个小于给定点则相交，记为一个交点。&lt;/li&gt;
+  &lt;li&gt;3.2.如果线段两端点经度一个大于一个小于给定点，同时纬度一个大于一个小于给定点，那么就需要通过平行相交的比例关系判断与射线所在直线的交点是否是在射线上。如果在，记为一个交点。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;具体算法:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;/**
+ * 判断点是否在图形区域内
+ * 原理:射线法，取点所在的经线作为射线来判断
+ *
+ * 特殊情况：
+ * 1.射线与n条边重合
+ * 2.射线与经过n个顶点
+ * @param point 点的经纬度，0/1   latitude/ longitude 纬度/经度
+ * @param polygon 多边形的点集合，0/1   latitude/ longitude 纬度/经度
+ * */
+public static boolean isPointInPolygon(double[] point,double[][] polygon){
+    /**参考射线取点所在经线自该点向南极发射的一条射线*/
+    int node = 0;
+    for (int i = 0; i &amp;lt; polygon.length; i++) {
+        int next = i+1;
+        if (i==polygon.length-1)
+            next = 0;
+        /**首先判断边是否与参考经线重合*/
+        if(point[1]==polygon[i][1]&amp;amp;&amp;amp;polygon[i][1]==polygon[next][1]){
+            if((point[0]&amp;gt;=polygon[i][0]&amp;amp;&amp;amp;point[0]&amp;lt;=polygon[next][0])||(point[0]&amp;lt;=polygon[i][0]&amp;amp;&amp;amp;point[0]&amp;gt;=polygon[next][0])){
+                /**在线段内*/
+                return true;
+            }else if(point[0]&amp;lt;polygon[i][0]&amp;amp;&amp;amp;point[0]&amp;lt;polygon[next][0]){
+                /**在线段外的射线上*/
+                System.out.println(&quot;~~点在线段延长线上:&quot;+i);
+                node+=2;
+            }else{
+                /**在线段外，并且不在射线上*/
+            }
+        }else if(point[1]==polygon[i][1]){
+            /**判断顶点是否在参考经线之上*/
+            if(point[0]==polygon[i][0]){
+                /**点与图形顶点重合*/
+                return true;
+            }else if(point[0]&amp;lt;polygon[i][0]){
+                node+=2;
+            }
+        }else{
+            /**判断边是否与射线相交*/
+
+            /**这种计算的先决条件是线段两点必须分布在当前位置点所在经线的两端*/
+            if((polygon[i][1]&amp;gt;point[1]&amp;amp;&amp;amp;polygon[next][1]&amp;gt;point[1])||(polygon[i][1]&amp;lt;point[1]&amp;amp;&amp;amp;polygon[next][1]&amp;lt;point[1])){
+                /**参考经线不会经过该线段*/
+                continue;
+            }else{
+                /**判断纬度是否需要计算*/
+                if(polygon[i][0]&amp;gt;point[0]&amp;amp;&amp;amp; polygon[next][0]&amp;gt;point[0]){
+                    System.out.println(&quot;~~纬度判断:&quot;+i);
+                    node++;
+                }else if(polygon[i][0]&amp;lt;point[0]&amp;amp;&amp;amp; polygon[next][0]&amp;gt;point[0]){
+                    /***/
+                    double tempLength1 = getDistanceByAndroid(polygon[i][0],polygon[i][1],polygon[i][0],point[1]);
+                    double tempLength2 = getDistanceByAndroid(polygon[next][0],polygon[next][1],polygon[next][0],point[1]);
+                    /**参考距离*/
+                    double tempLength4 = getDistanceByAndroid(point[0],point[1],polygon[next][0],point[1]);
+
+                    double tempLength5 = getDistanceByAndroid(polygon[i][0],point[1],polygon[next][0],point[1]);
+                    if((tempLength4/tempLength5)&amp;gt;(tempLength2/(tempLength1+tempLength2))){
+                        /**经过一个交点*/
+                        System.out.println(&quot;~~夹点判断1:&quot;+i);
+                        node++;
+                    }
+                }else if(polygon[i][0]&amp;gt;point[0]&amp;amp;&amp;amp; polygon[next][0]&amp;lt;point[0]){
+                    /***/
+                    double tempLength1 = getDistanceByAndroid(polygon[i][0],polygon[i][1],polygon[i][0],point[1]);
+                    double tempLength2 = getDistanceByAndroid(polygon[next][0],polygon[next][1],polygon[next][0],point[1]);
+                    /**参考距离*/
+                    double tempLength3 = getDistanceByAndroid(point[0],point[1],polygon[i][0],point[1]);
+
+                    double tempLength5 = getDistanceByAndroid(polygon[i][0],point[1],polygon[next][0],point[1]);
+                    if((tempLength3/tempLength5)&amp;gt;(tempLength1/(tempLength1+tempLength2))){
+                        /**经过一个交点*/
+                        System.out.println(&quot;~~夹点判断2:&quot;+i);
+                        node++;
+                    }
+                }
+                /**
+                 * polygon[i][0]&amp;lt;point[0]&amp;amp;&amp;amp; polygon[next][0]&amp;lt;point[0]
+                 相交于射线的反向延长线上(最后一种可能，基于性能不做判断)
+                 * */
+                }
+            }
+    }
+    System.out.println(&quot;~~node:&quot;+node);
+    if(node%2==0) return false;
+    else return true;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id=&quot;section-2&quot;&gt;3.计算点到多边形的距离&lt;/h1&gt;
+
+&lt;p&gt;直接计算我没有好的方法，我计算的是配合上面判断点是否在多边形内部，然后计算点到各个多边形边的最短距离&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;1.遍历多边形，得出每条边&lt;/li&gt;
+  &lt;li&gt;2.已知给定点到线段端点的长度，以及线段长度，求出点到线段的距离&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;算法1，已知三边长，求高：&lt;/p&gt;
+
+ 	/**&lt;br /&gt;
+&lt;pre&gt;&lt;code&gt; * 计算三角上a边上的高
+ *@param a a边长
+ *@param b b边长
+ *@param c c边长
+ * */
+public static double getTrigCh(double b,double c,double a){
+    double p1 = a+c+b;
+    double p2 = a+c-b;
+    double p3 = b+a-c;
+    double p4 = b-a+c;
+    double r1 = p1*p2*p3*p4;
+    double r2 = Math.sqrt(r1);
+    return r2/(2*a);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;算法2，计算点到多边形的距离：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;/**计算点到多边形之间的距离*/
+public static double calculateDistance(double[] point,double[][] polygon){
+    double[] distances = new double[polygon.length];
+    double[] sideLengths = new double[polygon.length];
+    for (int i = 0; i &amp;lt; polygon.length; i++) {
+        int next = i+1;
+        if (i==polygon.length-1)
+            next = 0;
+        distances[i] = getDistance(point[0],point[1],polygon[i][0],polygon[i][1]);
+        sideLengths[i] = getDistance(polygon[i][0],polygon[i][1],polygon[next][0],polygon[next][1]);
+        System.out.println(&quot;~distances[&quot;+i+&quot;]:&quot;+distances[i]);
+        System.out.println(&quot;~sideLengths[&quot;+i+&quot;]:&quot;+sideLengths[i]);
+    }
+    double minDistance = Double.MAX_VALUE;
+    for (int i = 0; i &amp;lt; polygon.length; i++) {
+        int next = i+1;
+        if (i==polygon.length-1)
+            next = 0;
+        double tampDistance;
+        if(distances[i]&amp;gt;distances[next]&amp;amp;&amp;amp;distances[i]&amp;gt;sideLengths[i]){
+            tampDistance = distances[next];
+        }else if(distances[next]&amp;gt;distances[i]&amp;amp;&amp;amp;distances[next]&amp;gt;sideLengths[i]){
+            tampDistance = distances[i];
+        }else{
+            tampDistance = getTrigCh(distances[i],distances[next],sideLengths[i]);
+        }
+        System.out.println(&quot;~tampDistance:&quot;+tampDistance);
+        minDistance = (minDistance&amp;gt;tampDistance)?tampDistance:minDistance;
+    }
+    return minDistance;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;a href=&quot;http://www.liuschen.com/code/gpsUtils.html&quot;&gt;更多GPS操作方法&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+</description>
+      </item>
+    
+      <item>
+        <title>GPS坐标区域判定1</title>
+        <link>http://www.liuschen.com/2017/09/20/gps1.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2017/09/20/gps1.html</guid>
+        <pubDate>Wed, 20 Sep 2017 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;相关知识因为总要用到，结果再看时却已经忘的差不多，所以这次温习，记下，备忘。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;strong&gt;地球是一个两极稍扁，赤道略鼓的扁球体&lt;/strong&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h1 id=&quot;section&quot;&gt;坐标系区分&lt;/h1&gt;
+
+&lt;p&gt;首先按坐标类型划分分为:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;地理坐标系(大地坐标系，球面坐标，地理坐标，4326 GCS_WGS_1984,火星坐标和百度坐标属于加偏过的地理坐标)&lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;投影坐标系(平面坐标，例:102100 WGS_1984_web_mercator_auxiliary_sphere,墨卡托投影坐标系)&lt;/p&gt;
+
+    &lt;p&gt;web_mercator是一个投影坐标系，其参考的基准面是WGS_1984( WGS 1984 是一个长半轴(a)为6378137，短半轴（b）为6356752.314245179 的椭球体，扁率(f)为298.257223563，f=(a-b)/a ),并不是严格意义上的墨卡托投影,&lt;br /&gt;
+  Auxiliary Sphere 就是在告知你，这个坐标在投影过程中，将椭球体近似为正球体做投影变换，虽然基准面是WGS 1984 椭球面&lt;br /&gt;
+  102100是Esri内部使用ID与之对应EPSG分配的坐标系ID为3857&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;其中地理坐标系也是一种球面坐标系，是用来定位一点在地球中的位置的。而投影坐标系则是通过点线面来计算长度测算距离面积的。&lt;/p&gt;
+
+&lt;p&gt;通过android手机获取的GPS坐标是经纬度坐标，一般小数位比较长，这是因为做分秒转化时没有除尽导致的，这也说明了Google取到的坐标是时分秒的形式，北京经度都是116。&lt;/p&gt;
+
+&lt;p&gt;时分秒坐标转经纬度坐标：&lt;/p&gt;
+
+&lt;p&gt;经/纬度 = 经/纬度 + 经/纬分/60 + 经/纬秒/3600&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;GCJ-02：火星坐标系，我国使用的，所有电子地图必须经过至少一次的加偏
+
+谷歌地图API，高德地图API，腾讯地图API上取到的，都是GCJ-02坐标
+百度API上取到的，是BD-09坐标，只适用于百度地图相关产品。
+搜狗API上取到的，是搜狗坐标，只适用于搜狗地图相关产品。
+谷歌地球，google earth上取到的，是GPS坐标，而且是度分秒形式的经纬度坐标，在国内不允许直接使用。
+百度和goole投影选择的都是墨卡托，web_mercator（web墨卡托）是将地球模拟为球体，Spherical Mercator常规墨卡托将地球模拟为椭球体
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id=&quot;section-1&quot;&gt;坐标转换&lt;/h1&gt;
+
+&lt;p&gt;坐标转换包括，GPS坐标转火星坐标(中国必须，偏移)，GPS和web墨卡托互相转化(地图显示)，算法，略。&lt;/p&gt;
+
+&lt;h1 id=&quot;section-2&quot;&gt;地图概念区分&lt;/h1&gt;
+
+&lt;p&gt;通常我们使用的定位坐标是GPS坐标，是一种地理坐标，即WGS_1984&lt;/p&gt;
+
+&lt;p&gt;应用到地图中的坐标为平面坐标，即墨卡托坐标系，与上面坐标系不同的是这种坐标系是一种平面坐标系，也就是单位是m或是km&lt;/p&gt;
+
+&lt;p&gt;我再用地图下载器下载的Google地图有未加偏和加偏的地图，这个加偏就是转火星坐标，也就是GCJ-02坐标，这种坐标的本质还是一种地理坐标系，所以还是用度分秒来表示&lt;/p&gt;
+
+&lt;p&gt;arcgis中进行图形判定时会有些转化设置，SpatialReference.create(4326), SpatialReference.create(102100),是将gps坐标转换为地图投影坐标再计算，注意，是由于是图形计算，才需要平面坐标系。&lt;/p&gt;
+
+&lt;p&gt;而我另一篇写的坐标区域判定并不是和arcgis一样纯图形的，是先通过gps来判断内外，然后通过各个点的距离来进行图形计算的，完美绕开了我误解的区域（我曾以为Google的偏移是由于gps转墨卡托坐标引起的）&lt;/p&gt;
+
+&lt;p&gt;参考:&lt;a href=&quot;http://blog.csdn.net/kikitamoon/article/details/46124935&quot;&gt;Web Mercator 公开的小秘密&lt;/a&gt;&lt;br /&gt;
+参考:&lt;a href=&quot;http://www.movable-type.co.uk/scripts/latlong.html&quot;&gt;Calculate distance, bearing and more between Latitude/Longitude points&lt;/a&gt;&lt;/p&gt;
+
+</description>
+      </item>
+    
+      <item>
+        <title>Kotlin笔记</title>
+        <link>http://www.liuschen.com/2017/06/08/kotlin.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2017/06/08/kotlin.html</guid>
+        <pubDate>Thu, 08 Jun 2017 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;初次尝试，安装了IntelliJ IDEA&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;新建Kotlin JVM项目,新建包并新建main.kt&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;//sampleStart
+fun printSum(a: Int, b: Int): Unit {
+    println(&quot;sum of $a and $b is ${a + b}&quot;)
+}
+//sampleEnd
+
+fun main(args: Array&amp;lt;String&amp;gt;) {
+    printSum(-1, 8)
+}
+
+fun maxOf(a: Int, b: Int): Int {
+    if (a &amp;gt; b) {
+        return a
+    } else {
+        return b
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;由此可见，函数的关键字区别为：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Kotlin:fun&lt;/li&gt;
+  &lt;li&gt;Python:def&lt;/li&gt;
+  &lt;li&gt;Java :没有，直接函数名&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;函数参数和返回值：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Kotlin:类型都放在后面，如参数args: Array&lt;string&gt;类型在参数后面，“：”隔开&lt;/string&gt;&lt;/li&gt;
+  &lt;li&gt;Python:没有类型，直接交给程序自己判断&lt;/li&gt;
+  &lt;li&gt;Java :类型在前，参数在后&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;返回值为空：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Kotlin:Unit&lt;/li&gt;
+  &lt;li&gt;Python:返回值类型是程序判断，不需要声明&lt;/li&gt;
+  &lt;li&gt;Java :void&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;输出语句的不同:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;Kotlin:println,可以直接在$后引用变量，如下：&lt;/p&gt;
+
+    &lt;p&gt;fun printSum(a: Int, b: Int) {&lt;br /&gt;
+      println(“sum of $a and $b is ${a + b}”)&lt;br /&gt;
+  }&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Python:print,通过占位符引入变量，中间由“%”隔开&lt;/li&gt;
+  &lt;li&gt;Java :直接通过“+”来拼接字符串&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;变量的声明：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Kotlin:val关键字用来定义只读的局部变量，var用来定义可变变量&lt;/li&gt;
+  &lt;li&gt;Python:变量不需要声明，自动判断类型&lt;/li&gt;
+  &lt;li&gt;Java :变量需要声明，而且有些时候必须有初始值&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Kotlin中，写法有点像Python，每句程序的结尾不需要写“;”,通过换行符来区分语句。&lt;br /&gt;
+但是python中制表符和空格是会区分开，写程序时如果混用是可能会出错的，KotLin&lt;br /&gt;
+目前还没有这种尝试，不知会不会一样。&lt;/p&gt;
+
+&lt;p&gt;Kotlin中的条件语句：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;if (){}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;和java一样，而Python则是:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;if 条件表达式:
+	条件语句
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;完全是用过换行与缩进来完成语句的书写的。&lt;/p&gt;
+
+&lt;p&gt;Kotlin新定义了一个？，如Int?表示声明的这个类型值可以为null,这个值可以是返回值，也可以为声明的变量。&lt;/p&gt;
+
+&lt;p&gt;java中的instanceof用来判断一个对象是否是一个类的实例，Kotlin直接用“is”来代替，简单直观。如果一个不可变的局部变量或属性已经判断出为某类型，那么检测后的分支中可以直接当作该类型使用，无需显式转换。如（看来obj会在obj is String为true时自动转化为String类型）：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;fun getStringLength(obj: Any): Int? {
+    if (obj is String) {
+        // `obj` 在该条件分支内自动转换成 `String`
+        return obj.length
+    }
+    // 在离开类型检测分支后，`obj` 仍然是 `Any` 类型
+    return null
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;for循环：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Kotlin:for(obj in list){}&lt;/li&gt;
+  &lt;li&gt;Python:for obj in list:&lt;/li&gt;
+  &lt;li&gt;Java :for(Obj obj:list){}//高级for&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Kotlin中的when表达式同Java中的不同，更像是Java中的switch语句（其中的函数赋值也同js中的语法很像，但js是弱类型的脚本语言，而Kotlin是同Java一样的强类型的高级编程语言）：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;fun describe(obj: Any): String =
+when (obj) {
+    1          -&amp;gt; &quot;One&quot;
+    &quot;Hello&quot;    -&amp;gt; &quot;Greeting&quot;
+    is Long    -&amp;gt; &quot;Long&quot;
+    !is String -&amp;gt; &quot;Not a string&quot;
+    else       -&amp;gt; &quot;Unknown&quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Python能够通过for循环直接遍历字符串，Kotlin不能，但是Kotlin中的区间比Python表达的更简洁:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;if (x in 1..y+1) {
+    println(&quot;fits in range&quot;)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;检测数字在区间之外用“!in”：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;if (-1 !in 0..list.lastIndex) {
+    println(&quot;-1 is out of range&quot;)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;倒序遍历:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;for (i in 4 downTo 1) print(i)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;步长为2的遍历:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;for (i in 1..4 step 2) print(i)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;要创建一个不包括其结束元素的区间:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;for (i in 1 until 10) {   // i in [1, 10) 排除了 10
+ 	println(i)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;而在Python遍历区间:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;for i in range(1,99):
+	print &quot;%d&quot; % i
+&lt;/code&gt;&lt;/pre&gt;
+
+</description>
+      </item>
+    
+      <item>
         <title>python笔记2</title>
         <link>http://www.liuschen.com/2017/05/20/Python2.html</link>
         <guid isPermaLink="true">http://www.liuschen.com/2017/05/20/Python2.html</guid>
@@ -2435,176 +2998,6 @@ at org.apache.catalina.startup.Bootstrap.main(Bootstrap.java:414)
 		&lt;nature&gt;org.eclipse.wst.jsdt.core.jsNature&lt;/nature&gt;&lt;/p&gt;
 
 &lt;p&gt;删除项目中的js文件，重新添加&lt;/p&gt;
-</description>
-      </item>
-    
-      <item>
-        <title>intellij尝试</title>
-        <link>http://www.liuschen.com/2016/12/28/Intellij.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2016/12/28/Intellij.html</guid>
-        <pubDate>Wed, 28 Dec 2016 00:00:00 +0800</pubDate>
-        <description>&lt;blockquote&gt;
-  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;intellij是Androidstudio的前身，所以开发Androidstudio的插件需要在intellij上进行。&lt;/p&gt;
-
-&lt;p&gt;安装后配置完SDK,JDK后build项目报异常：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;Gradle sync failed: The newly created daemon process has a different context than expected.
-		It won&#39;t be possible to reconnect to this daemon. Context mismatch: 
-		Java home is different.
-		Wanted: DefaultDaemonContext[uid=null,javaHome=F:\programer\IntelliJIDEA\jre,daemonRegistryDir=C:\Users\XX\.gradle\daemon,pid=78516,idleTimeout=null,daemonOpts=-XX:MaxPermSize=256m,-XX:+HeapDumpOnOutOfMemoryError,-Xmx1024m,-Dfile.encoding=GBK,-Duser.country=CN,-Duser.language=zh,-Duser.variant]
-		Actual: DefaultDaemonContext[uid=e7392332-8703-4ff8-8fd8-4d9e707ccc63,javaHome=C:\Program Files (x86)\Java\jre1.8.0_101,daemonRegistryDir=C:\Users\XX\.gradle\daemon,pid=105692,idleTimeout=60000,daemonOpts=-XX:MaxPermSize=256m,-XX:+HeapDumpOnOutOfMemoryError,-Xmx1024m,-Dfile.encoding=GBK,-Duser.country=CN,-Duser.language=zh,-Duser.variant]
-		Consult IDE log for more details (Help | Show Log)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;因为安装时，在Intellij目录下安装了jre,而我配置的JDK是我一直是用的那个版本，所以产生冲突了。&lt;/p&gt;
-
-&lt;p&gt;想要开发插件是一个即时的想法，因为担心破坏目前的开发环境，就没再进行下去。&lt;/p&gt;
-</description>
-      </item>
-    
-      <item>
-        <title>MAVEN配置</title>
-        <link>http://www.liuschen.com/2016/12/26/maven.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2016/12/26/maven.html</guid>
-        <pubDate>Mon, 26 Dec 2016 00:00:00 +0800</pubDate>
-        <description>&lt;blockquote&gt;
-  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h3 id=&quot;maven&quot;&gt;1.下载maven包&lt;/h3&gt;
-
-&lt;h3 id=&quot;binmavenjava&quot;&gt;2.将文件中的bin目录加入系统环境变量,并在命令行中检查maven和java&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;mvn -v
-java -version
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&quot;apache-maven-303confsettingxml&quot;&gt;3.新建一个文件夹作为本地仓库，修改…\apache-maven-3.0.3\conf\目录下的setting.xml文件中的仓库路径为自己新建的仓库路径&lt;/h3&gt;
-
-&lt;h3 id=&quot;mvn-helpsystem&quot;&gt;4.执行命令mvn help:system，会在仓库中下载一些东西&lt;/h3&gt;
-
-&lt;h3 id=&quot;section&quot;&gt;5.新建项目&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;mvn archetype:generate -DgroupId=com.chongshi.test -DartifactId=hello -DpackageName=com.chongshi.test -Dversion=1.0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;会卡在 Generating project in Interactive mode这里，mvn archetype:generate后面需要加这个参数-DarchetypeCatalog=internal&lt;/p&gt;
-
-&lt;h3 id=&quot;cdmvn-clean-compile&quot;&gt;6.创建成功项目后，cd进项目，执行mvn clean compile，第一次执行还会下载些东西，同时也会有编译好的文件生成&lt;/h3&gt;
-
-&lt;h3 id=&quot;mvn-eclipseeclipseeclipse&quot;&gt;7.执行mvn eclipse:eclipse，生成eclipse项目&lt;/h3&gt;
-
-&lt;h3 id=&quot;eclipseeclipsemaven&quot;&gt;8.此时项目已经能导入eclipse了，但是还会报错，因为依赖没有关联，需要配置eclipse的maven&lt;/h3&gt;
-
-&lt;pre&gt;&lt;code&gt;window-&amp;gt;preferences-&amp;gt;java-&amp;gt;Build Path-&amp;gt;Classpath Variables
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;下新添加一项，M2_REPO,值为Maven本地仓库路径，如果M2_REPO已经存在，并且改不了值，那么Preferences里面应该有Maven的设置，直接在里面改就可以了。&lt;/p&gt;
-
-&lt;h3 id=&quot;maven-1&quot;&gt;9.此时，可以使用maven了。&lt;/h3&gt;
-
-</description>
-      </item>
-    
-      <item>
-        <title>flash RTMP 推流</title>
-        <link>http://www.liuschen.com/2016/12/19/flash.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2016/12/19/flash.html</guid>
-        <pubDate>Mon, 19 Dec 2016 00:00:00 +0800</pubDate>
-        <description>&lt;blockquote&gt;
-  &lt;p&gt;flash曾经盛极一时，而如今却已日渐式微，就连微软和苹果都宣布不再支持flash。但是之前研究直播时用到基于rtmp协议的服务器red5其实就是一个flash直播框架。所以记录下，作为补充备忘，免得以后又做无用之功。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h2 id=&quot;movieclip&quot;&gt;1.MovieClip&lt;/h2&gt;
-
-&lt;p&gt;影片剪辑，不同于 Sprite 对象，MovieClip 对象拥有一个时间轴。相当于可以直接在代码中编写动画脚本。&lt;/p&gt;
-
-&lt;p&gt;如果修改包含补间动画的 MovieClip 对象的下列任一属性，该 MovieClip 对象中的播放头便会停止：alpha、blendMode、filters、height、opaqueBackground、rotation、scaleX、scaleY、scale9Grid、scrollRect、transform、visible、width、x 或 y。但是，它不会停止在该 MovieClip 对象的任何子 MovieClip 对象中的播放头。&lt;/p&gt;
-
-&lt;h2 id=&quot;flaaction-script&quot;&gt;2.FLA和action script关联&lt;/h2&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;直接创建一个单独图层存放脚本，右键点击帧选择动作可以为每一帧添加脚本；&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;新建一个文件夹，命名A，在文件夹中新建A.fla文件和A.as文件，用adobe flash编辑A.fla，点击发布，A.as就会关联发布出去，可以在actionscript高级设置中查看关联。&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;strong&gt;如果脚本中有访问网络，需要将&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;发布设置-&amp;gt;本地访问安全性&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;改为“只访问网络”&lt;/strong&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;action-script&quot;&gt;3.action script数据类型&lt;/h2&gt;
-
-&lt;p&gt;String：文本值，例如，一个名称或书中某一章的文字&lt;/p&gt;
-
-&lt;p&gt;Numeric：对于 numeric 型数据，ActionScript 3.0 包含三种特定的数据类型：&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;Number：任何数值，包括有小数部分或没有小数部分的值&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Int：一个整数（不带小数部分的整数）&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Uint：一个“无符号”整数，即不能为负数的整数&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Boolean：一个 true 或 false 值，例如开关是否开启或两个值是否相等&lt;/p&gt;
-
-&lt;h2 id=&quot;htmlflash&quot;&gt;4.html向flash传递参数&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;lt;object id=&quot;forfun&quot; classid=&quot;clsid:&quot; width=&quot;400&quot; height=&quot;300&quot;
-codebase=&quot;http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0&quot;&amp;gt;
-&amp;lt;param name=&quot;movie&quot; value=&quot;simplest_as3_rtmp_streamer.swf?url=rtmp://192.168.20.189:1935/oflaDemo&amp;amp;stream=str5&quot;&amp;gt;
-&amp;lt;param name=&quot;quality&quot; value=&quot;high&quot;&amp;gt;
-&amp;lt;param name=&quot;bgcolor&quot; value=&quot;#F0F0F0&quot;&amp;gt;
-&amp;lt;param name=&quot;menu&quot; value=&quot;false&quot;&amp;gt;
-&amp;lt;param name=&quot;wmode&quot; value=&quot;opaque&quot;&amp;gt;
-&amp;lt;param name=&quot;FlashVars&quot; value=&quot;url=rtmp://192.168.20.189:1935/oflaDemo&amp;amp;stream=str5&quot;&amp;gt;
-&amp;lt;param name=&quot;allowScriptAccess&quot; value=&quot;sameDomain&quot;&amp;gt;
-&amp;lt;embed id=&quot;forfunex&quot; src=&quot;simplest_as3_rtmp_streamer.swf?url=rtmp://192.168.20.189:1935/oflaDemo&amp;amp;stream=str5&quot;
-    width=&quot;400&quot;
-    height=&quot;300&quot;
-    align=&quot;middle&quot;
-    quality=&quot;high&quot;
-    bgcolor=&quot;#f0fff8&quot;
-    menu=&quot;false&quot;
-    play=&quot;true&quot;
-    loop=&quot;false&quot;
-    FlashVars=&quot;url=rtmp://192.168.20.189:1935/oflaDemo&amp;amp;stream=str5&quot;
-    allowScriptAccess=&quot;sameDomain&quot;
-    type=&quot;application/x-shockwave-flash&quot;
-    pluginspage=&quot;http://www.adobe.com/go/getflashplayer&quot;/&amp;gt;
-&amp;lt;/object&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;falsh中获取参数：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;var url:String = stage.loaderInfo.parameters[&quot;url&quot;];
-var stream:String = stage.loaderInfo.parameters[&quot;stream&quot;];
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;flash场景的大小可以通过在打开fla，场景中Ctrl+J快捷键修改&lt;/p&gt;
-
-&lt;h2 id=&quot;action-script-rtmp&quot;&gt;5.action script RTMP相关类&lt;/h2&gt;
-
-&lt;p&gt;NetConnection：连接服务器&lt;/p&gt;
-
-&lt;p&gt;NetStream：用来发布和接收流&lt;/p&gt;
-
-&lt;p&gt;Video:用来播放和显示&lt;/p&gt;
-
-&lt;h3 id=&quot;httpblogcsdnnetleixiaohua1020articledetails43936141httpblogcsdnnetleixiaohua1020articledetails43936141&quot;&gt;参考：&lt;a href=&quot;http://blog.csdn.net/leixiaohua1020/article/details/43936141&quot;&gt;http://blog.csdn.net/leixiaohua1020/article/details/43936141&lt;/a&gt;&lt;/h3&gt;
 </description>
       </item>
     

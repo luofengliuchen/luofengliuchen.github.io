@@ -9,6 +9,12 @@
 
 
 
+  /2017/09/20/gps2.html
+
+  /2017/09/20/gps1.html
+
+  /2017/06/08/kotlin.html
+
   /2017/05/20/Python2.html
 
   /2017/05/06/retrofit.html
