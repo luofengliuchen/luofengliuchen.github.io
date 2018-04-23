@@ -6,6 +6,1205 @@
     <description>落风的博客</description>
     
       <item>
+        <title>jar打包问题</title>
+        <link>http://www.liuschen.com/2018/04/01/jar.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2018/04/01/jar.html</guid>
+        <pubDate>Sun, 01 Apr 2018 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;打jar包命令:jar cvf &lt;打包生成的jar文件&gt; &lt;要打包的目录&gt;&lt;/要打包的目录&gt;&lt;/打包生成的jar文件&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&quot;section&quot;&gt;1. 问题发现&lt;/h2&gt;
+
+&lt;p&gt;但是打完包我却出现一个问题，就是引用后无法调用jar包内部的方法。可能是由于我打的包内部调用有native方法，因为我之后通过eclipse中的导出jar包功能又对比试了一下，发现，普通的包可以正常导出，但是带有native方法的包导出会报异常：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;JAR creation failed. See details for additional information.
+  	Class files on classpath not found or not accessible for: &#39;XXXX&#39;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;由于有缓存的原因，eclipse反复尝试多次导出并不稳定，clean的效果也有限。&lt;br /&gt;
+最终确定eclipse上导出问题是由于缓存问题，需要修改bug后clean,必须真实clean后再导出才能成功。&lt;/p&gt;
+
+&lt;h2 id=&quot;section-1&quot;&gt;2. 问题解决&lt;/h2&gt;
+
+&lt;p&gt;通过eclipse中的导出jar包功能时，会先将java文件编译为class文件，而我通过jar命令打包却没有进行这一步，正确应该是：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;1. 先通过javac命令将Java文件编译成class文件
+2. 通过jar命令将class文件打包成jar文件
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;之前遇到过这个问题，但是没记，结果忘了，总觉得不记住的话，以后还会浪费时间到这里。&lt;/p&gt;
+
+</description>
+      </item>
+    
+      <item>
+        <title>http请求头</title>
+        <link>http://www.liuschen.com/2018/04/01/http_sb.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2018/04/01/http_sb.html</guid>
+        <pubDate>Sun, 01 Apr 2018 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&quot;section&quot;&gt;一. 请求首部&lt;/h2&gt;
+
+&lt;h3 id=&quot;section-1&quot;&gt;1. 通用首部:&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Connection:允许客户端和服务端制定与请求/响应连接有关的选项，通常为keep-alive&lt;/li&gt;
+  &lt;li&gt;Date:提供日期和时间编制，说明报文的创建时间&lt;/li&gt;
+  &lt;li&gt;MIME-Vwesion:给出了发送端给出的MIME版本&lt;/li&gt;
+  &lt;li&gt;Trailer：如果报文采用了分块传输编码，可以用这个首部列出位于报文拖挂部分的首部集合。&lt;/li&gt;
+  &lt;li&gt;Transfer-Encoding:告知接收端为了保证报文的可靠传输，对报文采用了什么编码方式。&lt;/li&gt;
+  &lt;li&gt;Update:给出了发送端想要升级使用的新版本或协议。&lt;/li&gt;
+  &lt;li&gt;Via:显示报文经过的中间节点（代理，网关）&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;section-2&quot;&gt;2. 通用缓存首部&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Cache-Control:用于随报文传送缓存指示&lt;/li&gt;
+  &lt;li&gt;Pragma:另一种随报文传送指示方式，但并不专用于缓存。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;section-3&quot;&gt;3. 请求首部&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Client-IP:提供了运行客户端的机器IP地址&lt;/li&gt;
+  &lt;li&gt;Prom：提供了客户端用户的E-mail地址&lt;/li&gt;
+  &lt;li&gt;Host:给出了接收请求的服务器的主机名和端口号&lt;/li&gt;
+  &lt;li&gt;Referer:提供了包含当前请求URI的文档的URL&lt;/li&gt;
+  &lt;li&gt;UA-Color:提供了与客户端显示器的显示颜色有关的信息&lt;/li&gt;
+  &lt;li&gt;UA-CPU：给出了客户端CPU的类型或制造商&lt;/li&gt;
+  &lt;li&gt;UA-OS:提供了裕兴在客户端机器上的操作系统的名称和版本&lt;/li&gt;
+  &lt;li&gt;UA-Pixels:提供了客户端显示器的像素信息&lt;/li&gt;
+  &lt;li&gt;User-Agent:将发起请求的应用程序名称告知服务器&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;accept&quot;&gt;4. Accept首部(提供偏好信息)&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Accept:告诉服务器能发送哪些媒体类型&lt;/li&gt;
+  &lt;li&gt;Accept-Charset：告诉服务器发送哪些字符集&lt;/li&gt;
+  &lt;li&gt;Accept-Encoding:告诉服务器能够发送哪些编码方式&lt;/li&gt;
+  &lt;li&gt;Accept-Language:告诉服务器能够发送哪些语言&lt;/li&gt;
+  &lt;li&gt;TE:告诉服务器能够使用哪些扩展传输编码&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;section-4&quot;&gt;5. 安全请求首部&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Authorization：包含了客户端提供给服务器，以便对其自身进行认证的数据&lt;/li&gt;
+  &lt;li&gt;Cookie：客户端向服务端传送的一个令牌&lt;/li&gt;
+  &lt;li&gt;Cookie2:用来书名请求端支持的cookie版本&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;section-5&quot;&gt;6. 代理请求首部&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Max-Forward:通往源端服务器的路径上，将请求转发给其他代理或是网关的最大次数&lt;/li&gt;
+  &lt;li&gt;Proxy-Authorization:同Authorization，用于代理&lt;/li&gt;
+  &lt;li&gt;Proxy-Connection:同Connection，用于代理&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;section-6&quot;&gt;二. 响应首部&lt;/h2&gt;
+
+&lt;h3 id=&quot;section-7&quot;&gt;1. 通用信息性首部&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Age:响应持续时间&lt;/li&gt;
+  &lt;li&gt;Public：资源支持的请求方法列表&lt;/li&gt;
+  &lt;li&gt;Retry-After:如果资源不可用的话在此日期或时间重试&lt;/li&gt;
+  &lt;li&gt;Server：服务器应用程序软件的名称和版本&lt;/li&gt;
+  &lt;li&gt;Title:对HTML文档来说，标题&lt;/li&gt;
+  &lt;li&gt;Warning：警告报文&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;section-8&quot;&gt;2. 协商首部&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Accept-Ranges:对此资源来说，服务器可接受的范围类型&lt;/li&gt;
+  &lt;li&gt;Vary：服务器查看的其他首部的列表，可能会使响应发生变化，也就是说，服务器会根据首部内容挑选合适资源版本发送给客户端&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;section-9&quot;&gt;3. 安全响应首部&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Proxy-Authenticate:来自代理对客户端的质询列表&lt;/li&gt;
+  &lt;li&gt;Set-Cookie:对应令牌的响应&lt;/li&gt;
+  &lt;li&gt;Set-Cookie2:&lt;/li&gt;
+  &lt;li&gt;www-Authenticate:来自服务器对客户端的质询列表&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;section-10&quot;&gt;4. 实体首部&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Allow:列出了可以对此实体执行的请求方法&lt;/li&gt;
+  &lt;li&gt;Location:告知客户端实体实际上位于何处，用于将接收端定向到资源的（可能是新的）位置（URL）上去&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;section-11&quot;&gt;5. 内容首部&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Content-Base:解析主题中的相对URL时使用的基础URL&lt;/li&gt;
+  &lt;li&gt;Content-Encoding:对主题执行的任意编码方式&lt;/li&gt;
+  &lt;li&gt;Content-Language:理解主题时对十一使用的自然语言&lt;/li&gt;
+  &lt;li&gt;Content-Length:主体的长度或尺寸&lt;/li&gt;
+  &lt;li&gt;Content-Location:资源实际所处的位置&lt;/li&gt;
+  &lt;li&gt;Content-MD5:主题的MD5校验和&lt;/li&gt;
+  &lt;li&gt;Content-Range:在整个资源中此实体表示的字节范围&lt;/li&gt;
+  &lt;li&gt;Content-Type:这个主体的对象类型&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;section-12&quot;&gt;6. 实体缓存首部&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;ETag：与此实体相关的实体标记&lt;/li&gt;
+  &lt;li&gt;Expires:实体不再有效，要从原始的远端在此获取此实体的日期和时间&lt;/li&gt;
+  &lt;li&gt;Last-Modified:这个实体最后一次被修改的日期和时间&lt;/li&gt;
+&lt;/ul&gt;
+
+</description>
+      </item>
+    
+      <item>
+        <title>Fiddler抓取数据失败：tunnel to 443</title>
+        <link>http://www.liuschen.com/2018/04/01/fiddler.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2018/04/01/fiddler.html</guid>
+        <pubDate>Sun, 01 Apr 2018 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://blog.csdn.net/htdeyanlei/article/details/52874248&quot;&gt;参考&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Telerik Fiddler Options-Http,勾选CaptureHTTPS CONNECTs和Decrypt HTTPS traffic,会弹出如下提示&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;To intercept HTTPS traffic, Fiddler generates a unique root certificate.
+
+You may configure Windows to trust this root certificate to suppress
+security warnings. This is generally safe.
+
+Click &#39;Yes&#39; to reconfigure Windows&#39; Trusted CA list.
+Click &#39;No&#39; if this is all geek to you.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;确定，安装对应证书到计算机&lt;/p&gt;
+
+&lt;p&gt;SSL证书通过在客户端浏览器和Web服务器之间建立一条SSL安全通道，只要安装对应证书就可以激活服务，实现加密传输.&lt;/p&gt;
+
+&lt;p&gt;HTTPS:即是加入了SSL的HTTP，SSL依靠证书来验证服务器的身份，并为浏览器和服务器之间的通信加密。&lt;/p&gt;
+
+&lt;p&gt;Fiddler解析HTTPS的请求打开上述开关即可，但是如果要作为代理捕获手机客户端的对应请求，则需要安装对应的插件&lt;br /&gt;
+ &lt;a href=&quot;https://www.telerik.com/fiddler/add-ons&quot;&gt;CertMaker for iOS and Android&lt;/a&gt;在官网上下载，并且Fiddler以及它的一些插件都是免费的。&lt;/p&gt;
+
+&lt;p&gt;certmgr.msc是window的证书管理器&lt;/p&gt;
+
+&lt;p&gt;然而并没有什么用，安装完之后通过手机浏览网页会提示证书不可靠。并且还是捕获不到特定APP内的HTTPS请求。&lt;/p&gt;
+
+&lt;p&gt;所以，证书是站点发给客户端的凭证，通过证书可以保证交互的数据安全，Fiddler安装的证书可以对原始证书进行替换，在手机端请求到的证书是替换后的证书，所以检验会报警告。&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;TO BE TONTINUE&lt;/p&gt;
+&lt;/blockquote&gt;
+</description>
+      </item>
+    
+      <item>
+        <title>线程实例分析</title>
+        <link>http://www.liuschen.com/2018/04/01/thread.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2018/04/01/thread.html</guid>
+        <pubDate>Sun, 01 Apr 2018 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;如果在主线程中启动一个子线程，将这个子线程join到主线程上，子线程中再开一个线程池来启动一个新的任务。这个新的任务中设置一个无限循环。当程序执行5分钟后，有多少线程还在执行。程序如下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;public class Main {
+	public static void main(String[] args){
+		try {
+		Thread thread;
+		thread = new Thread(){
+			 @Override
+			public void run() {
+				 ExecutorService fixPool = Executors.newFixedThreadPool(5);
+				 WorkRunable1 runa = new WorkRunable1();
+				 //WorkRunable1 runa2 = new WorkRunable1();
+				 fixPool.execute(runa);
+				 //fixPool.execute(runa2);
+				 System.out.println(&quot;该线程已经执行完毕:当前线程为&quot;+Thread.currentThread().getName());
+			}
+		};
+		thread.start();
+		thread.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		System.out.println(&quot;主线程已经执行完毕:&quot;+Thread.currentThread().getName());
+		
+	}
+	
+	public static class WorkRunable1 implements Runnable{
+
+		@Override
+		public void run() {
+			while(true){
+				try {
+					Thread.sleep(3000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				System.out.println(&quot;我一直在输出:&quot;+Thread.activeCount());
+			}
+		}
+		
+	}
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;执行显示将会有两个线程：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Thread[pool-1-thread-1]
+Thread[DestoryJavaVM]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这时，第一个启动的子线程早已经结束，所以main线程也随之结束。但是，还有线程执行，在主线程结束后启动了DestoryJavaVM，监听是否还有非守护线程执行，如果没有将关闭JVM。&lt;/p&gt;
+
+&lt;p&gt;如果在一个子线程中开一个无限循环，那么执行的线程将会变为2个，分别是：&lt;/p&gt;
+
+&lt;p&gt;主线程，第一个启动的子线程，和持续输出的线程池中的线程。&lt;/p&gt;
+</description>
+      </item>
+    
+      <item>
+        <title>JNI常见问题(问题查询笔记)2</title>
+        <link>http://www.liuschen.com/2018/03/15/jni2.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2018/03/15/jni2.html</guid>
+        <pubDate>Thu, 15 Mar 2018 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&quot;ndk-build&quot;&gt;1.编译(ndk-build):&lt;/h2&gt;
+
+&lt;p&gt;Android.mk文件:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;LOCAL_PATH := $(call my-dir)：指向编译目标文件的位置，这里是本目录，开头必填项
+
+include $(CLEAR_VARS):清除之前系统中存在的LOCAL_XXX变量，因为是全局的
+
+LOCAL_MODULE：编译成为模块的名字
+
+LOCAL_SRC_FILES：编译包含的源文件，需要注意看Android.mk文件中的LOCAL_SRC_FILES选项是否包含了必要文件（不要忘了自己写的那个连接Java的调用文件），可以这样写来包含文件夹下的所有c文件LOCAL_SRC_FILES := $(wildcard $(LOCAL_PATH)/*.c)
+
+LOCAL_LDLIBS：依赖库，连接的是NDK目录下的android-ndk-r9b\platforms\android-19\arch-arm\usr\lib中的so文件
+
+LOCAL_ALLOW_UNDEFINED_SYMBOLS := true：忽略掉未定义的错误
+
+LOCAL_ARM_MODE := arm：指定编译的指令集
+
+LOCAL_PRELINK_MODULE ：Prelink利用事先链接代替运行时链接的方法来加速共享库的加载
+
+LOCAL_MODULE_TAGS ：=user eng tests optional
+	user: 指该模块只在user版本下才编译
+	eng: 指该模块只在eng版本下才编译
+	tests: 指该模块只在tests版本下才编译
+	optional:指该模块在所有版本下都编译
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;结尾要指向一个编译选项：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;include $(BUILD_STATIC_LIBRARY) ：编译成为一个静态库，不能被项目引用，用来生成动态库&lt;/li&gt;
+  &lt;li&gt;include $(BUILD_EXECUTABLE) ：编译成为一个可执行的本地程序&lt;/li&gt;
+  &lt;li&gt;include $(BUILD_SHARED_LIBRARY)：编译为一个共享库，.so文件，我们通常用的&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;TO BE CONTINUE&lt;/p&gt;
+&lt;/blockquote&gt;
+
+</description>
+      </item>
+    
+      <item>
+        <title>DCloud下的静态资源路径</title>
+        <link>http://www.liuschen.com/2018/03/15/DCloud.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2018/03/15/DCloud.html</guid>
+        <pubDate>Thu, 15 Mar 2018 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;在HBUILder中开发应用，访问开发目录中的资源，一般会通过http://localhost:13131/来访问。但是之前我做手机开发从来没有这种方式过，印象中只有服务器端才会有的这种服务器的访问方式。在手机端可这样搞的话，就说明了手机端自己构建了一个小型的服务器用来分配H5资源的访问。&lt;/p&gt;
+
+&lt;p&gt;DCloud离线打包在Android端集成有两种方式，一种是以H5APP的方式集成打包，一种是WebView的插件形式，原理没有区别，有区别的是对应的服务，插件形式只是提供简单的交互，而APP的方式则提供了一个完整的H5生态，其中就包括了在特定目录下资源的释放，以及http://localhost:13131/访问资源的服务。&lt;/p&gt;
+
+&lt;p&gt;需要注意的点:1.放到assets文件夹下的文件不能包含中文字符。aseets下的子文件名必须为manifest.json配置的id,子文件的子文件名必须为www,在这个文件夹下的文件才是对应在Hbuilder建立的项目文件&lt;/p&gt;
+</description>
+      </item>
+    
+      <item>
+        <title>python4-mxnet笔记</title>
+        <link>http://www.liuschen.com/2018/03/15/python4.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2018/03/15/python4.html</guid>
+        <pubDate>Thu, 15 Mar 2018 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&quot;ndarray&quot;&gt;ndarray(矩阵计算)&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;from mxnet import ndarray as nd
+nd.zeros((3, 4))   #初始化为0的3行4列2D数组
+nd.ones((3, 4))    #初始化为1的3行4列2D数组
+nd.array([[1,2],[2,3]])  #直接构造
+nd.random_normal(0, 1, shape=(3, 4))
+#元素值服从0到1的正态分布
+数组.shape获取形状
+数组.size数组大小
+
+nd.dot(x, y.T)  #转置，矩阵相乘
+nd.exp(y)       #指数运算
+nd.arange(3).reshape((3,1))  #3行1列二维数组从0到2
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ndarray可以很方便地同numpy进行转换&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;import numpy as np
+x = np.ones((2,3))
+y = nd.array(x)  # numpy -&amp;gt; mxnet
+z = y.asnumpy()  # mxnet -&amp;gt; numpy
+print([z, y])
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;功能函数:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;id(y):y的ID，可能是关于内存空间的ID
+z[:] = x + y  #将x+y之和赋给已开好的二维数组z中
+z = x + y     #将x+y之和赋给新开的二维数组z中(旧的被回收)
+nd.elemwise_add(x, y, out=z) #能够同时避免x+y临时空间的开销
+x[1:2,1:3]  #截取二维数组部分，这种写法也支持批量写入
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&quot;autograd&quot;&gt;autograd&lt;/h2&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;with关键字，用来代替try:except:finally&lt;br /&gt;
+流程控制语句中要注意行的缩进&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;求导过程:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;x = nd.array([[1, 2], [3, 4]])
+x.attach_grad()  #申请对应空间
+with ag.record():
+    y = x * 2
+    z = y * x
+z.backward()   
+x.grad 				#求导
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+      </item>
+    
+      <item>
+        <title>Android增量更新</title>
+        <link>http://www.liuschen.com/2018/03/15/android_zlgx.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2018/03/15/android_zlgx.html</guid>
+        <pubDate>Thu, 15 Mar 2018 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;android上进行增量更新是需要&lt;a href=&quot;http://www.daemonology.net/bsdiff/&quot;&gt;bsdiff4.3&lt;/a&gt;的而bsdiff里面又依赖&lt;a href=&quot;http://www.bzip.org/downloads.html&quot;&gt;bzip2-1.0.6&lt;/a&gt;,需要将其编译成so文件供Android调用&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;将解压后中的.c和.h文件拷贝到项目中的jni文件夹下，配置Android.mk,如下&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;LOCAL_PATH := $(call my-dir)
+
+include $(CLEAR_VARS)
+
+LOCAL_MODULE := libdiff
+
+LOCAL_ARM_MODE := arm
+
+LOCAL_LDLIBS := -llog -lz
+
+LOCAL_PRELINK_MODULE := false
+
+LOCAL_CPPFLAGS := \
+    -DNULL=0 -DSOCKLEN_T=socklen_t -DNO_SSTREAM -DBSD=1 -DNO_SSTREAM -fexceptions -DANDROID -DXLOCALE_NOT_USED
+
+LOCAL_MODULE_TAGS := optional
+
+LOCAL_SRC_FILES := $(wildcard $(LOCAL_PATH)/*.c)
+
+include $(BUILD_SHARED_LIBRARY)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;然后在cmd中执行ndk-build进行编译：&lt;/p&gt;
+
+&lt;p&gt;错误：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[armeabi] Compile arm    : diff &amp;lt;= spewG.c
+[armeabi] Compile arm    : diff &amp;lt;= unzcrash.c
+[armeabi] SharedLibrary  : libdiff.so
+F:/programer/android-ndk-r10e/toolchains/arm-linux-androideabi-4.8/prebuilt/windows-x86_64/bin/../lib/gcc/arm-linux-androideabi/4.8/../../../../arm-linux-androideabi/bin/ld.exe: error: D:/softku/BSDiff/app/src/main/obj/local/armeabi/objs/diff/D_/softku/BSDiff/app/src/main/jni/bzip2recover.o: multiple definition of &#39;main&#39;
+F:/programer/android-ndk-r10e/toolchains/arm-linux-androideabi-4.8/prebuilt/windows-x86_64/bin/../lib/gcc/arm-linux-androideabi/4.8/../../../../arm-linux-androideabi/bin/ld.exe: D:/softku/BSDiff/app/src/main/obj/local/armeabi/objs/diff/D_/softku/BSDiff/app/src/main/jni/bzip2.o: previous definition here
+F:/programer/android-ndk-r10e/toolchains/arm-linux-androideabi-4.8/prebuilt/windows-x86_64/bin/../lib/gcc/arm-linux-androideabi/4.8/../../../../arm-linux-androideabi/bin/ld.exe: error: D:/softku/BSDiff/app/src/main/obj/local/armeabi/objs/diff/D_/softku/BSDiff/app/src/main/jni/dlltest.o: multiple definition of &#39;main&#39;
+F:/programer/android-ndk-r10e/toolchains/arm-linux-androideabi-4.8/prebuilt/windows-x86_64/bin/../lib/gcc/arm-linux-androideabi/4.8/../../../../arm-linux-androideabi/bin/ld.exe: D:/softku/BSDiff/app/src/main/obj/local/armeabi/objs/diff/D_/softku/BSDiff/app/src/main/jni/bzip2.o: previous definition here
+F:/programer/android-ndk-r10e/toolchains/arm-linux-androideabi-4.8/prebuilt/windows-x86_64/bin/../lib/gcc/arm-linux-androideabi/4.8/../../../../arm-linux-androideabi/bin/ld.exe: error: D:/softku/BSDiff/app/src/main/obj/local/armeabi/objs/diff/D_/softku/BSDiff/app/src/main/jni/mk251.o: multiple definition of &#39;main&#39;
+F:/programer/android-ndk-r10e/toolchains/arm-linux-androideabi-4.8/prebuilt/windows-x86_64/bin/../lib/gcc/arm-linux-androideabi/4.8/../../../../arm-linux-androideabi/bin/ld.exe: D:/softku/BSDiff/app/src/main/obj/local/armeabi/objs/diff/D_/softku/BSDiff/app/src/main/jni/bzip2.o: previous definition here
+F:/programer/android-ndk-r10e/toolchains/arm-linux-androideabi-4.8/prebuilt/windows-x86_64/bin/../lib/gcc/arm-linux-androideabi/4.8/../../../../arm-linux-androideabi/bin/ld.exe: error: D:/softku/BSDiff/app/src/main/obj/local/armeabi/objs/diff/D_/softku/BSDiff/app/src/main/jni/spewG.o: multiple definition of &#39;main&#39;
+F:/programer/android-ndk-r10e/toolchains/arm-linux-androideabi-4.8/prebuilt/windows-x86_64/bin/../lib/gcc/arm-linux-androideabi/4.8/../../../../arm-linux-androideabi/bin/ld.exe: D:/softku/BSDiff/app/src/main/obj/local/armeabi/objs/diff/D_/softku/BSDiff/app/src/main/jni/bzip2.o: previous definition here
+F:/programer/android-ndk-r10e/toolchains/arm-linux-androideabi-4.8/prebuilt/windows-x86_64/bin/../lib/gcc/arm-linux-androideabi/4.8/../../../../arm-linux-androideabi/bin/ld.exe: error: D:/softku/BSDiff/app/src/main/obj/local/armeabi/objs/diff/D_/softku/BSDiff/app/src/main/jni/unzcrash.o: multiple definition of &#39;main&#39;
+F:/programer/android-ndk-r10e/toolchains/arm-linux-androideabi-4.8/prebuilt/windows-x86_64/bin/../lib/gcc/arm-linux-androideabi/4.8/../../../../arm-linux-androideabi/bin/ld.exe: D:/softku/BSDiff/app/src/main/obj/local/armeabi/objs/diff/D_/softku/BSDiff/app/src/main/jni/bzip2.o: previous definition here
+D:/softku/BSDiff/app/src/main/jni/bspatch.c:96: error: undefined reference to &#39;err&#39;
+D:/softku/BSDiff/app/src/main/jni/bspatch.c:140: error: undefined reference to &#39;err&#39;
+D:/softku/BSDiff/app/src/main/jni/bspatch.c:150: error: undefined reference to &#39;errx&#39;
+D:/softku/BSDiff/app/src/main/jni/bspatch.c:162: error: undefined reference to &#39;errx&#39;
+D:/softku/BSDiff/app/src/main/jni/bspatch.c:181: error: undefined reference to &#39;errx&#39;
+D:/softku/BSDiff/app/src/main/jni/bspatch.c:193: error: undefined reference to &#39;err&#39;
+D:/softku/BSDiff/app/src/main/jni/bspatch.c:198: error: undefined reference to &#39;err&#39;
+D:/softku/BSDiff/app/src/main/jni/bspatch.c:175: error: undefined reference to &#39;errx&#39;
+collect2.exe: error: ld returned 1 exit status
+make.exe: *** [D:/softku/BSDiff/app/src/main/obj/local/armeabi/libdiff.so] Error 1
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这个错误，前一部分报的是main函数入口太多，当然不是作者犯浑，而是可能有些文件是用作测试或是其他用途，从makefile文件中就可以知道并不是所有c文件都需要编译的。&lt;/p&gt;
+
+&lt;p&gt;将android.mk中的LOCAL_SRC_FILES改为:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;LOCAL_SRC_FILES := blocksort.c  \
+  huffman.c    \
+  crctable.c   \
+  randtable.c  \
+  compress.c   \
+  decompress.c \
+  bzlib.c
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;再次编译，成功通过。但是，这一次没有把新写入的Java调用的文件编入进去。没添加会报找不到对应的本地函数，添加后，报以下错误：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;D:/softku/BSDiff/app/src/main/jni/bspatch.c:96: error: undefined reference to &#39;err&#39;
+D:/softku/BSDiff/app/src/main/jni/bspatch.c:140: error: undefined reference to &#39;err&#39;
+D:/softku/BSDiff/app/src/main/jni/bspatch.c:150: error: undefined reference to &#39;errx&#39;
+D:/softku/BSDiff/app/src/main/jni/bspatch.c:162: error: undefined reference to &#39;errx&#39;
+D:/softku/BSDiff/app/src/main/jni/bspatch.c:181: error: undefined reference to &#39;errx&#39;
+D:/softku/BSDiff/app/src/main/jni/bspatch.c:193: error: undefined reference to &#39;err&#39;
+D:/softku/BSDiff/app/src/main/jni/bspatch.c:198: error: undefined reference to &#39;err&#39;
+D:/softku/BSDiff/app/src/main/jni/bspatch.c:175: error: undefined reference to &#39;errx&#39;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;缺少依赖，应该是c中的有些基础依赖没有引用，之前遇到过，如log日志，先忽略错误试试，毕竟看样子这个是关于错误的，如果项目没错是不会触发的。在android.mk中添加:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;LOCAL_ALLOW_UNDEFINED_SYMBOLS := true
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;再次编译，成功了，引入项目，能够正常生成和使用差量包。&lt;/p&gt;
+</description>
+      </item>
+    
+      <item>
+        <title>Android优化</title>
+        <link>http://www.liuschen.com/2018/03/15/android_yh.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2018/03/15/android_yh.html</guid>
+        <pubDate>Thu, 15 Mar 2018 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;1.不要在ondraw里面新建太多对象，对象在最好在构造方法里面先建好。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;引申:不要在多次调用的回调方法里面新建对象(不只适用Android)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;2.不要频繁调用requestLayout，invalidate这些方法，这些方法调用的时候必须保证绝对必要&lt;/p&gt;
+
+&lt;p&gt;3.View和activity，fragment这些一样，要有预防机制，在发生屏幕旋转，后台被杀这种情况时，要保存数据以便恢复，节省性能消耗。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;@Override
+protected Parcelable onSaveInstanceState() {
+    Bundle bundle = new Bundle();
+    bundle.putParcelable(STATE_INSTANCE, super.onSaveInstanceState());
+    bundle.putInt(STATE_TYPE, mType);
+    bundle.putInt(STATE_BORDER_RADIUS, mBorderRadius);
+    return bundle;
+}
+
+@Override
+protected void onRestoreInstanceState(Parcelable state) {
+    if (state instanceof Bundle) {
+        Bundle bundle = (Bundle) state;
+        super.onRestoreInstanceState(((Bundle) state).getParcelable(STATE_INSTANCE));
+        this.mType = bundle.getInt(STATE_TYPE);
+        this.mBorderRadius = bundle.getInt(STATE_BORDER_RADIUS);
+    } else {
+        super.onRestoreInstanceState(state);
+    }
+
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;TO BE CONTINUE&lt;/p&gt;
+&lt;/blockquote&gt;
+</description>
+      </item>
+    
+      <item>
+        <title>Android访问存储目录</title>
+        <link>http://www.liuschen.com/2018/03/15/Androidstore.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2018/03/15/Androidstore.html</guid>
+        <pubDate>Thu, 15 Mar 2018 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Context中方法：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;getFileDir():/data/user/0/包名/file&lt;/li&gt;
+  &lt;li&gt;getCache():/data/user/0/包名/cache&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Environment中方法：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;getExternalStorageDirectory():内存卡根目录，/storge/emulated/0&lt;/li&gt;
+  &lt;li&gt;getDataDirectory():/data&lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;getExternalStoragePublicDirectory(str):参数（Environment中的常量）&lt;/p&gt;
+
+    &lt;pre&gt;&lt;code&gt;* Each of its values have its own constant:
+   * &amp;lt;ul&amp;gt;
+   *   &amp;lt;li&amp;gt;{@link #DIRECTORY_MUSIC}
+   *   &amp;lt;li&amp;gt;{@link #DIRECTORY_PODCASTS}
+   *   &amp;lt;li&amp;gt;{@link #DIRECTORY_ALARMS}
+   *   &amp;lt;li&amp;gt;{@link #DIRECTORY_RINGTONES}
+   *   &amp;lt;li&amp;gt;{@link #DIRECTORY_NOTIFICATIONS}
+   *   &amp;lt;li&amp;gt;{@link #DIRECTORY_PICTURES}
+   *   &amp;lt;li&amp;gt;{@link #DIRECTORY_MOVIES}
+   *   &amp;lt;li&amp;gt;{@link #DIRECTORY_DOWNLOADS}
+   *   &amp;lt;li&amp;gt;{@link #DIRECTORY_DCIM}
+   *   &amp;lt;li&amp;gt;{@link #DIRECTORY_DOCUMENTS}
+   * &amp;lt;/ul&amp;gt;
+   * @hide
+   */
+&lt;/code&gt;&lt;/pre&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;获取Android存储卡上的图片，文档，等默认目录&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;getExternalFilesDir(“文件夹名”):/storge/emulated/0/Android/data/包名/files/文件夹名&lt;/li&gt;
+  &lt;li&gt;getExternalCacheDir():/storge/emulated/0/Android/data/包名/cache&lt;/li&gt;
+  &lt;li&gt;ContextCompat.getExternalCacheDirs(MainActivity.this)[0]:同上一条&lt;/li&gt;
+  &lt;li&gt;getExternalFilesDirs(Environment.DIRECTORY_MUSIC)[0]:/storge/emulated/0/Android/data/包名/files/Music&lt;br /&gt;
+应用可以管理在它外部存储上的特定包名目录，这个目录就是存储卡上的Android目录，而不用获取WRITE_EXTERNAL_STORAGE权限。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;比如，一个包名为com.example.foo的应用，可以自由访问外存上的Android/data/com.example.foo/目录。&lt;/p&gt;
+</description>
+      </item>
+    
+      <item>
+        <title>PHP语法简要笔记</title>
+        <link>http://www.liuschen.com/2018/01/20/PHP0.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2018/01/20/PHP0.html</guid>
+        <pubDate>Sat, 20 Jan 2018 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;PHP是一种弱类型的语言，和javascript很相似，但是PHP底层是c语言写的，又保证了执行的效率。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&quot;section&quot;&gt;1. 符号语法&lt;/h2&gt;
+
+&lt;p&gt;@抵制错误输出，加在函数前面&lt;/p&gt;
+
+&lt;p&gt;$变量前缀，不需要事先声明，&lt;/p&gt;
+
+&lt;p&gt;.= 字符串连接符&lt;/p&gt;
+
+&lt;h2 id=&quot;php&quot;&gt;2. PHP固定函数&lt;/h2&gt;
+
+&lt;p&gt;$_POST[”“]取得POST表单值&lt;/p&gt;
+
+&lt;p&gt;$_GET[”“]取得POST表单值&lt;/p&gt;
+
+&lt;h2 id=&quot;section-1&quot;&gt;3. 字符串连接符&lt;/h2&gt;
+
+&lt;p&gt;不是我们常用的“+”,而是“ . ”并且两边的空格必不可少，这点需要注意&lt;/p&gt;
+
+</description>
+      </item>
+    
+      <item>
+        <title>PHP开发环境搭建</title>
+        <link>http://www.liuschen.com/2018/01/20/PHP.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2018/01/20/PHP.html</guid>
+        <pubDate>Sat, 20 Jan 2018 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;最近买了个虚拟主机，但是买回来后却发现不支持java程序，只支持PHP，想想也不是想做什么复杂的东西，所以将就着先用用看。毕竟，所有语言都是共通的。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h1 id=&quot;section&quot;&gt;环境安装&lt;/h1&gt;
+
+&lt;p&gt;下载&lt;a href=&quot;http://www.apachelounge.com/download/&quot;&gt;httpd-2.4.29-Win32-VC15&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;下载&lt;a href=&quot;http://windows.php.net/download#php-5.5&quot;&gt;php-5.6.32-Win32-VC11-x64&lt;/a&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;apache&quot;&gt;Apache配置&lt;/h1&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;注意:下面安装服务必须使用管理员权限，所以打开CMD的时候要用管理员的身份打开&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;同java一样，先配置了环境变量，然后打开CMD（必须使用管理员权限），不然不能安装服务：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;首先配置:httpd.conf
+ServerRoot &quot;httpd的根目录&quot;
+DocumentRoot “根目录下同样位置”
+以及其下的Directory路径也配置相同
+
+httpd -k install（将apache注册为window的服务）
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;经常出现的错误是端口占用，这时候只需要更改默认的端口即可(至少两处)。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Errors reported here must be corrected before the service can be started
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这句话并不是错误，而是提示如果下面有错误要先解决。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;httpd -k start
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;启动（必须先安装服务），可以访问了，通过127.0.0.1：端口&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;继续配置httpd.conf
+DirectoryIndex index.html 后添加index.php index.htm
+ScriptAlias后目录同样修改为本机的相对应目录，后面Directory里面的当然也要修改
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;文件尾部最后添加对PHP支持：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;LoadModule php5_module &quot;本机php路径/php5apache2_4.dll&quot;
+AddType application/x-httpd-php .php .html .htm
+PHPIniDir &quot;本机php路径&quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;最后一句是为了找PHP根目录下的PHP.ini文件，是由php.ini-production重命名后得到，添加后如果提示不能载入php5_module，那么要么是window下的依赖没配置好（单独启动php试试），也可能就是我遇到的版本搭配问题，网上有关于这个问题的解答，我在版本号上的选择是没错的，只是，64位和32位的弄混了。应该下载httpd-2.4.29-Win64-VC15，才对，这是它起名造成的误解。&lt;/p&gt;
+
+&lt;h1 id=&quot;eclipse-for-php&quot;&gt;eclipse for PHP调试环境的搭建&lt;/h1&gt;
+
+&lt;p&gt;配置完调试没反应,修改php.ini文件,在结尾添加:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;;zend_extension = F:\programer4\php-5.6.32-Win32-VC11-x64\ext\php_xdebug.dll
+zend_extension_ts = F:\programer4\php-5.6.32-Win32-VC11-x64\ext\php_xdebug.dll
+;extension = php_xdebug.dll
+[Xdebug]
+xdebug.auto_trace = 1
+xdebug.show_exception_trace = 1
+xdebug.remote_autostart = 1
+xdebug.remote_enable = 1
+xdebug.collect_vars = 1
+xdebug.collect_return = 1
+xdebug.collect_params = 1
+xdebug.trace_output_dir=”D:/xDebugLog”
+xdebug.profiler_output_dir=”D:/xDebugLog”
+xdebug.profiler_enable= 1
+xdebug.remote_host=localhost
+xdebug.remote_port=9000
+xdebug.remote_mode = req
+xdebug.remote_handler=dbgp
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;注意：配置文件中的”；”为注释符号，end_extension要根据自己下载的放出合适的版本（TS线程安全和非线程安全）&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;xdebug.remote_port=9000
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;远程端口要和eclipse中设置一致，&lt;/p&gt;
+
+&lt;p&gt;选中php文件，点击Debug As-&amp;gt;PHP Script执行调试&lt;/p&gt;
+
+&lt;h1 id=&quot;section-1&quot;&gt;错误&lt;/h1&gt;
+
+&lt;p&gt;使用mysqli连接数据库错误:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Call to undefined function mysqli_connect()错误
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;解决:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;在php.ini文件中extension=php_mysqli.dll去掉前面的分号，然后再添加extension_dir=&quot;ext&quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;万网数据库访问遇到问题：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;using the old insecure authentication. Please use an administration tool to reset your password with the command SET PASSWORD = PASSWORD(&#39;your_existing_password&#39;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;重新修改数据库密码，并把密码设置为41位加密的&lt;/p&gt;
+
+&lt;p&gt;服务端错误：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Call to undefined function mysqli_connect()错误
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;开始我还以为是同一个问题，后来梳理清楚了，发现解决上面这个问题的方法，只是在eclipse中执行脚本时运行通过了（eclipse中关联php.ini文件了）。但是一旦在服务器上让网页访问还是会出现这个问题。&lt;/p&gt;
+
+&lt;h1 id=&quot;php&quot;&gt;更换PHP版本&lt;/h1&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;鉴于阿里云上的PHP没有5.6版本的支持，最终选择7.0版本作为使用版本，因为阿里云最高支持到7.1版本，为了避免麻烦，使用7.0版的。&lt;br /&gt;
+配置依照上面配置只是php5换成php7&lt;/p&gt;
+&lt;/blockquote&gt;
+
+</description>
+      </item>
+    
+      <item>
+        <title>PHP开发环境搭建</title>
+        <link>http://www.liuschen.com/2018/01/01/adb.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2018/01/01/adb.html</guid>
+        <pubDate>Mon, 01 Jan 2018 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;adb无法连接&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;error: device not found
+error: device not found
+error: device not found
+- waiting for device -
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;启动adb服务:adb nodaemon server&lt;br /&gt;
+查找adb服务占用端口:netstat -ano | findstr “5037”&lt;br /&gt;
+查找端口占用程序:tasklist | findstr “3360”&lt;br /&gt;
+杀死程序进程，释放端口：taskkill /F /PID 3360&lt;br /&gt;
+重新列出adb连接设备:adb devices&lt;/p&gt;
+
+&lt;p&gt;安装时报如下错误:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;1808 KB/s (1050884 bytes in 0.567s)
+Failure [INSTALL_PARSE_FAILED_NO_CERTIFICATES: Failed to collect certificates from /data/app/vmdl571586590.tmp/base.apk: Attempt to get length of null array]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;安装包没有签名，签名:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;jarsigner -verbose -keystore C:\Users\用户\.android\debug.keystore -signedjar dst.apk src.apk androiddebugkey
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;adb命令&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Android Debug Bridge version 1.0.31
+
+ -a                            - directs adb to listen on all interfaces for a connection
+ -d                            - directs command to the only connected USB device
+                                 returns an error if more than one USB device is present.
+ -e                            - directs command to the only running emulator.
+                                 returns an error if more than one emulator is running.
+ -s &amp;lt;specific device&amp;gt;          - directs command to the device or emulator with the given
+                                 serial number or qualifier. Overrides ANDROID_SERIAL
+                                 environment variable.
+ -p &amp;lt;product name or path&amp;gt;     - simple product name like &#39;sooner&#39;, or
+                                 a relative/absolute path to a product
+                                 out directory like &#39;out/target/product/sooner&#39;.
+                                 If -p is not specified, the ANDROID_PRODUCT_OUT
+                                 environment variable is used, which must
+                                 be an absolute path.
+ -H                            - Name of adb server host (default: localhost)
+ -P                            - Port of adb server (default: 5037)
+ devices [-l]                  - list all connected devices
+                                 (&#39;-l&#39; will also list device qualifiers)
+ connect &amp;lt;host&amp;gt;[:&amp;lt;port&amp;gt;]       - connect to a device via TCP/IP
+                                 Port 5555 is used by default if no port number is specified.
+ disconnect [&amp;lt;host&amp;gt;[:&amp;lt;port&amp;gt;]]  - disconnect from a TCP/IP device.
+                                 Port 5555 is used by default if no port number is specified.
+                                 Using this command with no additional arguments
+                                 will disconnect from all connected TCP/IP devices.
+
+device commands:
+  adb push [-p] &amp;lt;local&amp;gt; &amp;lt;remote&amp;gt;
+                               - copy file/dir to device
+                                 (&#39;-p&#39; to display the transfer progress)
+  adb pull [-p] [-a] &amp;lt;remote&amp;gt; [&amp;lt;local&amp;gt;]
+                               - copy file/dir from device
+                                 (&#39;-p&#39; to display the transfer progress)
+                                 (&#39;-a&#39; means copy timestamp and mode)
+  adb sync [ &amp;lt;directory&amp;gt; ]     - copy host-&amp;gt;device only if changed
+                                 (-l means list but don&#39;t copy)
+                                 (see &#39;adb help all&#39;)
+  adb shell                    - run remote shell interactively
+  adb shell &amp;lt;command&amp;gt;          - run remote shell command
+  adb emu &amp;lt;command&amp;gt;            - run emulator console command
+  adb logcat [ &amp;lt;filter-spec&amp;gt; ] - View device log
+  adb forward --list           - list all forward socket connections.
+                                 the format is a list of lines with the following format:
+                                    &amp;lt;serial&amp;gt; &quot; &quot; &amp;lt;local&amp;gt; &quot; &quot; &amp;lt;remote&amp;gt; &quot;\n&quot;
+  adb forward &amp;lt;local&amp;gt; &amp;lt;remote&amp;gt; - forward socket connections
+                                 forward specs are one of:
+                                   tcp:&amp;lt;port&amp;gt;
+                                   localabstract:&amp;lt;unix domain socket name&amp;gt;
+                                   localreserved:&amp;lt;unix domain socket name&amp;gt;
+                                   localfilesystem:&amp;lt;unix domain socket name&amp;gt;
+                                   dev:&amp;lt;character device name&amp;gt;
+                                   jdwp:&amp;lt;process pid&amp;gt; (remote only)
+  adb forward --no-rebind &amp;lt;local&amp;gt; &amp;lt;remote&amp;gt;
+                               - same as &#39;adb forward &amp;lt;local&amp;gt; &amp;lt;remote&amp;gt;&#39; but fails
+                                 if &amp;lt;local&amp;gt; is already forwarded
+  adb forward --remove &amp;lt;local&amp;gt; - remove a specific forward socket connection
+  adb forward --remove-all     - remove all forward socket connections
+  adb jdwp                     - list PIDs of processes hosting a JDWP transport
+  adb install [-l] [-r] [-d] [-s] [--algo &amp;lt;algorithm name&amp;gt; --key &amp;lt;hex-encoded key&amp;gt; --iv &amp;lt;hex-encoded iv&amp;gt;] &amp;lt;file&amp;gt;
+                               - push this package file to the device and install it
+                                 (&#39;-l&#39; means forward-lock the app)
+                                 (&#39;-r&#39; means reinstall the app, keeping its data)
+                                 (&#39;-d&#39; means allow version code downgrade)
+                                 (&#39;-s&#39; means install on SD card instead of internal storage)
+                                 (&#39;--algo&#39;, &#39;--key&#39;, and &#39;--iv&#39; mean the file is encrypted already)
+  adb uninstall [-k] &amp;lt;package&amp;gt; - remove this app package from the device
+                                 (&#39;-k&#39; means keep the data and cache directories)
+  adb bugreport                - return all information from the device
+                                 that should be included in a bug report.
+
+  adb backup [-f &amp;lt;file&amp;gt;] [-apk|-noapk] [-obb|-noobb] [-shared|-noshared] [-all] [-system|-nosystem] [&amp;lt;packages...&amp;gt;]
+                               - write an archive of the device&#39;s data to &amp;lt;file&amp;gt;.
+                                 If no -f option is supplied then the data is written
+                                 to &quot;backup.ab&quot; in the current directory.
+                                 (-apk|-noapk enable/disable backup of the .apks themselves
+                                    in the archive; the default is noapk.)
+                                 (-obb|-noobb enable/disable backup of any installed apk expansion
+                                    (aka .obb) files associated with each application; the default
+                                    is noobb.)
+                                 (-shared|-noshared enable/disable backup of the device&#39;s
+                                    shared storage / SD card contents; the default is noshared.)
+                                 (-all means to back up all installed applications)
+                                 (-system|-nosystem toggles whether -all automatically includes
+                                    system applications; the default is to include system apps)
+                                 (&amp;lt;packages...&amp;gt; is the list of applications to be backed up.  If
+                                    the -all or -shared flags are passed, then the package
+                                    list is optional.  Applications explicitly given on the
+                                    command line will be included even if -nosystem would
+                                    ordinarily cause them to be omitted.)
+
+  adb restore &amp;lt;file&amp;gt;           - restore device contents from the &amp;lt;file&amp;gt; backup archive
+
+  adb help                     - show this help message
+  adb version                  - show version num
+
+scripting:
+  adb wait-for-device          - block until device is online
+  adb start-server             - ensure that there is a server running
+  adb kill-server              - kill the server if it is running
+  adb get-state                - prints: offline | bootloader | device
+  adb get-serialno             - prints: &amp;lt;serial-number&amp;gt;
+  adb get-devpath              - prints: &amp;lt;device-path&amp;gt;
+  adb status-window            - continuously print device status for a specified device
+  adb remount                  - remounts the /system partition on the device read-write
+  adb reboot [bootloader|recovery] - reboots the device, optionally into the bootloader or recovery program
+  adb reboot-bootloader        - reboots the device into the bootloader
+  adb root                     - restarts the adbd daemon with root permissions
+  adb usb                      - restarts the adbd daemon listening on USB
+  adb tcpip &amp;lt;port&amp;gt;             - restarts the adbd daemon listening on TCP on the specified port
+networking:
+  adb ppp &amp;lt;tty&amp;gt; [parameters]   - Run PPP over USB.
+ Note: you should not automatically start a PPP connection.
+ &amp;lt;tty&amp;gt; refers to the tty for PPP stream. Eg. dev:/dev/omap_csmi_tty1
+ [parameters] - Eg. defaultroute debug dump local notty usepeerdns
+
+adb sync notes: adb sync [ &amp;lt;directory&amp;gt; ]
+  &amp;lt;localdir&amp;gt; can be interpreted in several ways:
+
+  - If &amp;lt;directory&amp;gt; is not specified, both /system and /data partitions will be updated.
+
+  - If it is &quot;system&quot; or &quot;data&quot;, only the corresponding partition
+    is updated.
+
+environmental variables:
+  ADB_TRACE                    - Print debug information. A comma separated list of the following values
+                                 1 or all, adb, sockets, packets, rwx, usb, sync, sysdeps, transport, jdwp
+  ANDROID_SERIAL               - The serial number to connect to. -s takes priority over this if given.
+  ANDROID_LOG_TAGS             - When used with the logcat option, only these debug tags are printed.
+&lt;/code&gt;&lt;/pre&gt;
+
+</description>
+      </item>
+    
+      <item>
+        <title>AndroidHTTPS安全请求解析2-手机请求以及连接捕获</title>
+        <link>http://www.liuschen.com/2018/01/01/AndroidHTTPS2.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2018/01/01/AndroidHTTPS2.html</guid>
+        <pubDate>Mon, 01 Jan 2018 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h1 id=&quot;fiddlerhttps&quot;&gt;1. Fiddler捕获HTTPS原理&lt;/h1&gt;
+
+&lt;p&gt;之前所说，当手机通过PS上的Fiddler代理访问网络时，Fiddler会从服务器端请求到一个证书，同Fiddler自带的根证书合并生成一个新的证书返回给客户端(手机)，由于此证书没有在权威认证机构注册过，所以显示不合法。这种办法是不能看到完整的SSl请求数据的&lt;/p&gt;
+
+&lt;p&gt;SSL会话原理&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;客户端发送安全会话请求&lt;/li&gt;
+  &lt;li&gt;服务器发送X509(或其他，根据配置)证书，包含服务器公钥&lt;/li&gt;
+  &lt;li&gt;客户端用已知的CA列表来认证证书(如果是手机客户端的话，会在Assets文件夹下有证书文件，通过代码加载)&lt;/li&gt;
+  &lt;li&gt;客户端生成随机对称密钥，并用服务端的公钥加密&lt;/li&gt;
+  &lt;li&gt;客户机和服务器都知道了对称密钥，并用它来加密会话期间的用户数据&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;SSL是高层协议，工作在传输层之上。&lt;/p&gt;
+
+&lt;p&gt;在Fiddler上代理访问时，启用了它的测试证书，手机访问会提示证书不安全，这个是服务端对客户端证书请求导致的，没请求到符合规范的证书，所以提示，如果这一过程是强制的，将直接导致会话失败。&lt;/p&gt;
+
+&lt;p&gt;在wireshark中捕获请求得到的数据将是TCP包，SSL是上层协议，而wireshark捕获后分析报文到传输层为止。&lt;/p&gt;
+
+&lt;p&gt;可以下载OPENSSL了解其中的功能。&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;TO BE CONTINUE&lt;/p&gt;
+&lt;/blockquote&gt;
+
+</description>
+      </item>
+    
+      <item>
+        <title>Android HTTPS安全请求解析-keystore工具的使用</title>
+        <link>http://www.liuschen.com/2018/01/01/AndroidHTTPS.html</link>
+        <guid isPermaLink="true">http://www.liuschen.com/2018/01/01/AndroidHTTPS.html</guid>
+        <pubDate>Mon, 01 Jan 2018 00:00:00 +0800</pubDate>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h1 id=&quot;keystorekeytoolhttpsblogcsdnnetsayyyarticledetails78351512&quot;&gt;一.keystore工具的使用(大部分摘自&lt;a href=&quot;https://blog.csdn.net/sayyy/article/details/78351512&quot;&gt;使用Keytool工具生成证书及签名完整步骤&lt;/a&gt;)&lt;/h1&gt;
+
+&lt;pre&gt;&lt;code&gt;命令:
+
+ -certreq            生成证书请求
+ -changealias        更改条目的别名
+ -delete             删除条目
+ -exportcert         导出证书
+ -genkeypair         生成密钥对
+ -genseckey          生成密钥
+ -gencert            根据证书请求生成证书
+ -importcert         导入证书或证书链
+ -importpass         导入口令
+ -importkeystore     从其他密钥库导入一个或所有条目
+ -keypasswd          更改条目的密钥口令
+ -list               列出密钥库中的条目
+ -printcert          打印证书内容
+ -printcertreq       打印证书请求的内容
+ -printcrl           打印 CRL 文件的内容
+ -storepasswd        更改密钥库的存储口令
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&quot;keystorejkscertificate&quot;&gt;1.创建证书库(Keystore/JKS)及证书(Certificate):&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code&gt;keytool -genkeypair \
+    -alias www.mydomain.com \
+    -keyalg RSA \
+    –keysize 4096 \
+    -keypass mypassword \
+    -sigalg SHA256withRSA \
+    -dname &quot;cn=www.mydomain.com,ou=xxx,o=xxx,l=Beijing,st=Beijing,c=CN&quot; \ 
+    -validity 3650 \
+    -keystore www.mydomain.com_keystore.jks \
+    -storetype JKS \
+    -storepass mypassword
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;使用&lt;strong&gt;genkeypair&lt;/strong&gt;参数：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;查看选项keytool -genkeypair -option
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;keytool 是jdk提供的工具，该工具名为”keytool“&lt;/li&gt;
+  &lt;li&gt;-alias www.mydomain.com 此处”www.mydomain.com“为别名，可以是任意字符，只要不提示错误即可。因一个证书库中可以存放多个证书，通过别名标识证书。&lt;/li&gt;
+  &lt;li&gt;-keyalg RSA 此处”RSA“为密钥的算法。可以选择的密钥算法有：RSA、DSA、EC。&lt;/li&gt;
+  &lt;li&gt;–keysize 4096 此处”4096“为密钥长度。keysize与keyalg默认对应关系： &lt;br /&gt;
+2048 (when using -genkeypair and -keyalg is “RSA”) &lt;br /&gt;
+1024 (when using -genkeypair and -keyalg is “DSA”) &lt;br /&gt;
+256 (when using -genkeypair and -keyalg is “EC”)&lt;/li&gt;
+  &lt;li&gt;-keypass mypassword 此处”mypassword “为本条目的密码(私钥的密码)。最好与storepass一致。&lt;/li&gt;
+  &lt;li&gt;-sigalg SHA256withRSA 此处”SHA256withRSA“为签名算法。keyalg=RSA时，签名算法有：MD5withRSA、SHA1withRSA、SHA256withRSA、SHA384withRSA、SHA512withRSA。keyalg=DSA时，签名算法有：SHA1withDSA、SHA256withDSA。此处需要注意：MD5和SHA1的签名算法已经不安全。&lt;/li&gt;
+  &lt;li&gt;-dname “cn=www.mydomain.com,ou=xxx,o=xxx,l=Beijing,st=Beijing,c=CN” 在此填写证书信息。”CN=名字与姓氏/域名,OU=组织单位名称,O=组织名称,L=城市或区域名称,ST=州或省份名称,C=单位的两字母国家代码”&lt;/li&gt;
+  &lt;li&gt;-validity 3650 此处”3650“为证书有效期天数。&lt;/li&gt;
+  &lt;li&gt;-keystore www.mydomain.com_keystore.jks 此处”www.mydomain.com_keystore.jks“为密钥库的名称。此处也给出绝对路径。默认在当前目录创建证书库。&lt;/li&gt;
+  &lt;li&gt;-storetype JKS 此处”JKS “为证书库类型。可用的证书库类型为：JKS、PKCS12等。jdk9以前，默认为JKS。自jdk9开始，默认为PKCS12。&lt;/li&gt;
+  &lt;li&gt;-storepass mypassword 此处”mypassword “为证书库密码(私钥的密码)。最好与keypass 一致。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;说明： &lt;br /&gt;
+上述命令，需要将 -dname 参数替换（尤其时域名要写对）、密码更改即可，其它可保持不变。&lt;/p&gt;
+
+&lt;p&gt;生成证书命令:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;keytool -genkey -alias luofeng -keyalg RSA -keystore .keystore
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&quot;csr&quot;&gt;2.生成证书签名请求(CSR)&lt;/h2&gt;
+
+&lt;p&gt;命令如下：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;keytool -certreq -keyalg RSA \
+        -alias www.mydomain.com \
+        -keystore www.mydomain.com_keystore.jks \
+        -storetype JKS \
+        -storepass mypassword \
+        -file www.mydomain.com_certreq.csr
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;strong&gt;certreq&lt;/strong&gt;;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;查看具体参数选项:keytool -certreq -option
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;解释：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;-file www.mydomain.com_certreq.csr 此处”www.mydomain.com_certreq.csr “为证书签名请求文件。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;说明：&lt;/p&gt;
+
+&lt;p&gt;将”www.mydomain.com_certreq.csr “文件发送给证书签名机构，然后等待证书签名机构将签名的证书发回，再进行下一步。&lt;/p&gt;
+
+&lt;h2 id=&quot;section&quot;&gt;3.将签名请求发给证书签名机构&lt;/h2&gt;
+
+&lt;p&gt;签名机构通过gencert来处理证书：&lt;/p&gt;
+
+&lt;p&gt;需要提供自己的签名请求文件，还需要签名机构的根证书(也是通过genkeypair生成的，只不过签名机构的证书被广泛认可)&lt;/p&gt;
+
+&lt;h2 id=&quot;section-1&quot;&gt;3.将已签名的证书导入证书库&lt;/h2&gt;
+
+&lt;p&gt;如果到了这步，应该会拿到两个证书。一个是签名机构的根证书（假定为GlobalSign_cert.cer），一个是www.mydomain.com的已签名证书（假定为www.mydomain.com_cert.cer）。两个证书均导入到证书库（www.mydomain.com_keystore.jks）中。&lt;/p&gt;
+
+&lt;p&gt;导入签名机构的根证书：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;keytool -import -trustcacerts \
+        -keystore www.mydomain.com_keystore.jks \
+        -storepass mypassword \
+        -alias root_GlobalSign \
+        -file GlobalSign_cert.cer
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;说明：&lt;/p&gt;
+
+&lt;p&gt;alias和file两个参数进行替换。&lt;/p&gt;
+
+&lt;p&gt;导入www.mydomain.com的已签名证书&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;keytool -import -trustcacerts \
+        -keystore www.mydomain.com_keystore.jks \
+        -storepass mypassword \
+        -alias www.mydomain.com \
+        -file www.mydomain.com_cert.cer 说明：  alias参数要与生成时一致，file参数进行替换。
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;辅助命令&lt;/p&gt;
+
+&lt;p&gt;查看证书库&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;keytool -list -v \
+        -keystore www.mydomain.com_keystore.jks \
+        -storepass mypassword
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;查看证书签名请求&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;keytool -printcertreq  -file www.mydomain.com_certreq.csr
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;查看已签名证书&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;keytool -printcert -file GlobalSign_cert.cer
+keytool -printcert -file www.mydomain.com_cert.cer
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&quot;section-2&quot;&gt;二. 证书概念的区别&lt;/h2&gt;
+
+&lt;p&gt;CSR文件:CSR文件-Certificate Signing Request证书签名请求，这个文件是向权威机构获得颁发证书的请求，核心是一个公钥&lt;br /&gt;
+JKS：java key store,java的keytool上实现的密钥库的格式&lt;br /&gt;
+Cer：window下证书格式&lt;/p&gt;
+
+&lt;p&gt;如果不想要得到签名机构的认可，可以直接使用JKS文件&lt;/p&gt;
+
+&lt;h2 id=&quot;cs&quot;&gt;三. C/S证书交互配置&lt;/h2&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;
+    &lt;p&gt;生成服务端证书(库)（注意域名填入服务端网站域名，否则访问会弹出警告）&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;导出服务端证书&lt;/p&gt;
+
+    &lt;p&gt;keytool -export -alias server -keystore 证书库路径+名称 -storepass 密码 -rfc -file 导出证书路径+名称.cer&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;tomcat中开启SSL&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;
+    &lt;p&gt;修改Server.xml:&lt;/p&gt;
+
+    &lt;connector port=&quot;8443&quot; protocol=&quot;org.apache.coyote.http11.Http11Protocol&quot; maxthreads=&quot;150&quot; sslenabled=&quot;true&quot; scheme=&quot;https&quot; secure=&quot;true&quot; clientauth=&quot;false&quot; sslprotocol=&quot;TLS&quot; keystorefile=&quot;C:/Users/luofe/Desktop/keystore/server.jks&quot; keystorepass=&quot;123456&quot; /&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;注释掉:&lt;/p&gt;
+
+    &lt;p&gt;&lt;!--&lt;Listener className=&quot;org.apache.catalina.core.AprLifecycleListener&quot; SSLEngine=&quot;on&quot; /&gt;--&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;安装证书到客户端浏览器(第二步导出的证书)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;在浏览器中访问tomcat通过https://127.0.0.1:8443/&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;如果出现不安全或是该链接不是私密连接的提示，说明证书安装的位置不对，这个证书只有安装到“受信任的根证书颁发机构”下才会被浏览器信任。&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;运行中输入certmgr.msc可以打开window的证书管理器，查看证书的安装位置&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;pre&gt;&lt;code&gt;生成本地测试证书:
+
+keytool -genkeypair -alias localhost -keyalg RSA -keysize 4096 -keypass 123456 -sigalg SHA256withRSA -dname &quot;cn=localhost,ou=test,o=test,l=Beijing,st=Beijing,c=CN&quot; -validity 3650 -keystore server.jks -storetype JKS -storepass 123456
+
+导出本地测试
+
+keytool -export -alias localhost -keystore server.jks -storepass 123456 -rfc -file server.cer
+&lt;/code&gt;&lt;/pre&gt;
+
+</description>
+      </item>
+    
+      <item>
         <title>混淆点义</title>
         <link>http://www.liuschen.com/2017/10/07/point2.html</link>
         <guid isPermaLink="true">http://www.liuschen.com/2017/10/07/point2.html</guid>
@@ -681,2089 +1880,6 @@ public static double calculateDistance(double[] point,double[][] polygon){
 &lt;p&gt;参考:&lt;a href=&quot;http://blog.csdn.net/kikitamoon/article/details/46124935&quot;&gt;Web Mercator 公开的小秘密&lt;/a&gt;&lt;br /&gt;
 参考:&lt;a href=&quot;http://www.movable-type.co.uk/scripts/latlong.html&quot;&gt;Calculate distance, bearing and more between Latitude/Longitude points&lt;/a&gt;&lt;/p&gt;
 
-</description>
-      </item>
-    
-      <item>
-        <title>PHP开发环境搭建</title>
-        <link>http://www.liuschen.com/2017/09/10/php.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2017/09/10/php.html</guid>
-        <pubDate>Sun, 10 Sep 2017 00:00:00 +0800</pubDate>
-        <description>&lt;blockquote&gt;
-  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;最近买了个虚拟主机，但是买回来后却发现不支持java程序，只支持PHP，想想也不是想做什么复杂的东西，所以将就着先用用看。毕竟，所有语言都是共通的。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h1 id=&quot;section&quot;&gt;环境安装&lt;/h1&gt;
-
-&lt;p&gt;下载&lt;a href=&quot;http://www.apachelounge.com/download/&quot;&gt;httpd-2.4.29-Win32-VC15&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;下载&lt;a href=&quot;http://windows.php.net/download#php-5.5&quot;&gt;php-5.6.32-Win32-VC11-x64&lt;/a&gt;&lt;/p&gt;
-
-&lt;h1 id=&quot;apache&quot;&gt;Apache配置&lt;/h1&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;注意:下面安装服务必须使用管理员权限，所以打开CMD的时候要用管理员的身份打开&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;同java一样，先配置了环境变量，然后打开CMD（必须使用管理员权限），不然不能安装服务：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;首先配置:httpd.conf
-ServerRoot &quot;httpd的根目录&quot;
-DocumentRoot “根目录下同样位置”
-以及其下的Directory路径也配置相同
-
-httpd -k install（将apache注册为window的服务）
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;经常出现的错误是端口占用，这时候只需要更改默认的端口即可(至少两处)。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;Errors reported here must be corrected before the service can be started
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;这句话并不是错误，而是提示如果下面有错误要先解决。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;httpd -k start
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;启动（必须先安装服务），可以访问了，通过127.0.0.1：端口&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;继续配置httpd.conf
-DirectoryIndex index.html 后添加index.php index.htm
-ScriptAlias后目录同样修改为本机的相对应目录，后面Directory里面的当然也要修改
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;文件尾部最后添加对PHP支持：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;LoadModule php5_module &quot;本机php路径/php5apache2_4.dll&quot;
-AddType application/x-httpd-php .php .html .htm
-PHPIniDir &quot;本机php路径&quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;最后一句是为了找PHP根目录下的PHP.ini文件，是由php.ini-production重命名后得到，添加后如果提示不能载入php5_module，那么要么是window下的依赖没配置好（单独启动php试试），也可能就是我遇到的版本搭配问题，网上有关于这个问题的解答，我在版本号上的选择是没错的，只是，64位和32位的弄混了。应该下载httpd-2.4.29-Win64-VC15，才对，这是它起名造成的误解。&lt;/p&gt;
-
-&lt;h1 id=&quot;eclipse-for-php&quot;&gt;eclipse for PHP调试环境的搭建&lt;/h1&gt;
-
-&lt;p&gt;配置完调试没反应,修改php.ini文件,在结尾添加:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;;zend_extension = F:\programer4\php-5.6.32-Win32-VC11-x64\ext\php_xdebug.dll
-zend_extension_ts = F:\programer4\php-5.6.32-Win32-VC11-x64\ext\php_xdebug.dll
-;extension = php_xdebug.dll
-[Xdebug]
-xdebug.auto_trace = 1
-xdebug.show_exception_trace = 1
-xdebug.remote_autostart = 1
-xdebug.remote_enable = 1
-xdebug.collect_vars = 1
-xdebug.collect_return = 1
-xdebug.collect_params = 1
-xdebug.trace_output_dir=”D:/xDebugLog”
-xdebug.profiler_output_dir=”D:/xDebugLog”
-xdebug.profiler_enable= 1
-xdebug.remote_host=localhost
-xdebug.remote_port=9000
-xdebug.remote_mode = req
-xdebug.remote_handler=dbgp
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;注意：配置文件中的”；”为注释符号，end_extension要根据自己下载的放出合适的版本（TS线程安全和非线程安全）&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;xdebug.remote_port=9000
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;远程端口要和eclipse中设置一致，&lt;/p&gt;
-
-&lt;p&gt;选中php文件，点击Debug As-&amp;gt;PHP Script执行调试&lt;/p&gt;
-
-&lt;h1 id=&quot;section-1&quot;&gt;错误&lt;/h1&gt;
-
-&lt;p&gt;使用mysqli连接数据库错误:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;Call to undefined function mysqli_connect()错误
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;解决:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;在php.ini文件中extension=php_mysqli.dll去掉前面的分号，然后再添加extension_dir=&quot;ext&quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;万网数据库访问遇到问题：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;using the old insecure authentication. Please use an administration tool to reset your password with the command SET PASSWORD = PASSWORD(&#39;your_existing_password&#39;)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;重新修改数据库密码，并把密码设置为41位加密的&lt;/p&gt;
-
-&lt;p&gt;服务端错误：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;Call to undefined function mysqli_connect()错误
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;开始我还以为是同一个问题，后来梳理清楚了，发现解决上面这个问题的方法，只是在eclipse中执行脚本时运行通过了（eclipse中关联php.ini文件了）。但是一旦在服务器上让网页访问还是会出现这个问题。&lt;/p&gt;
-
-&lt;h1 id=&quot;php&quot;&gt;更换PHP版本&lt;/h1&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;鉴于阿里云上的PHP没有5.6版本的支持，最终选择7.0版本作为使用版本，因为阿里云最高支持到7.1版本，为了避免麻烦，使用7.0版的。&lt;br /&gt;
-配置依照上面配置只是php5换成php7&lt;/p&gt;
-&lt;/blockquote&gt;
-
-</description>
-      </item>
-    
-      <item>
-        <title>线程实例分析</title>
-        <link>http://www.liuschen.com/2017/09/03/thresd2.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2017/09/03/thresd2.html</guid>
-        <pubDate>Sun, 03 Sep 2017 00:00:00 +0800</pubDate>
-        <description>&lt;blockquote&gt;
-  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;场景一：&lt;/p&gt;
-
-&lt;p&gt;如果在主线程中启动一个子线程，将这个子线程join到主线程上，子线程中再开一个线程池来启动一个新的任务。这个新的任务中设置一个无限循环。当程序执行5分钟后，有多少线程还在执行。程序如下：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;public class Main {
-	public static void main(String[] args){
-		try {
-		Thread thread;
-		thread = new Thread(){
-			 @Override
-			public void run() {
-				 ExecutorService fixPool = Executors.newFixedThreadPool(5);
-				 WorkRunable1 runa = new WorkRunable1();
-				 //WorkRunable1 runa2 = new WorkRunable1();
-				 fixPool.execute(runa);
-				 //fixPool.execute(runa2);
-				 System.out.println(&quot;该线程已经执行完毕:当前线程为&quot;+Thread.currentThread().getName());
-			}
-		};
-		thread.start();
-		thread.join();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		System.out.println(&quot;主线程已经执行完毕:&quot;+Thread.currentThread().getName());
-		
-	}
-	
-	public static class WorkRunable1 implements Runnable{
-
-		@Override
-		public void run() {
-			while(true){
-				try {
-					Thread.sleep(3000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				System.out.println(&quot;我一直在输出:&quot;+Thread.activeCount());
-			}
-		}
-		
-	}
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;执行显示将会有两个线程：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;Thread[pool-1-thread-1]
-Thread[DestoryJavaVM]
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;这时，第一个启动的子线程早已经结束，所以main线程也随之结束。但是，还有线程执行，在主线程结束后启动了DestoryJavaVM，监听是否还有非守护线程执行，如果没有将关闭JVM。&lt;/p&gt;
-
-&lt;p&gt;如果在一个子线程中开一个无限循环，那么执行的线程将会变为2个，分别是：&lt;/p&gt;
-
-&lt;p&gt;主线程，第一个启动的子线程，和持续输出的线程池中的线程。&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;虽然这个结果一直在实践中被证实，但是没深究过，总是主观以为主线程结束了，其他所有线程理应就跟着完了。&lt;/p&gt;
-&lt;/blockquote&gt;
-</description>
-      </item>
-    
-      <item>
-        <title>线程复习笔记</title>
-        <link>http://www.liuschen.com/2017/09/03/thread1.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2017/09/03/thread1.html</guid>
-        <pubDate>Sun, 03 Sep 2017 00:00:00 +0800</pubDate>
-        <description>&lt;blockquote&gt;
-  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;内容主要来自《Java多线程编程核心技术》 高洪岩著&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h2 id=&quot;section&quot;&gt;1.线程的生命周期&lt;/h2&gt;
-
-&lt;p&gt;线程是一个动态执行的过程，它也有一个从产生到死亡的过程。&lt;/p&gt;
-
-&lt;h3 id=&quot;section-1&quot;&gt;(1)生命周期的五种状态&lt;/h3&gt;
-
-&lt;h4 id=&quot;new-thread&quot;&gt;新建（new Thread）&lt;/h4&gt;
-
-&lt;p&gt;当创建Thread类的一个实例（对象）时，此线程进入新建状态（未被启动）。&lt;br /&gt;
-例如：Thread  t1=new Thread();&lt;/p&gt;
-
-&lt;h4 id=&quot;runnable&quot;&gt;就绪（runnable）&lt;/h4&gt;
-
-&lt;p&gt;线程已经被启动，正在等待被分配给CPU时间片，也就是说此时线程正在就绪队列中排队等候得到CPU资源。例如：t1.start();&lt;/p&gt;
-
-&lt;h4 id=&quot;running&quot;&gt;运行（running）&lt;/h4&gt;
-
-&lt;p&gt;线程获得CPU资源正在执行任务（run()方法），此时除非此线程自动放弃CPU资源或者有优先级更高的线程进入，线程将一直运行到结束。&lt;/p&gt;
-
-&lt;h4 id=&quot;dead&quot;&gt;死亡（dead）&lt;/h4&gt;
-
-&lt;p&gt;当线程执行完毕或被其它线程杀死，线程就进入死亡状态，这时线程不可能再进入就绪状态等待执行。&lt;br /&gt;
-自然终止：正常运行run()方法后终止&lt;br /&gt;
-异常终止：调用stop()方法让一个线程终止运行&lt;/p&gt;
-
-&lt;h4 id=&quot;blocked&quot;&gt;堵塞（blocked）&lt;/h4&gt;
-
-&lt;p&gt;由于某种原因导致正在运行的线程让出CPU并暂停自己的执行，即进入堵塞状态。&lt;/p&gt;
-
-&lt;p&gt;正在睡眠：用sleep(long t) 方法可使线程进入睡眠方式。一个睡眠着的线程在指定的时间过去可进入就绪状态。&lt;/p&gt;
-
-&lt;p&gt;正在等待：调用wait()方法。（调用motify()方法回到就绪状态）&lt;br /&gt;
-被另一个线程所阻塞：调用suspend()方法。（调用resume()方法恢复）&lt;/p&gt;
-
-&lt;h3 id=&quot;section-2&quot;&gt;2.常用方法&lt;/h3&gt;
-&lt;p&gt;void run()   创建该类的子类时必须实现的方法&lt;br /&gt;
-void start() 开启线程的方法&lt;br /&gt;
-static void sleep(long t) 释放CPU的执行权，不释放锁&lt;br /&gt;
-static void sleep(long millis,int nanos)&lt;br /&gt;
-final void wait()释放CPU的执行权，释放锁&lt;br /&gt;
-final void notify()&lt;br /&gt;
-static void yied()可以对当前线程进行临时暂停（让线程将资源释放出来）&lt;br /&gt;
-3.（1）结束线程原理：就是让run方法结束。而run方法中通常会定义循环结构，所以只要控制住循环即可&lt;br /&gt;
-(2)方法—-可以boolean标记的形式完成，只要在某一情况下将标记改变，让循环停止即可让线程结束&lt;br /&gt;
-（3）public final void join()//让线程加入执行，执行某一线程join方法的线程会被冻结，等待某一线程执行结束，该线程才会恢复到可运行状态&lt;/p&gt;
-
-&lt;p&gt;引用出处:&lt;a href=&quot;http://blog.csdn.net/mayouarebest8621/article/details/6755036&quot;&gt;http://blog.csdn.net/mayouarebest8621/article/details/6755036&lt;/a&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;section-3&quot;&gt;2.方法&lt;/h2&gt;
-
-&lt;p&gt;currentThread():返回调用代码段的线程信息&lt;/p&gt;
-
-&lt;p&gt;isAlive():判断线程是否处于活动状态，start之前调用为false,start之后为true&lt;/p&gt;
-
-&lt;p&gt;sleep():指定毫秒数让当前线程休眠&lt;/p&gt;
-
-&lt;p&gt;getId():取得线程的唯一标识&lt;/p&gt;
-
-&lt;p&gt;suspend()：挂起(也是有死锁的隐患，和锁有关，废除)&lt;/p&gt;
-
-&lt;p&gt;resume():重新开始执行，（和suspend，因为很容易造成资源独占，导致死锁，废除）&lt;/p&gt;
-
-&lt;p&gt;stop():停止（一般线程结束都是在线程中通过流程控制来结束，因为用stop太过暴力，会释放线程所有保有的资源，废除）&lt;/p&gt;
-
-&lt;p&gt;setPriority():设置线程的优先级&lt;/p&gt;
-
-&lt;p&gt;join(重要):当前线程等待新开的线程结束后再结束，多用于主线程和子线程&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;子线程.start()
-子线程.join()
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;join(long),延时，内部用wait()释放锁&lt;br /&gt;
-sleep(long),不释放锁&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;join方法会阻塞线程，所以一个线程不能同时开启多个线程然后join,这样用非但不能达到目的，反而会使逻辑变的混乱。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h1 id=&quot;section-4&quot;&gt;3.对象监视器(锁)&lt;/h1&gt;
-
-&lt;p&gt;方法内变量为线程安全，实例中变量非线程安全（多个线程可能会访问同一个实例中的变量）&lt;/p&gt;
-
-&lt;p&gt;synchronized修饰方法，先调用该方法在没执行完时会持有锁，使后调用该方法的线程阻塞，直到前一个线程将锁释放。&lt;/p&gt;
-
-&lt;p&gt;synchronized（this）同步代码块，两个线程同时访问一个对象中的同步代码块时，先进入线程释放锁之前，后访问的线程阻塞等待。&lt;/p&gt;
-
-&lt;p&gt;synchronized同步方法和synchronized（this）互相阻塞&lt;/p&gt;
-
-&lt;p&gt;synchronized(非this对象)互相阻塞,互相阻塞表示的是对象监视器相同，在一个线程持有锁，另一个线程调用具有加锁的代码块时就会等待，&lt;strong&gt;wait()方法会释放当前线程的锁，sleep()不会释放锁&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;static方法加synchronized持有的是class锁，而普通方法加synchronized持有的是对象锁，所以两者不能同步&lt;/p&gt;
-
-&lt;h1 id=&quot;section-5&quot;&gt;原子性&lt;/h1&gt;
-
-&lt;p&gt;原子性就是操作的不可分割性，就和加上同步是一个效果，一个线程对一些变量进行操作，操作没有完成就不能有其他线程操作，否则，回写的值就会出现问题，产生脏数据。&lt;/p&gt;
-
-&lt;p&gt;volatile是强制从公共堆栈中取得变量，而不是从线程专有的线程中取得，对它的操作不具备原子性，也就是在不同线程同时写入可能会出错。&lt;/p&gt;
-
-&lt;p&gt;原子类如：AtomicInteger，前有前缀Atomic&lt;/p&gt;
-
-&lt;p&gt;原子类的操作也不一定是线程安全的，因为之外可能有不安全的操作，要综合考虑。&lt;/p&gt;
-
-&lt;h1 id=&quot;section-6&quot;&gt;等待通知&lt;/h1&gt;
-
-&lt;p&gt;锁对象所属的wait()和notify()方法是等待和唤醒，在同步代码块之中，如果所属同一个锁对象的wait()被多个线程调用，那么调用的线程会释放对象锁，然后进入线程等待池中，等待被唤醒。如果调用notify()会随机唤醒锁对象，多调用几次就能唤醒全部，也可以直接调用notifyAll()&lt;/p&gt;
-
-&lt;h1 id=&quot;threadlocalinheritablethreadlocal&quot;&gt;ThreadLocal和InheritableThreadLocal&lt;/h1&gt;
-
-&lt;p&gt;InheritableThreadLocal继承于前者&lt;/p&gt;
-
-&lt;p&gt;#同步锁&lt;/p&gt;
-
-&lt;p&gt;Lock lock = new ReentrantLock();&lt;br /&gt;
-Condition condition = lock.newCondition();&lt;br /&gt;
-lock.lock();&lt;/p&gt;
-
-&lt;p&gt;condition.await()&lt;br /&gt;
-condition.signal()&lt;br /&gt;
-condition.signalAll()&lt;/p&gt;
-
-&lt;p&gt;lock相当于之前的synchronized&lt;br /&gt;
-condition相当于之前的锁对象，里面有相关的等待唤醒方法。只是功能更强大。可以建立多个来保证等待与唤醒线程的准确切换。&lt;/p&gt;
-
-&lt;p&gt;公平锁与非公平锁：传入一个boolean来指定&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;tryLock()立即返回，可以带延时
-lock()获取不到，就使当前线程休眠等待
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h1 id=&quot;reentrantreadwritelock&quot;&gt;ReentrantReadWriteLock读写锁&lt;/h1&gt;
-
-&lt;p&gt;读读共享，写写互斥，读写互斥，写读互斥&lt;/p&gt;
-
-&lt;p&gt;#线程组与线程池&lt;/p&gt;
-
-&lt;p&gt;线程组是为了方便线程的管理&lt;/p&gt;
-
-&lt;p&gt;线程池是为了减少线程创建与销毁的开销&lt;/p&gt;
-
-&lt;h1 id=&quot;section-7&quot;&gt;单例模式&lt;/h1&gt;
-
-&lt;p&gt;饿汉模式:直接建立对象，获取直接返回&lt;/p&gt;
-
-&lt;p&gt;懒汉模式：为了解决多线程下问题，需要对对象进行双检查，既防止不同线程多次创建实例，又保证了效率&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;if(obj!=null){
-}else{
-	synchronized(){
-		if(obj==null)
-			obj = new Obj();
-	}
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h1 id=&quot;section-8&quot;&gt;守护线程&lt;/h1&gt;
-
-&lt;p&gt;在新建的线程启动前setDaemon(true)即可，在守护线程中新开的线程也是守护线程，守护线程不应访问资源，因为守护线程有中断的危险。当JVM中不存在非守护线程时，就会销毁JVM。&lt;/p&gt;
-
-</description>
-      </item>
-    
-      <item>
-        <title>android权限管理</title>
-        <link>http://www.liuschen.com/2017/08/05/AndroidSafe.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2017/08/05/AndroidSafe.html</guid>
-        <pubDate>Sat, 05 Aug 2017 00:00:00 +0800</pubDate>
-        <description>&lt;blockquote&gt;
-  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;android6.0后权限管理上更为严格，原本安装程序时确认的权限信息，也被分散到了调用的地方。也就是说除了在清单文件中声明权限外，对于一些安全敏感的权限而言，需要在调用的时候请求用户手动去开启权限。以内存卡读写权限为例。&lt;/p&gt;
-
-&lt;p&gt;首先，应该在清单文件中添加：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;lt;uses-permission android:name=&quot;android.permission.WRITE_EXTERNAL_STORAGE&quot; /&amp;gt;
-&amp;lt;uses-permission android:name=&quot;android.permission.READ_EXTERNAL_STORAGE&quot; /&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;其次，需要在调用的地方手动请求：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;	int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-
-    if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 001);
-    } else {
-		
-        String path = Environment.getExternalStorageDirectory().getAbsolutePath();
-        File file = new File(path+File.separator+&quot;pdemo5&quot;);
-        Toast.makeText(this,&quot;开始执行&quot;,Toast.LENGTH_SHORT).show();
-        if (!file.exists()){
-            Toast.makeText(this,&quot;文件不存在，创建文件夹&quot;,Toast.LENGTH_SHORT).show();
-            file.mkdir();
-            if(!file.exists()){
-                Toast.makeText(this,&quot;创建失败，文件依旧不存在&quot;,Toast.LENGTH_SHORT).show();
-            }else{
-                Toast.makeText(this,&quot;文件创建成功&quot;,Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;然后通过以下方法在activity中监听向用户申请权限得到的结果：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;@Override
-public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-    switch (requestCode) {
-        case 001:
-            Toast.makeText(this,&quot;开始执行回调&quot;,Toast.LENGTH_SHORT).show();
-            if ((grantResults.length &amp;gt; 0) &amp;amp;&amp;amp; (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                Toast.makeText(this,&quot;开始执行回调判断&quot;,Toast.LENGTH_SHORT).show();
-            }
-            break;
-        default:
-            break;
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;代码中需要实时授权的权限，同组只需要授权一个就行：&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;CALENDAR（日历）&lt;/li&gt;
-  &lt;li&gt;READ_CALENDAR&lt;/li&gt;
-  &lt;li&gt;WRITE_CALENDAR&lt;/li&gt;
-  &lt;li&gt;CAMERA（相机）&lt;/li&gt;
-  &lt;li&gt;CAMERA&lt;/li&gt;
-  &lt;li&gt;CONTACTS（联系人）&lt;/li&gt;
-  &lt;li&gt;READ_CONTACTS&lt;/li&gt;
-  &lt;li&gt;WRITE_CONTACTS&lt;/li&gt;
-  &lt;li&gt;GET_ACCOUNTS&lt;/li&gt;
-  &lt;li&gt;LOCATION（位置）&lt;/li&gt;
-  &lt;li&gt;ACCESS_FINE_LOCATION&lt;/li&gt;
-  &lt;li&gt;ACCESS_COARSE_LOCATION&lt;/li&gt;
-  &lt;li&gt;MICROPHONE（麦克风）&lt;/li&gt;
-  &lt;li&gt;RECORD_AUDIO&lt;/li&gt;
-  &lt;li&gt;PHONE（手机）&lt;/li&gt;
-  &lt;li&gt;READ_PHONE_STATE&lt;/li&gt;
-  &lt;li&gt;CALL_PHONE&lt;/li&gt;
-  &lt;li&gt;READ_CALL_LOG&lt;/li&gt;
-  &lt;li&gt;WRITE_CALL_LOG&lt;/li&gt;
-  &lt;li&gt;ADD_VOICEMAIL&lt;/li&gt;
-  &lt;li&gt;USE_SIP&lt;/li&gt;
-  &lt;li&gt;PROCESS_OUTGOING_CALLS&lt;/li&gt;
-  &lt;li&gt;SENSORS（传感器）&lt;/li&gt;
-  &lt;li&gt;BODY_SENSORS&lt;/li&gt;
-  &lt;li&gt;SMS（短信）&lt;/li&gt;
-  &lt;li&gt;SEND_SMS&lt;/li&gt;
-  &lt;li&gt;RECEIVE_SMS&lt;/li&gt;
-  &lt;li&gt;READ_SMS&lt;/li&gt;
-  &lt;li&gt;RECEIVE_WAP_PUSH&lt;/li&gt;
-  &lt;li&gt;RECEIVE_MMS&lt;/li&gt;
-  &lt;li&gt;STORAGE（存储卡）&lt;/li&gt;
-  &lt;li&gt;READ_EXTERNAL_STORAGE&lt;/li&gt;
-  &lt;li&gt;WRITE_EXTERNAL_STORAGE&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;同一个应用同一种权限正常情况下只会向用户请求一次，如果只在清单中加，而没有在代码中申请权限，那么是得不到相关的安全敏感的权限的，用得不到操作权限的操作操作数据处理信息会导致程序异常退出，但程序退出可能并不是直接由权限缺失导致。&lt;/p&gt;
-
-&lt;p&gt;参考:&lt;a href=&quot;http://blog.csdn.net/yanzhenjie1003/article/details/52503533/&quot;&gt;http://blog.csdn.net/yanzhenjie1003/article/details/52503533/&lt;/a&gt;&lt;/p&gt;
-</description>
-      </item>
-    
-      <item>
-        <title>maven2</title>
-        <link>http://www.liuschen.com/2017/07/25/maven2.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2017/07/25/maven2.html</guid>
-        <pubDate>Tue, 25 Jul 2017 00:00:00 +0800</pubDate>
-        <description>&lt;blockquote&gt;
-  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;maven同gradle以及git,svn等版本控制软件一样，都有局部设置（用户的目录下都有一个默认的.m2/repository/路径作为本地仓库，.m2文件夹中的settings.xml）和全局设置（maven目录下config中的settings.xml）。&lt;/p&gt;
-
-&lt;p&gt;maven的远程仓库分为中央仓库，和私服。中央仓库时默认的，因为新建的pom.xml默认继承了超级pom.xml而这个超级pom.xml配置了中央仓库的地址。可以在pom.xml中配置其他仓库地址：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;lt;repositories&amp;gt;  
-&amp;lt;repository&amp;gt;  
-  &amp;lt;id&amp;gt;central&amp;lt;/id&amp;gt;  
-  &amp;lt;name&amp;gt;Central Repository&amp;lt;/name&amp;gt;  
-  &amp;lt;url&amp;gt;http://repo.maven.apache.org/maven2&amp;lt;/url&amp;gt;  
-  &amp;lt;layout&amp;gt;default&amp;lt;/layout&amp;gt;  
-  &amp;lt;snapshots&amp;gt;  
-    &amp;lt;enabled&amp;gt;false&amp;lt;/enabled&amp;gt;  
-  &amp;lt;/snapshots&amp;gt;  
-&amp;lt;/repository&amp;gt;  
-  	&amp;lt;/repositories&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;如果要将项目发布到远程服务器上可以这样设置:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;lt;distributionManagement&amp;gt;
-	&amp;lt;repository&amp;gt;
-		&amp;lt;id&amp;gt;releases&amp;lt;/id&amp;gt;
-		&amp;lt;name&amp;gt;Nexus Release Repository&amp;lt;/name&amp;gt;
-		&amp;lt;url&amp;gt;http://10.168.1.105:8081/nexus/content/repositories/releases/&amp;lt;/url&amp;gt;
-	&amp;lt;/repository&amp;gt;
-	&amp;lt;snapshotRepository&amp;gt;
-		&amp;lt;id&amp;gt;snapshots&amp;lt;/id&amp;gt;
-		&amp;lt;name&amp;gt;Nexus Snapshots Repository&amp;lt;/name&amp;gt;
-		&amp;lt;url&amp;gt;http://10.168.1.105:8081/nexus/content/repositories/snapshots/&amp;lt;/url&amp;gt;
-	&amp;lt;/snapshotRepository&amp;gt;
-&amp;lt;/distributionManagement&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;需要验证身份信息的话，在settings.xml中配置：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;lt;server&amp;gt;  
-	&amp;lt;id&amp;gt;releases&amp;lt;/id&amp;gt;  
-	&amp;lt;username&amp;gt;deployment&amp;lt;/username&amp;gt;  
-	&amp;lt;password&amp;gt;deployment123&amp;lt;/password&amp;gt;  
-&amp;lt;/server&amp;gt;
-&amp;lt;server&amp;gt;
-	&amp;lt;id&amp;gt;snapshots&amp;lt;/id&amp;gt;  
-	&amp;lt;username&amp;gt;deployment&amp;lt;/username&amp;gt;  
-	&amp;lt;password&amp;gt;deployment123&amp;lt;/password&amp;gt;  
-&amp;lt;/server&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;远程仓库的配置同样也是可以在settings.xml中:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;lt;profile&amp;gt;
-  &amp;lt;id&amp;gt;jdk-1.4&amp;lt;/id&amp;gt;
-
-  &amp;lt;activation&amp;gt;
-    &amp;lt;jdk&amp;gt;1.4&amp;lt;/jdk&amp;gt;
-  &amp;lt;/activation&amp;gt;
-
-  &amp;lt;repositories&amp;gt;
-    &amp;lt;repository&amp;gt;
-      &amp;lt;id&amp;gt;jdk14&amp;lt;/id&amp;gt;
-      &amp;lt;name&amp;gt;Repository for JDK 1.4 builds&amp;lt;/name&amp;gt;
-      &amp;lt;url&amp;gt;http://www.myhost.com/maven/jdk14&amp;lt;/url&amp;gt;
-      &amp;lt;layout&amp;gt;default&amp;lt;/layout&amp;gt;
-      &amp;lt;snapshotPolicy&amp;gt;always&amp;lt;/snapshotPolicy&amp;gt;
-    &amp;lt;/repository&amp;gt;
-  &amp;lt;/repositories&amp;gt;
-&amp;lt;/profile&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;其中profile标签中的内容是满足条件时激活该profile,activation表示激活条件，也就是jdk版本是1.4时激活该profile，如果要始终生效，可以添加激活条件:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;lt;activeProfiles&amp;gt;  
- &amp;lt;activeProfile&amp;gt;profileTest1&amp;lt;/activeProfile&amp;gt;  
-&amp;lt;/activeProfiles&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;这个激活条件时在settings.xml的根标签中配置的，profileTest1是要激活的profile的id，而profile中的activation是主动选择执行情况&lt;/p&gt;
-
-&lt;p&gt;还可以直接在项目中的pom.xml中配置私服地址（只在本项目起作用）:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;lt;repositories&amp;gt;  
-    &amp;lt;repository&amp;gt;  
-        &amp;lt;id&amp;gt;nexus&amp;lt;/id&amp;gt;  
-        &amp;lt;name&amp;gt;nexus&amp;lt;/name&amp;gt;  
-        &amp;lt;url&amp;gt;http://192.168.1.103:8081/nexus/content/groups/public/&amp;lt;/url&amp;gt;  
-        &amp;lt;releases&amp;gt;  
-            &amp;lt;enabled&amp;gt;true&amp;lt;/enabled&amp;gt;  
-        &amp;lt;/releases&amp;gt;  
-        &amp;lt;snapshots&amp;gt;  
-            &amp;lt;enabled&amp;gt;true&amp;lt;/enabled&amp;gt;  
-        &amp;lt;/snapshots&amp;gt;  
-    &amp;lt;/repository&amp;gt;  
-&amp;lt;/repositories&amp;gt;  
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;指定插件地址:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;lt;pluginRepositories&amp;gt;  
-    &amp;lt;pluginRepository&amp;gt;  
-        &amp;lt;id&amp;gt;nexus&amp;lt;/id&amp;gt;  
-        &amp;lt;name&amp;gt;nexus&amp;lt;/name&amp;gt;  
-        &amp;lt;url&amp;gt;http://192.168.1.103:8081/nexus/content/groups/public/&amp;lt;/url&amp;gt;  
-        &amp;lt;releases&amp;gt;  
-            &amp;lt;enabled&amp;gt;true&amp;lt;/enabled&amp;gt;  
-        &amp;lt;/releases&amp;gt;  
-        &amp;lt;snapshots&amp;gt;  
-            &amp;lt;enabled&amp;gt;true&amp;lt;/enabled&amp;gt;  
-        &amp;lt;/snapshots&amp;gt;  
-    &amp;lt;/pluginRepository&amp;gt;  
-&amp;lt;/pluginRepositories&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;或是在settdings.xml中配置:&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;mvn install 会将项目生成的构件安装到本地Maven仓库，mvn deploy 用来将项目生成的构件分发到远程Maven仓库。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;正式版本在不更改版本号的情况下，编译打包时如果本地已经存在该版本的模块则不会主动去镜像服务器上下载。快照版本会主动下载最新。&lt;/p&gt;
-&lt;/blockquote&gt;
-</description>
-      </item>
-    
-      <item>
-        <title>数据库测试</title>
-        <link>http://www.liuschen.com/2017/07/20/dbtest.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2017/07/20/dbtest.html</guid>
-        <pubDate>Thu, 20 Jul 2017 00:00:00 +0800</pubDate>
-        <description>&lt;blockquote&gt;
-  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;测试MYSQL数据库操作性能&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;建立3个相互关联的表:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;create table table_test1(id varchar(50) primary key not null,table_c1 varchar(50),table_c2 varchar(40),table_c3 varchar(40),table_c4 varchar(40));
-
-create table table_test2(id varchar(50) primary key not null,table2_c1 varchar(50),table2_c2 varchar(40),table2_c3 varchar(40),table2_c4 varchar(40),test1_id varchar(50) not null,foreign key(test1_id) references table_test1(id));
-
-create table table_test3(id varchar(50) primary key not null,table3_c1 varchar(50),table3_c2 varchar(40),table3_c3 varchar(40),table3_c4 varchar(40),test2_id varchar(50) not null,foreign key(test2_id) references table_test2(id));
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;第一个表为主表，第二个表为第一个表的从表，第三个表为第二个表的从表。&lt;/p&gt;
-
-&lt;p&gt;然后通过sql语句插入数据(插入数据的关系为，主表一条数据，从表为10条，从表的从表为100条)：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;| 插入主表的条目 	| 执行消耗的时间 	| CPU消耗的时间  | 删除表耗时 |
-| ------------- |:-------------:| -------------:|----------:|
-| 1      		| &amp;lt;1s 			| &amp;lt;1s 			| &amp;lt;1s 		|
-| 10      		| &amp;lt;1s      		| &amp;lt;1s			| &amp;lt;1s		|
-| 100 			| 5s      		| 5s 			| &amp;lt;1s		|
-| 1000 			| 55s      		| 55s 			| 9s		|
-| 2000 			| 296s      	| 296s 			| 59s		|
-| 3000 			| 1350ss      	| 1350ss 		| 574s		|
-| 4000 			| 3741s      	| 3741s 		| 930s		|
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;插入40万条数据（严格来说是444000条）时就已经执行了很长时间，要1个小时多。按照增加的速度，下一次将会好几个小时才能执行完成。那么，如果要在这种情况下插入100w+测试数据没有几天根本跑不下来。&lt;/p&gt;
-</description>
-      </item>
-    
-      <item>
-        <title>cordova</title>
-        <link>http://www.liuschen.com/2017/07/02/cordova.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2017/07/02/cordova.html</guid>
-        <pubDate>Sun, 02 Jul 2017 00:00:00 +0800</pubDate>
-        <description>&lt;blockquote&gt;
-  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;首先安装&lt;a href=&quot;https://nodejs.org/en/download/&quot;&gt;Node.js&lt;/a&gt;;&lt;/p&gt;
-
-&lt;p&gt;在命令行中安装cordova&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;npm install -g cordova
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;创建工程&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;cordova create hello com.example.hello HelloWorld
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;执行完这一步，会在当前目录之下生成一个hello文件夹，文件夹内目录结构:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;--hooks(文件夹)
---platforms(空文件夹)
---plugins(空文件夹)
---www(存放网页js代码)
--config.xml(配置文件)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;进入目录并添加打包平台&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;cd hello
-cordova platform add ios --save
-cordova platform add android --save
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;添加平台时可以指定版本&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;cordova platform add android@5.1 --save
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;此时在platforms(空文件夹)和plugins(空文件夹)下都会生成相应内容，如果后面加–save则会在config.xml中添加&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;lt;engine name=&quot;android&quot; spec=&quot;~5.1.1&quot; /&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;命令文档cordova platform –help&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;Synopsis
-
-    cordova platform &amp;lt;command&amp;gt; [options]
-
-Manage project platforms
-
-    add &amp;lt;plat-spec&amp;gt; [...].............. Add specified platforms
-        --save ........................ Save specified platforms into config.xml after installing them
-
-        --link ........................ When &amp;lt;plat-spec&amp;gt; is a local path, links the platform
-                                        library directly instead of making a copy of it (support
-                                        varies by platform; useful for platform development)
-
-        --fetch ....................... Fetches the plugin into the project&#39;s node_modules directory.
-                                        Uses `npm install` to do the fetching.
-
-
-
-
-    remove &amp;lt;platform&amp;gt; [...] ........... Remove specified platforms
-        --save ........................ Delete specified platforms from config.xml after removing them
-        --fetch ....................... Removes the plugin from the project&#39;s node_modules directory.
-                                        Runs `npm uninstall` under the hood.
-
-
-    update &amp;lt;plat-spec&amp;gt; ................ Update the version of Cordova used for a specific platform;
-                                        update to the latest &amp;lt;version&amp;gt; if no &amp;lt;plat-spec&amp;gt; is specified
-
-        --save ........................ Save the latest versions for specified platforms into config.xml
-
-        --fetch ....................... Fetches the plugin into the project&#39;s node_modules directory.
-                                        Uses `npm install` to do the fetching.
-
-    list .............................. List all installed and available platforms
-    check ............................. List platforms which can be updated by `cordova platform update`
-    save .............................. Save version of all platforms added to config.xml
-
-
-Syntax
-    &amp;lt;plat-spec&amp;gt; : &amp;lt;platform&amp;gt;[@&amp;lt;version&amp;gt;]|&amp;lt;path&amp;gt;|&amp;lt;url&amp;gt;[#&amp;lt;commit-ish&amp;gt;]
-
-    &amp;lt;platform&amp;gt; ........................ Platform name e.g. android, ios, windows etc.
-    &amp;lt;version&amp;gt; ......................... Major.minor.patch version specifier using semver
-    &amp;lt;path&amp;gt; ............................ Path to a directory containing a platform
-    &amp;lt;url&amp;gt; ............................. Url to a git repository containing a platform
-    &amp;lt;commit-ish&amp;gt; ...................... Commit/tag/bramch reference. If none is specified, &#39;master&#39; is used
-
-Aliases
-    platforms -&amp;gt; platform
-    rm -&amp;gt; remove
-    ls -&amp;gt; list
-
-Examples
-    cordova platform add android ios --save
-    cordova platform add android@^5.0.0 --save
-    cordova platform add https://github.com/myfork/cordova-android.git#4.0.0 --save
-    cordova platform add ../android --save
-    cordova platform add ../cordova-android.tgz --save
-    cordova platform rm android --save
-    cordova platform ls
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;配置环境变量ANDROID_HOME(SDK路径)和JAVA_HOME(JDK路径)&lt;/p&gt;
-
-&lt;p&gt;查看环境需求&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;cordova requirements
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;编译&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;cordova build
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;编译过程，如果选择新版本本地没有相关资源会自动下载，编译后会在&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;/platforms/android/build/outputs/apk/
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;目录下生成android版的app&lt;/p&gt;
-
-</description>
-      </item>
-    
-      <item>
-        <title>Kotlin笔记</title>
-        <link>http://www.liuschen.com/2017/06/08/kotlin.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2017/06/08/kotlin.html</guid>
-        <pubDate>Thu, 08 Jun 2017 00:00:00 +0800</pubDate>
-        <description>&lt;blockquote&gt;
-  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;初次尝试，安装了IntelliJ IDEA&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;新建Kotlin JVM项目,新建包并新建main.kt&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;//sampleStart
-fun printSum(a: Int, b: Int): Unit {
-    println(&quot;sum of $a and $b is ${a + b}&quot;)
-}
-//sampleEnd
-
-fun main(args: Array&amp;lt;String&amp;gt;) {
-    printSum(-1, 8)
-}
-
-fun maxOf(a: Int, b: Int): Int {
-    if (a &amp;gt; b) {
-        return a
-    } else {
-        return b
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;由此可见，函数的关键字区别为：&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Kotlin:fun&lt;/li&gt;
-  &lt;li&gt;Python:def&lt;/li&gt;
-  &lt;li&gt;Java :没有，直接函数名&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;函数参数和返回值：&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Kotlin:类型都放在后面，如参数args: Array&lt;string&gt;类型在参数后面，“：”隔开&lt;/string&gt;&lt;/li&gt;
-  &lt;li&gt;Python:没有类型，直接交给程序自己判断&lt;/li&gt;
-  &lt;li&gt;Java :类型在前，参数在后&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;返回值为空：&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Kotlin:Unit&lt;/li&gt;
-  &lt;li&gt;Python:返回值类型是程序判断，不需要声明&lt;/li&gt;
-  &lt;li&gt;Java :void&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;输出语句的不同:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;Kotlin:println,可以直接在$后引用变量，如下：&lt;/p&gt;
-
-    &lt;p&gt;fun printSum(a: Int, b: Int) {&lt;br /&gt;
-      println(“sum of $a and $b is ${a + b}”)&lt;br /&gt;
-  }&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;Python:print,通过占位符引入变量，中间由“%”隔开&lt;/li&gt;
-  &lt;li&gt;Java :直接通过“+”来拼接字符串&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;变量的声明：&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Kotlin:val关键字用来定义只读的局部变量，var用来定义可变变量&lt;/li&gt;
-  &lt;li&gt;Python:变量不需要声明，自动判断类型&lt;/li&gt;
-  &lt;li&gt;Java :变量需要声明，而且有些时候必须有初始值&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Kotlin中，写法有点像Python，每句程序的结尾不需要写“;”,通过换行符来区分语句。&lt;br /&gt;
-但是python中制表符和空格是会区分开，写程序时如果混用是可能会出错的，KotLin&lt;br /&gt;
-目前还没有这种尝试，不知会不会一样。&lt;/p&gt;
-
-&lt;p&gt;Kotlin中的条件语句：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;if (){}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;和java一样，而Python则是:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;if 条件表达式:
-	条件语句
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;完全是用过换行与缩进来完成语句的书写的。&lt;/p&gt;
-
-&lt;p&gt;Kotlin新定义了一个？，如Int?表示声明的这个类型值可以为null,这个值可以是返回值，也可以为声明的变量。&lt;/p&gt;
-
-&lt;p&gt;java中的instanceof用来判断一个对象是否是一个类的实例，Kotlin直接用“is”来代替，简单直观。如果一个不可变的局部变量或属性已经判断出为某类型，那么检测后的分支中可以直接当作该类型使用，无需显式转换。如（看来obj会在obj is String为true时自动转化为String类型）：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;fun getStringLength(obj: Any): Int? {
-    if (obj is String) {
-        // `obj` 在该条件分支内自动转换成 `String`
-        return obj.length
-    }
-    // 在离开类型检测分支后，`obj` 仍然是 `Any` 类型
-    return null
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;for循环：&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Kotlin:for(obj in list){}&lt;/li&gt;
-  &lt;li&gt;Python:for obj in list:&lt;/li&gt;
-  &lt;li&gt;Java :for(Obj obj:list){}//高级for&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Kotlin中的when表达式同Java中的不同，更像是Java中的switch语句（其中的函数赋值也同js中的语法很像，但js是弱类型的脚本语言，而Kotlin是同Java一样的强类型的高级编程语言）：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;fun describe(obj: Any): String =
-when (obj) {
-    1          -&amp;gt; &quot;One&quot;
-    &quot;Hello&quot;    -&amp;gt; &quot;Greeting&quot;
-    is Long    -&amp;gt; &quot;Long&quot;
-    !is String -&amp;gt; &quot;Not a string&quot;
-    else       -&amp;gt; &quot;Unknown&quot;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Python能够通过for循环直接遍历字符串，Kotlin不能，但是Kotlin中的区间比Python表达的更简洁:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;if (x in 1..y+1) {
-    println(&quot;fits in range&quot;)
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;检测数字在区间之外用“!in”：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;if (-1 !in 0..list.lastIndex) {
-    println(&quot;-1 is out of range&quot;)
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;倒序遍历:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;for (i in 4 downTo 1) print(i)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;步长为2的遍历:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;for (i in 1..4 step 2) print(i)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;要创建一个不包括其结束元素的区间:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;for (i in 1 until 10) {   // i in [1, 10) 排除了 10
- 	println(i)
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;而在Python遍历区间:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;for i in range(1,99):
-	print &quot;%d&quot; % i
-&lt;/code&gt;&lt;/pre&gt;
-
-</description>
-      </item>
-    
-      <item>
-        <title>python笔记2</title>
-        <link>http://www.liuschen.com/2017/05/20/Python2.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2017/05/20/Python2.html</guid>
-        <pubDate>Sat, 20 May 2017 00:00:00 +0800</pubDate>
-        <description>&lt;blockquote&gt;
-  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h1 id=&quot;section&quot;&gt;1.安装工具包&lt;/h1&gt;
-
-&lt;p&gt;需要安装pandas_datareader和pandas&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;pip install pandas
-pip install pandas_datareader
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;但是会出现错误：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;ImportError: cannot import name PandasError
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;解决办法是更换pandas的版本，执行&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;pip install -U pandas==0.19.2
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;替换掉了我已经安装的0.20.1版本&lt;/p&gt;
-
-&lt;h1 id=&quot;section-1&quot;&gt;2.股票代码含义&lt;/h1&gt;
-
-&lt;p&gt;沪市A股票买卖的代码是以600、601或603打头&lt;/p&gt;
-
-&lt;h1 id=&quot;section-2&quot;&gt;3.爬虫&lt;/h1&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://www.crummy.com/software/BeautifulSoup/bs4/doc/index.zh.html&quot;&gt;BeautifulSoup文档&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;安装BeautifulSoup用来解析xml/Html文件：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;pip install beautifulsoup4
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;引入项目：from bs4 import BeautifulSoup，使用：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;soup = BeautifulSoup(getHtml(dstUrl), &#39;html.parser&#39;, from_encoding=&#39;utf-8&#39;)
-print soup.find_all(&#39;title&#39;)
-
-soup.find_all(&quot;title&quot;)
-# [&amp;lt;title&amp;gt;The Dormouse&#39;s story&amp;lt;/title&amp;gt;]
-
-soup.find_all(&quot;p&quot;, &quot;title&quot;)
-# [&amp;lt;p class=&quot;title&quot;&amp;gt;&amp;lt;b&amp;gt;The Dormouse&#39;s story&amp;lt;/b&amp;gt;&amp;lt;/p&amp;gt;]
-
-soup.find_all(&quot;a&quot;)
-# [&amp;lt;a class=&quot;sister&quot; href=&quot;http://example.com/elsie&quot; id=&quot;link1&quot;&amp;gt;Elsie&amp;lt;/a&amp;gt;,
-#  &amp;lt;a class=&quot;sister&quot; href=&quot;http://example.com/lacie&quot; id=&quot;link2&quot;&amp;gt;Lacie&amp;lt;/a&amp;gt;,
-#  &amp;lt;a class=&quot;sister&quot; href=&quot;http://example.com/tillie&quot; id=&quot;link3&quot;&amp;gt;Tillie&amp;lt;/a&amp;gt;]
-
-soup.find_all(id=&quot;link2&quot;)
-# [&amp;lt;a class=&quot;sister&quot; href=&quot;http://example.com/lacie&quot; id=&quot;link2&quot;&amp;gt;Lacie&amp;lt;/a&amp;gt;]
-
-import re
-soup.find(text=re.compile(&quot;sisters&quot;))
-
-data_soup.find_all(attrs={&quot;data-foo&quot;: &quot;value&quot;})
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;通过find_all得到的列表中的HTML段都可以再次应用find,find_all过滤&lt;/p&gt;
-
-&lt;h1 id=&quot;section-3&quot;&gt;4.数据库通信乱码&lt;/h1&gt;
-
-&lt;p&gt;将爬到的数据写入数据库中，发现有几处编码格式会产生影响：&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;py文件编码&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;window系统，所以是ascii&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;
-    &lt;p&gt;系统编码&lt;/p&gt;
-
-    &lt;p&gt;import sys&lt;br /&gt;
- reload(sys)&lt;br /&gt;
- sys.setdefaultencoding(‘gbk’)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;连接数据库的编码&lt;/p&gt;
-
-    &lt;p&gt;db = MySQLdb.connect(“ip”,”user”,”pwd”,”house_msg”,charset=”gbk”)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;写入字符的编码&lt;/p&gt;
-
-    &lt;p&gt;soup = BeautifulSoup(getHtml(dstUrl), ‘html.parser’, from_encoding=’utf-8’)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;数据库本身的字符集编码&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;一开始我将所有都改为utf-8格式（为了适应数据库），但是发现py文件本身是ascii编码格式，根本不能写入数据库，即使将当前文件编码改为utf-8，它的引用文件依然会报这个错误，于是将系统编码改为gbk,可写入，但毫无疑问，数据库中表出现了乱码。最好智能将系统编码和连接数据库的编码以及数据库本身的字符集编码都改为了gbk,乱码问题才解决。&lt;/p&gt;
-
-&lt;h2 id=&quot;section-4&quot;&gt;异常：&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code&gt;UnicodeEncodeError: &#39;gbk&#39; codec can&#39;t encode character u&#39;\xa0&#39; in position 208: illegal multibyte sequence
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Python操作数据库写入时，字符串数据中如果有u’\xa0’将不能正确转码，需要string.replace(u’\xa0’,u’‘)替换掉&lt;/p&gt;
-</description>
-      </item>
-    
-      <item>
-        <title>Retrofit浅析-OkHttp-rxjava</title>
-        <link>http://www.liuschen.com/2017/05/06/retrofit.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2017/05/06/retrofit.html</guid>
-        <pubDate>Sat, 06 May 2017 00:00:00 +0800</pubDate>
-        <description>&lt;blockquote&gt;
-  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h1 id=&quot;retrofit-okhttp-rxjava&quot;&gt;1.Retrofit-OkHttp-rxjava&lt;/h1&gt;
-
-&lt;p&gt;首先，主体是retrofit，这种配置低耦合，通过converter来连接模块，retrofit2的连接模块有如下(在studio的仓库中搜索到的最新版本)：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;com.squareup.retrofit2:converter-moshi:2.3.0
-com.squareup.retrofit2:converter-scalars:2.3.0
-com.squareup.retrofit2:converter-simplexml:2.3.0
-com.squareup.retrofit2:converter-wire:2.3.0
-com.squareup.retrofit2:converter-java8:2.3.0
-com.squareup.retrofit2:converter-jackson:2.3.0
-com.squareup.retrofit2:converter-protobuf:2.3.0
-com.squareup.retrofit2:converter-guava:2.3.0
-com.squareup.retrofit2:converter-gson:2.3.0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;同rxjava适配需要导入&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;com.squareup.retrofit2:adapter-rxjava:2.3.0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h1 id=&quot;section&quot;&gt;2.资源拦截器&lt;/h1&gt;
-
-&lt;p&gt;BasicParamsInterceptor:这是一个独立的类，github上作者项目:&lt;a href=&quot;https://github.com/jkyeo/okhttp-basicparamsinterceptor&quot;&gt;https://github.com/jkyeo/okhttp-basicparamsinterceptor&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;用来向请求添加公共的参数，但是实际用，可能是因为一个独立文件，并不好使，没细究。&lt;/p&gt;
-
-&lt;p&gt;因为就是一个普通的拦截器，完全可以自己定义：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;OkHttpClient.Builder builder = new OkHttpClient.Builder();
-   		builder.connectTimeout(30, TimeUnit.SECONDS);//连接超时时间
-    builder.writeTimeout(30, TimeUnit.SECONDS);//写操作 超时时间
-    builder.readTimeout(30, TimeUnit.SECONDS);//读操作超时时间
-    builder.interceptors().add(new MyInterceptor());
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;拦截器：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;public class MyInterceptor implements okhttp3.Interceptor {
-    @Override
-    public Response intercept(Chain chain) throws IOException {
-        Request.Builder builder = chain.request().newBuilder();
-		/**为请求添加头*/
-        Request requst = builder.addHeader(&quot;Content-type&quot;, &quot;application/json&quot;).build();
-        return chain.proceed(requst);
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h1 id=&quot;retrofit&quot;&gt;3.Retrofit使用&lt;/h1&gt;
-
-&lt;p&gt;基础版：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;Retrofit retrofit = new Retrofit.Builder()
-//加入OkHttpClient.Builder支持，这个是内部默认的，默认使用OkHttpClient
-            .client(builder.build())
-//加入基本url,最好如此，只到端口，后面‘/不能少’
-            .baseUrl(&quot;http://192.168.24.76:8080/&quot;)
-            .build();
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;升级版：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;Retrofit retrofit = new Retrofit.Builder()
-//加入OkHttpClient.Builder支持，这个是内部默认的，默认使用OkHttpClient
-            .client(builder.build())
-//加入字符串支持
-            .addConverterFactory(ScalarsConverterFactory.create())
-//加入gson支持
-            .addConverterFactory(GsonConverterFactory.create())
-//加入rxJava2支持
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-//加入基本url,最好如此，只到端口，后面‘/不能少’
-            .baseUrl(&quot;http://192.168.24.76:8080/&quot;)
-            .build();
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h1 id=&quot;model&quot;&gt;4.请求model&lt;/h1&gt;
-
-&lt;p&gt;Retrofit的参数是通过一个接口的注解来标明，用Java的动态代理来将参数传递进去，很巧妙将参数的定义和参数分开，简化了可见的代码，如下是定义的接口：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;public interface BlogService {
-    @FormUrlEncoded
-    @POST(&quot;AndroidService/{id}/android_msg!androidMsg.action&quot;)
-    Call&amp;lt;ResponseBody&amp;gt; getBlog(@Path(&quot;id&quot;) int id, @Query(&quot;name&quot;) int name, @Field(&quot;page&quot;) int page);
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;首先知道，post请求方式和get请求方式不同，post是将参数单独编码传递，在URL中是不可见的&lt;/p&gt;
-
-&lt;p&gt;@FormUrlEncoded 和@POST以及参数注解中的@Field是用于定义POST的单独参数编码的，@FormUrlEncoded 和@Field相互依赖，必须同时存在且只能在@POST时才能存在&lt;/p&gt;
-
-&lt;p&gt;@Query定义的是URL中附带的可见参数注解中的是key,参数表示的是value&lt;/p&gt;
-
-&lt;p&gt;发出请求：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;BlogService service = retrofit.create(BlogService.class);
-    Call&amp;lt;ResponseBody&amp;gt; call = service.getBlog(2,3,9);
-    call.enqueue(new Callback&amp;lt;ResponseBody&amp;gt;() {
-        @Override
-        public void onResponse(Call&amp;lt;ResponseBody&amp;gt; call, Response&amp;lt;ResponseBody&amp;gt; response) {
-            try {
-                System.out.println(&quot;成功1:&quot;+new String(response.body().bytes(),&quot;utf-8&quot;));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            System.out.println(&quot;成功1.2:&quot;+response.body().contentType());
-            System.out.println(&quot;成功1.5:&quot;+response.body().contentLength());
-            System.out.println(&quot;成功2:&quot;+response.message());
-            System.out.println(&quot;成功3:&quot;+response.toString());
-            System.out.println(&quot;成功4:&quot;+response.headers().toString());
-            System.out.println(&quot;成功5:&quot;+response.code());
-            System.out.println(&quot;成功6:&quot;+response.isSuccessful());
-            System.out.println(&quot;成功7:&quot;+response.raw());
-        }
-        @Override
-        public void onFailure(Call&amp;lt;ResponseBody&amp;gt; call, Throwable t) {
-            System.out.println(&quot;失败：&quot;+t.toString());
-        }
-    });
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;其中可见ResponseBody是一个基础的返回对象，包含了很多东西，以下是测试返回值：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;成功1:{&quot;message&quot;:&quot;success&quot;,&quot;success&quot;:true}
-成功1.2:application/json;charset=UTF-8
-成功1.5:-1
-成功2:OK
-成功3:Response{protocol=http/1.1, code=200, message=OK, url=http://192.168.24.76:8080/AndroidService/2/android_msg!androidMsg.action?name=3}
-成功4:Server: Apache-Coyote/1.1
- Content-Type: application/json;charset=UTF-8
-Transfer-Encoding: chunked
- Date: Tue, 23 May 2017 06:55:27 GMT
-成功5:200
-成功6:true
-成功7:Response{protocol=http/1.1, code=200, message=OK, url=http://192.168.24.76:8080/AndroidService/2/android_msg!androidMsg.action?name=3}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h1 id=&quot;section-1&quot;&gt;5.可插拔的的数据转换支持&lt;/h1&gt;
-
-&lt;p&gt;gson支持，当然，需要相应的jar包&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;addConverterFactory(GsonConverterFactory.create())
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;将ResponseBody替换成自己定义的返回对象MyResultBean，就会自动解析，不添加上面支持的话会报错（直接down掉）；&lt;/p&gt;
-
-&lt;p&gt;String字符串支持,当然，也需要相应的jar包&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;.addConverterFactory(ScalarsConverterFactory.create())
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;将ResponseBody替换成自己定义的返回对象String，就会自动解析，不添加上面支持的话会报错(会走失败的方法):&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;失败：java.lang.IllegalStateException: Expected a string but was BEGIN_OBJECT at line 1 column 2 path $
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h1 id=&quot;rxjava2&quot;&gt;6.RxJava2支持&lt;/h1&gt;
-
-&lt;p&gt;RxJava2是响应式编程框架，因为在Android开发中，请求网络只能在子线程，绘制界面只能在主线程，所以有些操作就需要分开来执行，AsyncTask就是一种解决方案。&lt;/p&gt;
-
-&lt;p&gt;call是retrofit返回的对象，其中的回调方法都是在主线程中执行&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;call.enqueue(new Callback&amp;lt;String&amp;gt;() {
-        @Override
-        public void onResponse(Call&amp;lt;String&amp;gt; call, Response&amp;lt;String&amp;gt; response) {
-        }
-        @Override
-        public void onFailure(Call&amp;lt;String&amp;gt; call, Throwable t) {
-        }
-    });
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;添加rxjava2支持，将可以把返回对象由原来的call变为Observable，Observable订阅线程执行：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;observable.subscribeOn(Schedulers.from(Executors.newFixedThreadPool(10)))
-            .subscribe(new Observer&amp;lt;String&amp;gt;() {
-                @Override
-                public void onSubscribe(Disposable d) {
-
-                    System.out.println(&quot;resultBean:&quot;);
-                    System.out.println(&quot;当前所在线程为onResponse:&quot;+Thread.currentThread().getName());
-                }
-
-                @Override
-                public void onNext(String value) {
-                    System.out.println(&quot;resultBean:&quot;+value);
-                    System.out.println(&quot;当前所在线程为onResponse:&quot;+Thread.currentThread().getName());
-                }
-
-                @Override
-                public void onError(Throwable e) {
-                    System.out.println(&quot;resultBean:&quot;+e.toString());
-                    System.out.println(&quot;当前所在线程为onResponse:&quot;+Thread.currentThread().getName());
-                }
-
-                @Override
-                public void onComplete() {
-                    System.out.println(&quot;resultBean:onComplete&quot;);
-                    System.out.println(&quot;当前所在线程为onResponse:&quot;+Thread.currentThread().getName());
-                }
-            });
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;其中onSubscribe方法在所有方法之前执行，甚至在Okhttp的拦截器之前执行，运行在主线程&lt;/p&gt;
-
-&lt;p&gt;onNext和onerror,onComplete运行在订阅的线程，subscribeOn的传入对象：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;//订阅线程传入的是一个10线程的线程池
-Schedulers.from(Executors.newFixedThreadPool(10))
-//订阅线程是新开一个线程
-Schedulers.newThread()	
-/**
-订阅线程做io操作，也是新线程，I/O 操作（读写文件、读写数据库、网络信息交互等）所使用的 Scheduler。行为模式和 newThread() 差不多，区别在于 io() 的内部实现是是用一个无数量上限的线程池，可以重用空闲的线程，因此多数情况下 io() 比 newThread() 更有效率。不要把计算工作放在 io() 中，可以避免创建不必要的线程。
-*/
-Schedulers.io()
-/**
-计算所使用的 Scheduler。这个计算指的是 CPU 密集型计算，即不会被 I/O 等操作限制性能的操作，例如图形的计算。这个 Scheduler 使用的固定的线程池，大小为 CPU 核数。不要把 I/O 操作放在 computation() 中，否则 I/O 操作的等待时间会浪费 CPU。
-*/
-Schedulers.computation()
-//独立线程：RxSingleScheduler-1
-Schedulers.single()
-//主线程，会报异常：android.os.NetworkOnMainThreadException
-Schedulers.trampoline()
-/***/
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;所以，如果想要返回的结果在主线程中，就直接用返回的call,如果希望返回的结果订阅在特定子线程，就返回observable对象来使用，rxjava与retrofit结合，observable是被创造好的，不需要重新create，消息也都给定了，只需要定义要发布的线程即可。&lt;/p&gt;
-
-</description>
-      </item>
-    
-      <item>
-        <title>python笔记1</title>
-        <link>http://www.liuschen.com/2017/04/25/python.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2017/04/25/python.html</guid>
-        <pubDate>Tue, 25 Apr 2017 00:00:00 +0800</pubDate>
-        <description>&lt;blockquote&gt;
-  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;python语言接近于自然语言，基本语法逻辑和其他语言一样，只是一些小的细节不同，python2.x和python3.x的一些函数也有一些细节的不同。&lt;a href=&quot;http://www.runoob.com/python/&quot;&gt;python2的教程&lt;/a&gt;而我首先用的是python3,所以主要记录一下不同。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h2 id=&quot;python3python2&quot;&gt;1.python3和python2差异&lt;/h2&gt;
-
-&lt;p&gt;python3中print后面字符串需要加()&lt;/p&gt;
-
-&lt;p&gt;urllib分为了若干模块，需要分别引用&lt;/p&gt;
-
-&lt;h2 id=&quot;section&quot;&gt;2.安装下载&lt;/h2&gt;
-
-&lt;p&gt;选择下载安装最好选择32位的2.x版的Python，原因如下：&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;2.x版的存在时间长，教程比较好找，相关blog也很多&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://sourceforge.net/projects/mysql-python/?source=typ_redirect&quot;&gt;连接mysql的数据库引擎&lt;/a&gt;，诸如此类的插件库比较好找,换32位的也是因为64位的这个插件支持不好，因为插件是32位的，我安装的mysql也是32位的，避免麻烦&lt;/li&gt;
-  &lt;li&gt;PIL是一个图形处理库，也是win32的和数据库连接引擎安装方式一样&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;section-1&quot;&gt;3.正则表达式&lt;/h2&gt;
-
-&lt;p&gt;python的正则表达式主要有3中判断：&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;匹配开始位置，如果不匹配返回none：re.match&lt;/li&gt;
-  &lt;li&gt;搜索整个字符串:re.search&lt;/li&gt;
-  &lt;li&gt;搜索整个字符串并返回一个list:re.findAll&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;正则表达式的字符规则不说了，主要需要注意的方面是&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;正则表达式前加一个字符’r’&lt;/li&gt;
-  &lt;li&gt;正则可以引号嵌套，同时里面可以添加括号
-    &lt;ul&gt;
-      &lt;li&gt;一个括号的话，查找返回的是括号内的表达式匹配内容&lt;/li&gt;
-      &lt;li&gt;多个括号的话，是返回的一个多维列表，列表中每一个对象是一个元组，元组中是对每一个括号内容匹配到的值&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;mysql&quot;&gt;4.Mysql数据库&lt;/h2&gt;
-
-&lt;p&gt;数据库操作比较固定&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;import MySQLdb
-
-db = MySQLdb.connect(&quot;127.0.0.1&quot;,&quot;user&quot;,&quot;pwd&quot;,&quot;数据库名&quot; )
-
-# 使用cursor()方法获取操作游标 
-
-cursor = db.cursor()
-
-# SQL 语句
-sql = &quot;&quot;
-
-try:
-   # 执行sql语句
-   cursor.execute(sql)
-   # 提交到数据库执行
-   db.commit()
-except:
-   # 发生错误时回滚
-   db.rollback()
-
-# 关闭数据库连接
-db.close()
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&quot;oracle&quot;&gt;4.5.连接Oracle数据库&lt;/h2&gt;
-
-&lt;p&gt;下载数据库驱动:&lt;a href=&quot;https://pypi.python.org/pypi/cx_Oracle/5.3&quot;&gt;https://pypi.python.org/pypi/cx_Oracle/5.3&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;注意下载的python版本的位数和驱动的位数以及安装的oracle数据库位数要一致&lt;/p&gt;
-
-&lt;p&gt;我在本机安装的oracle是64位的，而驱动和python都是32位的，所以总是提示：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;import cx_Oracle
-ImportError: DLL load failed: %1 不是有效的 Win32 应用程序。
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;然后搜索下载一个32位的oci.dll放在python\Lib\site-packages下，问题解决。应该是数据库驱动会访问本机中的oci.dll，一般搜索都会在环境变量目录中和本目录中寻找，python\Lib\site-packages是插件安装目录，所以放在该目录下能被顺利访问到。但是又出现另一个问题，运行到调用数据库的程序会报：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;cx_Oracle.InterfaceError: Unable to acquire Oracle environment handle
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;我的处理方法是下载instantclient-basic-win32-11.2.0.1.0.zip，这个是连接数据库的客户端，一定要32位的，不然就没意义了。&lt;br /&gt;
-然后拷贝其中的oci.dll, oraociei10.dll, oraocci10.dll到site-package中，当然oci.dll要覆盖之前添加的，因为要保证版本一致才行。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;db=cx_Oracle.connect(&#39;username&#39;,&#39;password&#39;,&#39;127.0.0.1/orcl&#39;,cx_Oracle.SYSDBA)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;开始IP的部分用的是本机的IP地址，但是却会报异常：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;cx_Oracle.DatabaseError: ORA-12541: TNS:no listener
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;将IP地址改为127.0.0.1能正常访问。&lt;/p&gt;
-
-&lt;h2 id=&quot;section-2&quot;&gt;5.常见错误(注意问题)&lt;/h2&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;IndentationError: unindent does not match any outer indentation level&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;前面的空格和制表符不能混用，否则就会出现这类问题，写程序时最好将空白的符号显示出来&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;格式化输出字符串”%s”%x,字符串和实际值用%隔开&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;AttributeError: ‘module’ object has no attribute ‘XXX’&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;.pyc是Python的字节码文件，如果新建.py文件时，不要与预留关键字和模块名重复，否则引用就有可能出现问题，实际调用的是.pyc文件，所以解决办法将目录中与模块名重复的.py文件重新命名，并且删除生成的.pyc文件，重新编译即可&lt;br /&gt;
-* url中带有‘,’的图片urlretrieve下载不了&lt;/p&gt;
-
-&lt;h2 id=&quot;section-3&quot;&gt;6.多线程使用&lt;/h2&gt;
-
-&lt;p&gt;基础用thread&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;thread.start_new_thread
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;也可以用thread的包装threading&lt;/p&gt;
-
-&lt;p&gt;以上两个都是包里面自带的，还可以使用线程池&lt;/p&gt;
-
-&lt;p&gt;python安装目录下有一个script文件夹，里面有包管理工具pip,可以运行如pip install threadpool安装线程池模块&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;task_pool = threadpool.ThreadPool(10,10,0,10)
-param_list = [(({param1:param1},{param2:param2}))]
-	requests = threadpool.makeRequests(线程函数, param_list)
-	[task_pool.putRequest(req) for req in requests]
-task_pool.wait()
-
-def 线程函数(param1,param2):
-	return;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;直接在主线程中是取不到全局定义的变量的，因为语法原因会被作为新的局部变量，所以如果要在子线程中取全局变量需要在其作用域中加全局声明 global，如要用全局变量context,就需要先&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;global Context
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&quot;scrapy&quot;&gt;7.使用Scrapy爬网页&lt;/h2&gt;
-
-&lt;p&gt;安装&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;pip install Scrapy
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;安装完后会有提示&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;----------------------------------------
-Command &quot;f:\programer2\python27\python.exe -u -c &quot;import setuptools, tokenize;__file__=&#39;c:\\users\\XXX\\appdata\\local
-\\temp\\pip-build-98jdcm\\Twisted\\setup.py&#39;;f=getattr(tokenize, &#39;open&#39;, open)(__file__);code=f.read().replace(&#39;\r\n&#39;, &#39;
-\n&#39;);f.close();exec(compile(code, __file__, &#39;exec&#39;))&quot; install --record c:\users\luofe\appdata\local\temp\pip-j9ztlc-reco
-rd\install-record.txt --single-version-externally-managed --compile&quot; failed with error code 1 in c:\users\luofe\appdata\
-local\temp\pip-build-98jdcm\Twisted\
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;似乎是window平台对着个框架有些要求，太麻烦就不配置了，对于我的需求，用多线程自己抓取已经能够满足。&lt;/p&gt;
-
-&lt;h2 id=&quot;section-4&quot;&gt;8.注意&lt;/h2&gt;
-
-&lt;p&gt;空值：None&lt;br /&gt;
-空字符：NULL&lt;/p&gt;
-
-&lt;h2 id=&quot;section-5&quot;&gt;9.图像处理&lt;/h2&gt;
-
-&lt;p&gt;PIL库导入：from PIL import Image, ImageEnhance, ImageDraw,ImageChops&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;#打开
-img = Image.open(&quot;C:\\Users\\luofe\\Pictures\\12.jpg&quot;)
-#改变大小
-new_img = img.resize((128, 128), Image.BILINEAR) 
-#旋转
-rot_img = new_img.rotate(45)
-#显示
-img.show()
-#保存
-img.save(&quot;name&quot;,&quot;格式&quot;)
-#获取尺寸
-width, height = img.size  
-#绘图，单独开一个图层
-draw = ImageDraw.Draw(img)  
-draw.line( ( (0,0), (width-1, height-1)), fill=255)
-#各种效果
-color = ImageEnhance.Color(img)  
-color_img = color.enhance(3.0)
-
-sharpness = ImageEnhance.Sharpness(img)  
-sharp_img = sharpness.enhance(7.0)
-
-contrast = ImageEnhance.Contrast(img)  
-contrast_img = contrast.enhance(2.0)  
-
-brightness = ImageEnhance.Brightness(img)  
-bright_img = brightness.enhance(2.0) 
-
-#反相
-invert_img = ImageChops.invert(img)
-#混合模式，需要两张图
-#lighter_image = ImageChops.lighter(image1, image2)
-#darker_image = ImageChops.darker(image1, image2)
-#difference_image = ImageChops.difference(image1, image2) 
-#multiply_image = ImageChops.multiply(image1, image2)
-#screen_image = ImageChops.screen(image1, image2)  
-#add_image = ImageChops.add(img1, img2, scale, offset)    
-#subtract_image = ImageChops.subtract(img1, img2, scale, offset)
-
-#获取像素点
-point = img.getpixel((pXX,pYY))
-#设置像素点
-img.putpixel((pXX,pYY),point)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&quot;jupyter-notebook&quot;&gt;10.jupyter notebook&lt;/h2&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;Jupyter Notebook（此前被称为 IPython notebook）是一个交互式笔记本，支持运行 40 多种编程语言。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;通过pip install jupyter来安装，提示血少C++库&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;running install
-running build
-running build_py
-creating build
-creating build\lib.win32-2.7
-copying scandir.py -&amp;gt; build\lib.win32-2.7
-running build_ext
-building &#39;_scandir&#39; extension
-error: Microsoft Visual C++ 9.0 is required. Get it from http://aka.ms/vcpython27
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;下载VCForPython27.msi，安装，然后重试，安装成功&lt;/p&gt;
-
-&lt;p&gt;将命令路径添加到环境变量后在cmd窗口键入命令：jupyter notebook，启动会打开一个浏览器文本编辑器，在文本编辑器中可以直接执行代码并生成结果。&lt;/p&gt;
-
-&lt;h2 id=&quot;pythoncaffe&quot;&gt;11.Python与caffe结合&lt;/h2&gt;
-
-&lt;p&gt;下载的caffe是for window版本的，首先，解压，进入目录下Python文件夹中，查看requirement.txt文件夹，根据内容安装依赖&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;#和c语言沟通，可以将Python编译成c语言模块使用
-Cython&amp;gt;=0.19.2
-#Python的一种开源的数值计算扩展，有matlabd的一些功能
-numpy&amp;gt;=1.7.1
-#也是一种数字计算库
-scipy&amp;gt;=0.13.2
-#一组用于图像处理的算法的集合，是Python下的一种图形库
-scikit-image&amp;gt;=0.9.3
-#是一个 Python 的 2D绘图库，它以各种硬拷贝格式和跨平台的交互式环境生成出版质量级别的图形。有点类似MATLAB中的统计图。
-matplotlib&amp;gt;=1.3.1
-#一个 python 的交互式 shell，比默认的python shell 好用得多，支持变量自动补全，自动缩进，支持 bash shell 命令，内置了许多很有用的功能和函数。
-ipython&amp;gt;=3.0.0
-#HDF5持久化存储的Python版本
-h5py&amp;gt;=2.2.0
-#一个键值对数据库
-leveldb&amp;gt;=0.191
-#NetworkX是一个用Python语言开发的图论与复杂网络建模工具，内置了常用的图与复杂网络分析算法，可以方便的进行复杂网络数据分析、仿真建模等工作。
-networkx&amp;gt;=1.8.1
-#python测试框架
-nose&amp;gt;=1.3.0
-#Pandas是python的一个数据分析包
-pandas&amp;gt;=0.12.0
-#python时间处理工具类
-python-dateutil&amp;gt;=1.4,&amp;lt;2
-#将文件读取到内存，主要用来读取配置文件
-protobuf&amp;gt;=2.5.0
-#用来解析命令行参数的库
-python-gflags&amp;gt;=2.0
-#L是一个Python的YAML解析器
-pyyaml&amp;gt;=3.10
-#PIL图形库
-Pillow&amp;gt;=2.3.0
-#画图，数据分析的依赖库
-six&amp;gt;=1.1.0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;主要是通过&lt;strong&gt;pip install [soft_name]&lt;/strong&gt;，可以直接执行：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;pip install -r requirements.txt
-&lt;/code&gt;&lt;/pre&gt;
-
-</description>
-      </item>
-    
-      <item>
-        <title>Freemarker基本使用</title>
-        <link>http://www.liuschen.com/2017/04/20/Freemarker.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2017/04/20/Freemarker.html</guid>
-        <pubDate>Thu, 20 Apr 2017 00:00:00 +0800</pubDate>
-        <description>&lt;blockquote&gt;
-  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h2 id=&quot;freemarker&quot;&gt;Freemarker&lt;/h2&gt;
-
-&lt;p&gt;导入Freemarker的jar包&lt;/p&gt;
-
-&lt;h2 id=&quot;java&quot;&gt;生成Java代码&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code&gt;/**
- * 生成Java代码
- * */
-public static void generateJavaCode(){
-	
-
-	String templateFile = &quot;src/demo_java.ftl&quot;;
-	String targetFile = &quot;src/com/luofeng/Person.java&quot;;
-	
-	Map&amp;lt;String, Object&amp;gt; map = new HashMap&amp;lt;String, Object&amp;gt;();
-
-	map.put(&quot;packageName&quot;, &quot;com.luofeng&quot;);
-	map.put(&quot;className&quot;, &quot;Person&quot;);
-	map.put(&quot;author&quot;, &quot;luofeng&quot;);
-
-	
-    List&amp;lt;Attribute&amp;gt; attr_list = new ArrayList&amp;lt;Attribute&amp;gt;();
-    attr_list.add(new Attribute(&quot;id&quot;, &quot;Long&quot;));
-    attr_list.add(new Attribute(&quot;name&quot;, &quot;String&quot;));
-    attr_list.add(new Attribute(&quot;age&quot;, &quot;Integer&quot;));
-    attr_list.add(new Attribute(&quot;hobby&quot;, &quot;List&amp;lt;String&amp;gt;&quot;));
-
-    map.put(&quot;attrs&quot;, attr_list);
-    
-    Configuration configuration = new Configuration();
-	
-	try {
-		Template template = configuration.getTemplate(templateFile);
-		template.setEncoding(&quot;UTF-8&quot;);
-		Writer out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(targetFile), &quot;UTF-8&quot;));  
-        template.process(map, out);
-        out.flush();
-        out.close();
-	} catch (IOException e) {
-		e.printStackTrace();
-	} catch (TemplateException e) {
-		e.printStackTrace();
-	}
-    
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Java的ftl模板文件&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;package ${packageName};
-
-import java.util.List;
-
-/**
- *  @author ${author}
- */
-public class ${className} {
-    &amp;lt;#list attrs as attr&amp;gt; 
-    private ${attr.value!&quot;meizhi&quot;} ${attr.name};
-    &amp;lt;/#list&amp;gt;
-
-    &amp;lt;#list attrs as attr&amp;gt;
-    public void set${attr.name?cap_first}(${attr.value!&quot;meizhi&quot;} ${attr.name}){
-        this.${attr.name} = ${attr.name};
-    }
-    public ${attr.value!&quot;meizhi&quot;} get${attr.name?cap_first}(){
-        return this.${attr.name};
-    }
-
-    &amp;lt;/#list&amp;gt;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;其中&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;lt;h1&amp;gt;Welcome ${user!&quot;Anonymous&quot;}!&amp;lt;/h1&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;可以为替换的变量设置默认值，因为变量为空会直接崩溃掉&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;lt;#if user??&amp;gt;&amp;lt;h1&amp;gt;Welcome ${user}!&amp;lt;/h1&amp;gt;&amp;lt;/#if&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;可以判断变量是否存在，不存在的话会忽略掉整个代码段&lt;/p&gt;
-
-&lt;h2 id=&quot;html&quot;&gt;生成Html代码&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code&gt;/**
- * 生成Html代码
- * */
-public void generateHtmlCode(){
-	String templateFile = &quot;src/demo_html.ftl&quot;;
-	String targetFile = &quot;src/html.html&quot;;
-	
-	Map map = new HashMap&amp;lt;String, String&amp;gt;();
-	map.put(&quot;message&quot;, &quot;hello world&quot;);
-	map.put(&quot;name&quot;, &quot;java小强&quot;);
-	
-	Configuration configuration = new Configuration();
-	
-	try {
-		Template template = configuration.getTemplate(templateFile);
-		template.setEncoding(&quot;UTF-8&quot;);
-		Writer out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(targetFile), &quot;UTF-8&quot;));  
-        template.process(map, out);
-        out.flush();
-        out.close();
-	} catch (IOException e) {
-		e.printStackTrace();
-	} catch (TemplateException e) {
-		e.printStackTrace();
-	}
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;对应的ftl模板&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;lt;html&amp;gt;  
-  &amp;lt;head&amp;gt;  
-        &amp;lt;title&amp;gt;freemarker是什么&amp;lt;/title&amp;gt;  
-    &amp;lt;/head&amp;gt;  
-    &amp;lt;body&amp;gt;  
-        &amp;lt;h1&amp;gt;${message},${name}&amp;lt;/h1&amp;gt;  
-    &amp;lt;/body&amp;gt;  
-&amp;lt;/html&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;需要注意的是，在代码中我设置的编码格式是UTF-8,但是eclipse默认打开文件的编码格式可能是gbk,如果这个全局值不修改，直接打开生成的文件就会乱码，位置是在：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;window-&amp;gt;Preferences-&amp;gt;General-&amp;gt;Workspace-&amp;gt;Text file encoding
-&lt;/code&gt;&lt;/pre&gt;
-</description>
-      </item>
-    
-      <item>
-        <title>GIT配置</title>
-        <link>http://www.liuschen.com/2017/04/03/git2.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2017/04/03/git2.html</guid>
-        <pubDate>Mon, 03 Apr 2017 00:00:00 +0800</pubDate>
-        <description>&lt;blockquote&gt;
-  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;一直以来，用git和SVN都是懂得基本操作就行了，会克隆推送提交什么的，一直缺少一个全局性的把握，所以一旦设置出现问题就手足无措，即使知道了解决方法，不常用的知识往往也易于忘记。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;git的配置分为，局部，全局和系统，作用域不同&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;git config [&amp;lt;file-option&amp;gt;] [type] [-z|--null] name [value [value_regex]]
-git config [&amp;lt;file-option&amp;gt;] [type] --add name value
-git config [&amp;lt;file-option&amp;gt;] [type] --replace-all name value [value_regex]
-git config [&amp;lt;file-option&amp;gt;] [type] [-z|--null] --get name [value_regex]
-git config [&amp;lt;file-option&amp;gt;] [type] [-z|--null] --get-all name [value_regex]
-git config [&amp;lt;file-option&amp;gt;] [type] [-z|--null] --get-regexp name_regex [value_regex]
-git config [&amp;lt;file-option&amp;gt;] [type] [-z|--null] --get-urlmatch name URL
-git config [&amp;lt;file-option&amp;gt;] --unset name [value_regex]
-git config [&amp;lt;file-option&amp;gt;] --unset-all name [value_regex]
-git config [&amp;lt;file-option&amp;gt;] --rename-section old_name new_name
-git config [&amp;lt;file-option&amp;gt;] --remove-section name
-git config [&amp;lt;file-option&amp;gt;] [-z|--null] -l | --list
-git config [&amp;lt;file-option&amp;gt;] --get-color name [default]
-git config [&amp;lt;file-option&amp;gt;] --get-colorbool name [stdout-is-tty]
-git config [&amp;lt;file-option&amp;gt;] -e | --edit
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;其中&lt;file-option&gt;就是作用域&lt;/file-option&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt; --global              use global config file（全局）
---system              use system config file（系统）
---local               use repository config file（局部）
--f, --file &amp;lt;file&amp;gt;     use given config file（自定义）
---blob &amp;lt;blob-id&amp;gt;      read config from given blob object（自定义）
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&quot;section&quot;&gt;例子&lt;/h3&gt;
-
-&lt;p&gt;1.查看仓库配置&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;git config -l[-list]
-git config –-local -l
-git config –-global -l
-git config –-system -l
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;2.添加配置(键和值不可缺少)&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;git config –-local --add name value
-git config –-global --add name value
-git config –-system --add name value
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;3.修改配置&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;git config –-local  name value
-git config –-global  name value
-git config –-system  name value
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;4.删除配置&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;git config –-local  --unset name
-git config –-global  --unset name
-git config –-system  --unset name
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;有时候修改的时候会提示找不到修改项&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;error: key does not contain a section: –-global[local]
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;可能是文中”–“字符编码的问题，换一种再试&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;我系统上没有配置系统配置，但是按照一般套路应该是：&lt;br /&gt;
-&lt;strong&gt;系统配置&amp;gt;全局配置&amp;gt;局部配置&lt;/strong&gt;&lt;/p&gt;
-
-  &lt;p&gt;所以如果要在不同地址分别配置不同库地址，就不要再设置全局地址，否则会被覆盖（主要是针对图形化的客户端），也比较混乱&lt;/p&gt;
-&lt;/blockquote&gt;
-
-</description>
-      </item>
-    
-      <item>
-        <title>Android反编译smali文件的修改</title>
-        <link>http://www.liuschen.com/2017/03/31/smali.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2017/03/31/smali.html</guid>
-        <pubDate>Fri, 31 Mar 2017 00:00:00 +0800</pubDate>
-        <description>&lt;blockquote&gt;
-  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;之前提到过Android的反编译，知道了Android的apk反编译后依然是一个完整的项目。资源文件易于修改，不提了，这里主要记录一下smali文件的一些特性和修改方式。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;smali文件是Dalvik虚拟机的指令码，和汇编文件有点像。&lt;/p&gt;
-
-&lt;p&gt;进入到smali包下面,往往会发现诸如R$id.smali等R$*.smali格式的文件，这是自动生成的R文件，也就是资源映射文件，这些文件一旦编译好都是死的，没法变，所以不到万不得已不要smali码和资源文件一起添加，太麻烦。&lt;/p&gt;
-
-&lt;p&gt;包里面的smali文件都是一个名字可以对应多个文件，这是将写在Java中的内部类拆分的结果。后面用${数字}来区分，也可以是${数字}${数字}表示内部类的内部类，只不过这样增加代码复杂度的写法不多见而已。&lt;/p&gt;
-
-&lt;p&gt;然后就可以修改smali码了，需要注意两点:&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;了解指令码的含义（&lt;a href=&quot;http://pallergabor.uw.hu/androidblog/dalvik_opcodes.html&quot;&gt;Dalvik操作指令&lt;/a&gt;）&lt;/li&gt;
-  &lt;li&gt;注意代码中的汉字字符会转成Unicode码，所以添加需要将汉字字符会转成Unicode码(&lt;a href=&quot;http://www.cnblogs.com/mq0036/p/4007452.html&quot;&gt;如何转&lt;/a&gt;)&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;这里我主要修改一个Handler的内部，它的头如下，这也是所有内部类的共性&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;.class L该文件的完整路径名;
-.super Landroid/os/Handler(父类);
-.source &quot;原始从属的Java类.java&quot;
-
-# annotations
-.annotation system Ldalvik/annotation/EnclosingClass;
-    value = L该文件原始从属的Java类的完整路径名(在哪个类里面定义就是那个类);
-.end annotation
-
-.annotation system Ldalvik/annotation/InnerClass;
-    accessFlags = 0x0
-    name = null
-.end annotation
-
-# instance fields
-.field final synthetic this$0:L该文件原始从属的Java类的完整路径名;
-
-# direct methods
-.method constructor &amp;lt;init&amp;gt;(L该文件原始从属的Java类的完整路径名;)V
-.locals 0
-
-.prologue
-.line 1
-iput-object p1, p0, L该文件的完整路径名;-&amp;gt;this$0:L该文件原始从属的Java类的完整路径名;
-
-.line 278
-invoke-direct {p0}, Landroid/os/Handler;-&amp;gt;&amp;lt;init&amp;gt;()V
-
-return-void
-.end method
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;可能单看没什么用，还是不能理解，就需要自己写些例子，生成apk反编译对比看看，就会发现规律&lt;/p&gt;
-
-&lt;p&gt;.field故名思议就是变量，而且一般是全局的&lt;/p&gt;
-
-&lt;p&gt;.method和end method之间是方法体，.method constructor &lt;init&gt;表示是该handler内部类的构造方法&lt;/init&gt;&lt;/p&gt;
-
-&lt;p&gt;一个字符串常量v2:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;const-string v2, &quot;SOMETHING&quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;新建一个对象并存到v4:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;new-instance v4, L对象完整路径
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;调用方法(这个是要结果的):&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;invoke-virtual {v1, v2}, Ljava/lang/String;-&amp;gt;equals(Ljava/lang/Object;)Z
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;调用方法后将结果保存到v2:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;move-result-object v2
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;调用方法(这个不要结果，是用来初始化v4这个内部类对象的，v6存储的是默认内部类所属外部类对象，v2存储的是外部类的一个final修饰的参数，都不是正经传入的参数，是编译器处理的结果)&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;invoke-direct {v4, v6, v2}, Lv4存储的实例对应的类的路径;-&amp;gt;&amp;lt;init&amp;gt;(Lv6存储的实例对应的类的路径;Ljava/lang/String;)V
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;重新打包时经常有错误报v数字不在v1-v15范围内(&lt;a href=&quot;http://www.aichengxu.com/other/2553264.htm&quot;&gt;reason&lt;/a&gt;)，又因为v可以反复使用，所以这个应该是如汇编一样是对寄存器的操作，v1-v15表示寄存器，所以只要明白了类是如何取到的，其他的就好理解了。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;if结构：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;if-eqz v1, :cond_1
-.
-.
-:cond_1
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;外部的final定义的对象，内部类是如何取到实例的？首先做如下定义:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;.local v2, &quot;对象名(在Java中自己起的)&quot;:Ljava/lang/String;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;然后用上面的invoke-direct方法将v2塞进去,然后再内部类中的构造方法里就会有：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;iput-object p2, p0, L该类完整路径名;-&amp;gt;val$对象名:Ljava/lang/String;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;在具体方法中会通过&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;iget-object v2, p0, L该类完整路径名;-&amp;gt;val$对象名:Ljava/lang/String;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;得到该值，即存储在v2中&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;我是通过查找字符串来定位修改的大致位置的，然后通过if结构的关键字cond来确定最终的修改坐标，比较粗浅，因为关于smali文件我还有许多不明白的地方，日后再有需要再去详细了解。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;还有一点，我发现.line {数字}这种似乎只是记录行号，具体作用不明，随便添加删除也看不出影响，所以修改代码时不用考虑就好。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-</description>
-      </item>
-    
-      <item>
-        <title>Bootstrap</title>
-        <link>http://www.liuschen.com/2017/03/28/Bootstrap.html</link>
-        <guid isPermaLink="true">http://www.liuschen.com/2017/03/28/Bootstrap.html</guid>
-        <pubDate>Tue, 28 Mar 2017 00:00:00 +0800</pubDate>
-        <description>&lt;blockquote&gt;
-  &lt;p&gt;文章链接:&lt;a href=&quot;http://www.liuschen.com&quot;&gt;http://www.liuschen.com&lt;/a&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;&lt;a href=&quot;http://v3.bootcss.com/getting-started/#download&quot;&gt;参考bootstrap起步文档&lt;/a&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;bootstrap&quot;&gt;下载bootstrap并解压&lt;/h2&gt;
-
-&lt;h2 id=&quot;grunt&quot;&gt;安装编译系统Grunt&lt;/h2&gt;
-
-&lt;p&gt;首先下载并安装 node.js，之前安装cordova时安装过了，省略。&lt;/p&gt;
-
-&lt;p&gt;按装grunt-cli ：&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;npm install -g grunt-cli
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;进入 /bootstrap/ 根目录，然后执行 npm install 命令。npm 将读取 package.json 文件并自动安装此文件中列出的所有被依赖的扩展包。&lt;/p&gt;
-
-&lt;p&gt;如果在安装依赖包或者运行 Grunt 命令时遇到了问题，请首先删除 npm 自动生成的 /node_modules/ 目录，然后，再次运行 npm install 命令（这一步需要翻墙不然会有如下错误）。&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;npm ERR! Windows_NT 10.0.14393
-npm ERR! argv &quot;F:\\programer2\\nodejs\\node.exe&quot; &quot;F:\\programer2\\nodejs\\node_modules\\npm\\bin\\npm-cli.js&quot; &quot;install&quot;
-npm ERR! node v6.10.0
-npm ERR! npm  v3.10.10
-npm ERR! code ELIFECYCLE
-
-npm ERR! phantomjs@1.9.20 install: `node install.js`
-npm ERR! Exit status 1
-npm ERR!
-npm ERR! Failed at the phantomjs@1.9.20 install script &#39;node install.js&#39;.
-npm ERR! Make sure you have the latest version of node.js and npm installed.
-npm ERR! If you do, this is most likely a problem with the phantomjs package,
-npm ERR! not with npm itself.
-npm ERR! Tell the author that this fails on your system:
-npm ERR!     node install.js
-npm ERR! You can get information on how to open an issue for this project with:
-npm ERR!     npm bugs phantomjs
-npm ERR! Or if that isn&#39;t available, you can get their info via:
-npm ERR!     npm owner ls phantomjs
-npm ERR! There is likely additional logging output above.
-
-npm ERR! Please include the following file with any support request:
-npm ERR!     F:\programer2\bootstrap\bootstrap-3.3.7\npm-debug.log
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;grunt命令运行却没问题&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;grunt dist （仅编译 CSS 和 JavaScript 文件）
-grunt watch （监测文件的改变，并运行指定的 Grunt 任务）
-grunt test （运行测试用例）
-grunt docs （编译并测试文档中的资源文件）
-grunt （重新构建所有内容并运行测试用例）
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;可以编译javascript和css,文件夹下dest文件夹为生成的直接可以在生产环境中使用的js和css代码&lt;/p&gt;
-
-&lt;p&gt;当然，这个dest文件夹里面的内容也可以直接在官网上下载。&lt;/p&gt;
-
-&lt;h2 id=&quot;bootstrap-1&quot;&gt;bootstrap基本模板&lt;/h2&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;lt;!DOCTYPE html&amp;gt;
-&amp;lt;html lang=&quot;zh-CN&quot;&amp;gt;
-  &amp;lt;head&amp;gt;
-    &amp;lt;meta charset=&quot;utf-8&quot;&amp;gt;
-    &amp;lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&amp;gt;
-    &amp;lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&amp;gt;
-    &amp;lt;!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ --&amp;gt;
-    &amp;lt;title&amp;gt;Bootstrap 101 Template&amp;lt;/title&amp;gt;
-
-    &amp;lt;!-- Bootstrap --&amp;gt;
-    &amp;lt;link href=&quot;css/bootstrap.min.css&quot; rel=&quot;stylesheet&quot;&amp;gt;
-
-    &amp;lt;!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries --&amp;gt;
-    &amp;lt;!-- WARNING: Respond.js doesn&#39;t work if you view the page via file:// --&amp;gt;
-    &amp;lt;!--[if lt IE 9]&amp;gt;
-      &amp;lt;script src=&quot;https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js&quot;&amp;gt;&amp;lt;/script&amp;gt;
-      &amp;lt;script src=&quot;https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js&quot;&amp;gt;&amp;lt;/script&amp;gt;
-    &amp;lt;![endif]--&amp;gt;
-  &amp;lt;/head&amp;gt;
-  &amp;lt;body&amp;gt;
-
-    &amp;lt;!-- jQuery (necessary for Bootstrap&#39;s JavaScript plugins) --&amp;gt;
-    &amp;lt;script src=&quot;js/jquery-3.2.0.min.js&quot;&amp;gt;&amp;lt;/script&amp;gt;
-    &amp;lt;!-- Include all compiled plugins (below), or include individual files as needed --&amp;gt;
-    &amp;lt;script src=&quot;js/bootstrap.min.js&quot;&amp;gt;&amp;lt;/script&amp;gt;
-  &amp;lt;/body&amp;gt;
-&amp;lt;/html&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&quot;bootstrap-2&quot;&gt;bootstrap控件实例学习&lt;/h2&gt;
-
-&lt;p&gt;&lt;a href=&quot;http://v3.bootcss.com/components/&quot;&gt;参考中文文档&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;学习最方便的途径就是做自己的东西，所以我这里写一个介绍某某平台产品的页面&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;../../../html5/bootstrap.html&quot;&gt;例子URL&lt;/a&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;bootstrap-3&quot;&gt;为什么需要编译bootstrap&lt;/h2&gt;
-
-&lt;p&gt;我们知道，js和css和Java代码不同是不需要编译的，但是bootstrap的编译主要是为了生成javascript和css代码；存储bootstrap样式的代码主要写在less中，通过编译可以生成对应的css代码，从而使更改样式变得简单。&lt;/p&gt;
 </description>
       </item>
     
